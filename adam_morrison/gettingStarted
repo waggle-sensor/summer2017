@@ -1,0 +1,414 @@
+Script started on Fri Jul 28 16:15:30 2017
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# cd  cp send-node-metrics.service /etc/system/systemdm[1@d/systemd 
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# [Kcp start-web-app.;ser    service  /etc/systemd. /system
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# [Kpython  3 sendDay ta.py
+Traceback (most recent call last):
+  File "sendData.py", line 2, in <module>
+    import pika
+ImportError: No module named 'pika'
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# s sudo apt-get install python-pika
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... 96%Building dependency tree       
+Reading state information... 0%Reading state information... 0%Reading state information... Done
+The following additional packages will be installed:
+  libpython-stdlib libpython2.7-minimal libpython2.7-stdlib python python-minimal python2.7 python2.7-minimal
+Suggested packages:
+  python-doc python-tk python-pika-doc python2.7-doc binfmt-support
+The following NEW packages will be installed:
+  libpython-stdlib libpython2.7-minimal libpython2.7-stdlib python python-minimal python-pika python2.7
+  python2.7-minimal
+0 upgraded, 8 newly installed, 0 to remove and 84 not upgraded.
+Need to get 3760 kB of archives.
+After this operation, 15.5 MB of additional disk space will be used.
+Do you want to continue? [Y/n] y
+0% [Working]            Get:1 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf libpython2.7-minimal armhf 2.7.12-1ubuntu0~16.04.1 [338 kB]
+0% [1 libpython2.7-minimal 0 B/338 kB 0%]5% [1 libpython2.7-minimal 229 kB/338 kB 68%]                                             10% [Working]             Get:2 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf python2.7-minimal armhf 2.7.12-1ubuntu0~16.04.1 [1114 kB]
+10% [2 python2.7-minimal 0 B/1114 kB 0%]                                        36% [Working]             Get:3 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-minimal armhf 2.7.11-1 [28.2 kB]
+36% [3 python-minimal 0 B/28.2 kB 0%]                                     39% [Working]             Get:4 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf libpython2.7-stdlib armhf 2.7.12-1ubuntu0~16.04.1 [1838 kB]
+39% [4 libpython2.7-stdlib 0 B/1838 kB 0%]68% [4 libpython2.7-stdlib 1376 kB/1838 kB 75%]                                               81% [Working]             Get:5 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf python2.7 armhf 2.7.12-1ubuntu0~16.04.1 [224 kB]
+81% [5 python2.7 0 B/224 kB 0%]                               88% [Working]             Get:6 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf libpython-stdlib armhf 2.7.11-1 [7640 B]
+88% [6 libpython-stdlib 0 B/7640 B 0%]                                      91% [Working]             Get:7 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python armhf 2.7.11-1 [137 kB]
+91% [7 python 0 B/137 kB 0%]                            96% [Working]             Get:8 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-pika all 0.10.0-1 [73.0 kB]
+96% [8 python-pika 0 B/73.0 kB 0%]                                  100% [Working]              Fetched 3760 kB in 2s (1862 kB/s)
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_MESSAGES to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
+Selecting previously unselected package libpython2.7-minimal:armhf.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 24391 files and directories currently installed.)
+Preparing to unpack .../libpython2.7-minimal_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking libpython2.7-minimal:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package python2.7-minimal.
+Preparing to unpack .../python2.7-minimal_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking python2.7-minimal (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package python-minimal.
+Preparing to unpack .../python-minimal_2.7.11-1_armhf.deb ...
+Unpacking python-minimal (2.7.11-1) ...
+Selecting previously unselected package libpython2.7-stdlib:armhf.
+Preparing to unpack .../libpython2.7-stdlib_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking libpython2.7-stdlib:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package python2.7.
+Preparing to unpack .../python2.7_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking python2.7 (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package libpython-stdlib:armhf.
+Preparing to unpack .../libpython-stdlib_2.7.11-1_armhf.deb ...
+Unpacking libpython-stdlib:armhf (2.7.11-1) ...
+Processing triggers for man-db (2.7.5-1) ...
+Processing triggers for mime-support (3.59ubuntu1) ...
+Setting up libpython2.7-minimal:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Setting up python2.7-minimal (2.7.12-1ubuntu0~16.04.1) ...
+Linking and byte-compiling packages for runtime python2.7...
+Setting up python-minimal (2.7.11-1) ...
+Selecting previously unselected package python.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25140 files and directories currently installed.)
+Preparing to unpack .../python_2.7.11-1_armhf.deb ...
+Unpacking python (2.7.11-1) ...
+Selecting previously unselected package python-pika.
+Preparing to unpack .../python-pika_0.10.0-1_all.deb ...
+Unpacking python-pika (0.10.0-1) ...
+Processing triggers for man-db (2.7.5-1) ...
+Setting up libpython2.7-stdlib:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Setting up python2.7 (2.7.12-1ubuntu0~16.04.1) ...
+Setting up libpython-stdlib:armhf (2.7.11-1) ...
+Setting up python (2.7.11-1) ...
+Setting up python-pika (0.10.0-1) ...
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# sudo apt-get install python-pika[13Ppython3 sendData.pyn3[1P sendData.py
+Traceback (most recent call last):
+  File "sendData.py", line 4, in <module>
+    import requests
+ImportError: No module named requests
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# sudo apt-get install requests  ts
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... 93%Building dependency tree       
+Reading state information... 0%Reading state information... 0%Reading state information... Done
+E: Unable to locate package requests
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# sudo apt-get install requests        pyto hon-requests
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... 96%Building dependency tree       
+Reading state information... 0%Reading state information... 0%Reading state information... Done
+The following additional packages will be installed:
+  python-cffi-backend python-chardet python-cryptography python-enum34 python-idna python-ipaddress
+  python-ndg-httpsclient python-openssl python-pkg-resources python-pyasn1 python-six python-urllib3
+Suggested packages:
+  python-cryptography-doc python-cryptography-vectors python-enum34-doc python-openssl-doc python-openssl-dbg
+  python-setuptools doc-base python-ntlm
+The following NEW packages will be installed:
+  python-cffi-backend python-chardet python-cryptography python-enum34 python-idna python-ipaddress
+  python-ndg-httpsclient python-openssl python-pkg-resources python-pyasn1 python-requests python-six python-urllib3
+0 upgraded, 13 newly installed, 0 to remove and 84 not upgraded.
+Need to get 791 kB of archives.
+After this operation, 4380 kB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+0% [Working]            Get:1 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-cffi-backend armhf 1.5.2-1ubuntu1 [50.4 kB]
+0% [1 python-cffi-backend 0 B/50.4 kB 0%]                                         7% [Working]            Get:2 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-pkg-resources all 20.7.0-1 [108 kB]
+7% [2 python-pkg-resources 0 B/108 kB 0%]                                         19% [Working]             Get:3 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-chardet all 2.3.0-2 [96.3 kB]
+19% [3 python-chardet 0 B/96.3 kB 0%]                                     30% [Working]             Get:4 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-enum34 all 1.1.2-1 [35.8 kB]
+30% [4 python-enum34 0 B/35.8 kB 0%]                                    36% [Working]             Get:5 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-idna all 2.0-3 [35.1 kB]
+36% [5 python-idna 0 B/35.1 kB 0%]                                  41% [Working]             Get:6 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-ipaddress all 1.0.16-1 [18.0 kB]
+41% [6 python-ipaddress 0 B/18.0 kB 0%]                                       44% [Working]             Get:7 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-pyasn1 all 0.1.9-1 [45.1 kB]
+44% [7 python-pyasn1 0 B/45.1 kB 0%]                                    50% [Working]             Get:8 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-six all 1.10.0-3 [10.9 kB]
+50% [8 python-six 0 B/10.9 kB 0%]                                 53% [Working]             Get:9 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf python-cryptography armhf 1.2.3-1ubuntu0.1 [169 kB]
+53% [9 python-cryptography 0 B/169 kB 0%]                                         71% [Working]             Get:10 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-openssl all 0.15.1-2build1 [84.1 kB]
+71% [10 python-openssl 0 B/84.1 kB 0%]                                      81% [Working]             Get:11 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-ndg-httpsclient all 0.4.0-3 [25.1 kB]
+81% [11 python-ndg-httpsclient 0 B/25.1 kB 0%]                                              86% [Working]             Get:12 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf python-urllib3 all 1.13.1-2ubuntu0.16.04.1 [57.2 kB]
+86% [12 python-urllib3 0 B/57.2 kB 0%]                                      93% [Working]             Get:13 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-requests all 2.9.1-3 [55.6 kB]
+93% [13 python-requests 0 B/55.6 kB 0%]                                       100% [Working]              Fetched 791 kB in 1s (782 kB/s)
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_MESSAGES to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
+Selecting previously unselected package python-cffi-backend.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25228 files and directories currently installed.)
+Preparing to unpack .../python-cffi-backend_1.5.2-1ubuntu1_armhf.deb ...
+Unpacking python-cffi-backend (1.5.2-1ubuntu1) ...
+Selecting previously unselected package python-pkg-resources.
+Preparing to unpack .../python-pkg-resources_20.7.0-1_all.deb ...
+Unpacking python-pkg-resources (20.7.0-1) ...
+Selecting previously unselected package python-chardet.
+Preparing to unpack .../python-chardet_2.3.0-2_all.deb ...
+Unpacking python-chardet (2.3.0-2) ...
+Selecting previously unselected package python-enum34.
+Preparing to unpack .../python-enum34_1.1.2-1_all.deb ...
+Unpacking python-enum34 (1.1.2-1) ...
+Selecting previously unselected package python-idna.
+Preparing to unpack .../python-idna_2.0-3_all.deb ...
+Unpacking python-idna (2.0-3) ...
+Selecting previously unselected package python-ipaddress.
+Preparing to unpack .../python-ipaddress_1.0.16-1_all.deb ...
+Unpacking python-ipaddress (1.0.16-1) ...
+Selecting previously unselected package python-pyasn1.
+Preparing to unpack .../python-pyasn1_0.1.9-1_all.deb ...
+Unpacking python-pyasn1 (0.1.9-1) ...
+Selecting previously unselected package python-six.
+Preparing to unpack .../python-six_1.10.0-3_all.deb ...
+Unpacking python-six (1.10.0-3) ...
+Selecting previously unselected package python-cryptography.
+Preparing to unpack .../python-cryptography_1.2.3-1ubuntu0.1_armhf.deb ...
+Unpacking python-cryptography (1.2.3-1ubuntu0.1) ...
+Selecting previously unselected package python-openssl.
+Preparing to unpack .../python-openssl_0.15.1-2build1_all.deb ...
+Unpacking python-openssl (0.15.1-2build1) ...
+Selecting previously unselected package python-ndg-httpsclient.
+Preparing to unpack .../python-ndg-httpsclient_0.4.0-3_all.deb ...
+Unpacking python-ndg-httpsclient (0.4.0-3) ...
+Selecting previously unselected package python-urllib3.
+Preparing to unpack .../python-urllib3_1.13.1-2ubuntu0.16.04.1_all.deb ...
+Unpacking python-urllib3 (1.13.1-2ubuntu0.16.04.1) ...
+Selecting previously unselected package python-requests.
+Preparing to unpack .../python-requests_2.9.1-3_all.deb ...
+Unpacking python-requests (2.9.1-3) ...
+Processing triggers for man-db (2.7.5-1) ...
+Setting up python-cffi-backend (1.5.2-1ubuntu1) ...
+Setting up python-pkg-resources (20.7.0-1) ...
+Setting up python-chardet (2.3.0-2) ...
+Setting up python-enum34 (1.1.2-1) ...
+Setting up python-idna (2.0-3) ...
+Setting up python-ipaddress (1.0.16-1) ...
+Setting up python-pyasn1 (0.1.9-1) ...
+Setting up python-six (1.10.0-3) ...
+Setting up python-cryptography (1.2.3-1ubuntu0.1) ...
+Setting up python-openssl (0.15.1-2build1) ...
+Setting up python-ndg-httpsclient (0.4.0-3) ...
+Setting up python-urllib3 (1.13.1-2ubuntu0.16.04.1) ...
+Setting up python-requests (2.9.1-3) ...
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# [Ksudo apt-get install python-requests[7Prequests[11Ppython sendData.py
+Traceback (most recent call last):
+  File "sendData.py", line 7, in <module>
+    from metrics import sendMetrics, getGeneralInfo
+  File "/root/waggleWebAPI/metrics.py", line 1, in <module>
+    from dateutil.parser import parse
+ImportError: No module named dateutil.parser
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# sudo      apt-get install python-dateutil
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... 95%Building dependency tree       
+Reading state information... 0%Reading state information... 0%Reading state information... Done
+The following NEW packages will be installed:
+  python-dateutil
+0 upgraded, 1 newly installed, 0 to remove and 84 not upgraded.
+Need to get 42.5 kB of archives.
+After this operation, 205 kB of additional disk space will be used.
+0% [Working]            Get:1 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-dateutil all 2.4.2-1 [42.5 kB]
+0% [1 python-dateutil 0 B/42.5 kB 0%]                                     100% [Working]              Fetched 42.5 kB in 0s (134 kB/s)
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_MESSAGES to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
+Selecting previously unselected package python-dateutil.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25627 files and directories currently installed.)
+Preparing to unpack .../python-dateutil_2.4.2-1_all.deb ...
+Unpacking python-dateutil (2.4.2-1) ...
+Setting up python-dateutil (2.4.2-1) ...
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# apt-get install python-dateutil[13Ppython sendData.py
+Traceback (most recent call last):
+  File "sendData.py", line 7, in <module>
+    from metrics import sendMetrics, getGeneralInfo
+  File "/root/waggleWebAPI/metrics.py", line 8, in <module>
+    import pytz
+ImportError: No module named pytz
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# sudo   apt-get install python-pytz
+bash: sapt-get: command not found
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# sapt-get install python-pytz[1P
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... 96%Building dependency tree       
+Reading state information... 0%Reading state information... 0%Reading state information... Done
+E: Unable to locate package python-pytz
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# apt-get install python-pytz        hon-pip
+Reading package lists... 0%Reading package lists... 100%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... 93%Building dependency tree       
+Reading state information... 0%Reading state information... 0%Reading state information... Done
+The following additional packages will be installed:
+  libexpat1 libexpat1-dev libpython-all-dev libpython-dev libpython2.7 libpython2.7-dev python-all python-all-dev
+  python-dev python-pip-whl python-setuptools python-wheel python2.7-dev
+Suggested packages:
+  python-setuptools-doc
+The following NEW packages will be installed:
+  libexpat1-dev libpython-all-dev libpython-dev libpython2.7 libpython2.7-dev python-all python-all-dev python-dev
+  python-pip python-pip-whl python-setuptools python-wheel python2.7-dev
+The following packages will be upgraded:
+  libexpat1
+1 upgraded, 13 newly installed, 0 to remove and 83 not upgraded.
+Need to get 30.0 MB of archives.
+After this operation, 40.8 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+0% [Working]            Get:1 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf libexpat1 armhf 2.1.0-7ubuntu0.16.04.3 [53.0 kB]
+0% [1 libexpat1 0 B/53.0 kB 0%]                               2% [Working]            Get:2 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf libexpat1-dev armhf 2.1.0-7ubuntu0.16.04.3 [104 kB]
+2% [2 libexpat1-dev 0 B/104 kB 0%]                                  3% [Working]            Get:3 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf libpython2.7 armhf 2.7.12-1ubuntu0~16.04.1 [936 kB]
+3% [3 libpython2.7 0 B/936 kB 0%]5% [3 libpython2.7 765 kB/936 kB 82%]                                     7% [Working]            Get:4 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf libpython2.7-dev armhf 2.7.12-1ubuntu0~16.04.1 [27.2 MB]
+7% [4 libpython2.7-dev 0 B/27.2 MB 0%]11% [4 libpython2.7-dev 1303 kB/27.2 MB 5%]16% [4 libpython2.7-dev 3174 kB/27.2 MB 12%]22% [4 libpython2.7-dev 5560 kB/27.2 MB 20%]30% [4 libpython2.7-dev 8479 kB/27.2 MB 31%]39% [4 libpython2.7-dev 11.9 MB/27.2 MB 44%]51% [4 libpython2.7-dev 16.4 MB/27.2 MB 60%]66% [4 libpython2.7-dev 22.0 MB/27.2 MB 81%]76% [4 libpython2.7-dev 25.8 MB/27.2 MB 95%]80% [4 libpython2.7-dev 27.2 MB/27.2 MB 100%]80% [4 libpython2.7-dev 27.2 MB/27.2 MB 100%]                                                              4621 kB/s 0s80% [4 libpython2.7-dev 27.2 MB/27.2 MB 100%]                                                              4621 kB/s 0s80% [4 libpython2.7-dev 27.2 MB/27.2 MB 100%]                                                              4621 kB/s 0s81% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:5 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf libpython-dev armhf 2.7.11-1 [7710 B]
+81% [5 libpython-dev 0 B/7710 B 0%]                                                                        4621 kB/s 0s82% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:6 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf libpython-all-dev armhf 2.7.11-1 [996 B]
+82% [6 libpython-all-dev 0 B/996 B 0%]                                                                     4621 kB/s 0s84% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:7 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-all armhf 2.7.11-1 [982 B]
+84% [7 python-all 0 B/982 B 0%]                                                                            4621 kB/s 0s85% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:8 http://ports.ubuntu.com/ubuntu-ports xenial-updates/main armhf python2.7-dev armhf 2.7.12-1ubuntu0~16.04.1 [276 kB]
+85% [8 python2.7-dev 0 B/276 kB 0%]                                                                        4621 kB/s 0s88% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:9 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-dev armhf 2.7.11-1 [1174 B]
+88% [9 python-dev 0 B/1174 B 0%]                                                                           4621 kB/s 0s89% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:10 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-all-dev armhf 2.7.11-1 [1004 B]
+89% [10 python-all-dev 0 B/1004 B 0%]                                                                      4621 kB/s 0s90% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:11 http://ports.ubuntu.com/ubuntu-ports xenial-updates/universe armhf python-pip-whl all 8.1.1-2ubuntu0.4 [1110 kB]
+90% [11 python-pip-whl 0 B/1110 kB 0%]                                                                     4621 kB/s 0s95% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:12 http://ports.ubuntu.com/ubuntu-ports xenial-updates/universe armhf python-pip all 8.1.1-2ubuntu0.4 [144 kB]
+95% [12 python-pip 0 B/144 kB 0%]                                                                          4621 kB/s 0s95% [12 python-pip 144 kB/144 kB 100%]                                                                     4621 kB/s 0s95% [12 python-pip 144 kB/144 kB 100%]                                                                     4621 kB/s 0s95% [12 python-pip 144 kB/144 kB 100%]                                                                     4621 kB/s 0s97% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:13 http://ports.ubuntu.com/ubuntu-ports xenial/main armhf python-setuptools all 20.7.0-1 [169 kB]
+97% [13 python-setuptools 0 B/169 kB 0%]                                                                   4621 kB/s 0s98% [Working]                                                                                              4621 kB/s 0s                                                                                                                       Get:14 http://ports.ubuntu.com/ubuntu-ports xenial/universe armhf python-wheel all 0.29.0-1 [48.0 kB]
+98% [14 python-wheel 0 B/48.0 kB 0%]                                                                       4621 kB/s 0s100% [Working]                                                                                             4621 kB/s 0s                                                                                                                       Fetched 30.0 MB in 9s (3317 kB/s)
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LANG = "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+locale: Cannot set LC_CTYPE to default locale: No such file or directory
+locale: Cannot set LC_MESSAGES to default locale: No such file or directory
+locale: Cannot set LC_ALL to default locale: No such file or directory
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 25647 files and directories currently installed.)
+Preparing to unpack .../libexpat1_2.1.0-7ubuntu0.16.04.3_armhf.deb ...
+Unpacking libexpat1:armhf (2.1.0-7ubuntu0.16.04.3) over (2.1.0-7ubuntu0.16.04.2) ...
+Selecting previously unselected package libexpat1-dev:armhf.
+Preparing to unpack .../libexpat1-dev_2.1.0-7ubuntu0.16.04.3_armhf.deb ...
+Unpacking libexpat1-dev:armhf (2.1.0-7ubuntu0.16.04.3) ...
+Selecting previously unselected package libpython2.7:armhf.
+Preparing to unpack .../libpython2.7_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking libpython2.7:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package libpython2.7-dev:armhf.
+Preparing to unpack .../libpython2.7-dev_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking libpython2.7-dev:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package libpython-dev:armhf.
+Preparing to unpack .../libpython-dev_2.7.11-1_armhf.deb ...
+Unpacking libpython-dev:armhf (2.7.11-1) ...
+Selecting previously unselected package libpython-all-dev:armhf.
+Preparing to unpack .../libpython-all-dev_2.7.11-1_armhf.deb ...
+Unpacking libpython-all-dev:armhf (2.7.11-1) ...
+Selecting previously unselected package python-all.
+Preparing to unpack .../python-all_2.7.11-1_armhf.deb ...
+Unpacking python-all (2.7.11-1) ...
+Selecting previously unselected package python2.7-dev.
+Preparing to unpack .../python2.7-dev_2.7.12-1ubuntu0~16.04.1_armhf.deb ...
+Unpacking python2.7-dev (2.7.12-1ubuntu0~16.04.1) ...
+Selecting previously unselected package python-dev.
+Preparing to unpack .../python-dev_2.7.11-1_armhf.deb ...
+Unpacking python-dev (2.7.11-1) ...
+Selecting previously unselected package python-all-dev.
+Preparing to unpack .../python-all-dev_2.7.11-1_armhf.deb ...
+Unpacking python-all-dev (2.7.11-1) ...
+Selecting previously unselected package python-pip-whl.
+Preparing to unpack .../python-pip-whl_8.1.1-2ubuntu0.4_all.deb ...
+Unpacking python-pip-whl (8.1.1-2ubuntu0.4) ...
+Selecting previously unselected package python-pip.
+Preparing to unpack .../python-pip_8.1.1-2ubuntu0.4_all.deb ...
+Unpacking python-pip (8.1.1-2ubuntu0.4) ...
+Selecting previously unselected package python-setuptools.
+Preparing to unpack .../python-setuptools_20.7.0-1_all.deb ...
+Unpacking python-setuptools (20.7.0-1) ...
+Selecting previously unselected package python-wheel.
+Preparing to unpack .../python-wheel_0.29.0-1_all.deb ...
+Unpacking python-wheel (0.29.0-1) ...
+Processing triggers for libc-bin (2.23-0ubuntu5) ...
+Processing triggers for man-db (2.7.5-1) ...
+Setting up libexpat1:armhf (2.1.0-7ubuntu0.16.04.3) ...
+Setting up libexpat1-dev:armhf (2.1.0-7ubuntu0.16.04.3) ...
+Setting up libpython2.7:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Setting up libpython2.7-dev:armhf (2.7.12-1ubuntu0~16.04.1) ...
+Setting up libpython-dev:armhf (2.7.11-1) ...
+Setting up libpython-all-dev:armhf (2.7.11-1) ...
+Setting up python-all (2.7.11-1) ...
+Setting up python2.7-dev (2.7.12-1ubuntu0~16.04.1) ...
+Setting up python-dev (2.7.11-1) ...
+Setting up python-all-dev (2.7.11-1) ...
+Setting up python-pip-whl (8.1.1-2ubuntu0.4) ...
+Setting up python-pip (8.1.1-2ubuntu0.4) ...
+Setting up python-setuptools (20.7.0-1) ...
+Setting up python-wheel (0.29.0-1) ...
+Processing triggers for libc-bin (2.23-0ubuntu5) ...
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# apt-get install python-pipytz[1@sapt-get install python-pytz[1Papt-get install python-pytz[1Pip[Kpip install pytz
+Traceback (most recent call last):
+  File "/usr/bin/pip", line 11, in <module>
+    sys.exit(main())
+  File "/usr/lib/python2.7/dist-packages/pip/__init__.py", line 215, in main
+    locale.setlocale(locale.LC_ALL, '')
+  File "/usr/lib/python2.7/locale.py", line 581, in setlocale
+    return _setlocale(category, locale)
+locale.Error: unsupported locale setting
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# pip install pytzapt-get install python-pipytz[1@sapt-get install python-pytz[10Ppython sendData.pyapt-get install python-dateutil[13Ppython sendData.py
+Traceback (most recent call last):
+  File "sendData.py", line 35, in <module>
+    connection = pika.BlockingConnection(params)
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/blocking_connection.py", line 337, in __init__
+    stop_ioloop_on_close=False)
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/select_connection.py", line 76, in __init__
+    stop_ioloop_on_close)
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/base_connection.py", line 80, in __init__
+    on_close_callback)
+  File "/usr/lib/python2.7/dist-packages/pika/connection.py", line 613, in __init__
+    self.connect()
+  File "/usr/lib/python2.7/dist-packages/pika/connection.py", line 745, in connect
+    error = self._adapter_connect()
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/select_connection.py", line 85, in _adapter_connect
+    error = super(SelectConnection, self)._adapter_connect()
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/base_connection.py", line 139, in _adapter_connect
+    error = self._create_and_connect_to_socket(sock_addr)
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/base_connection.py", line 206, in _create_and_connect_to_socket
+    self.socket = self._wrap_socket(self.socket)
+  File "/usr/lib/python2.7/dist-packages/pika/adapters/base_connection.py", line 491, in _wrap_socket
+    **self.params.ssl_options)
+  File "/usr/lib/python2.7/ssl.py", line 933, in wrap_socket
+    ciphers=ciphers)
+  File "/usr/lib/python2.7/ssl.py", line 542, in __init__
+    self._context.load_verify_locations(ca_certs)
+IOError: [Errno 2] No such file or directory
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# python sendData.py           waggleApp.py
+Traceback (most recent call last):
+  File "waggleApp.py", line 1, in <module>
+    from flask import Flask, render_template, Response
+ImportError: No module named flask
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# pip install fal  lask
+Collecting flask
+  Downloading Flask-0.12.2-py2.py3-none-any.whl (83kB)
+[?25l[K    12% |████                            | 10kB 6.3MB/s eta 0:00:01[K    24% |████████                        | 20kB 5.8MB/s eta 0:00:01[K    37% |███████████▉                    | 30kB 5.0MB/s eta 0:00:01[K    49% |███████████████▉                | 40kB 3.9MB/s eta 0:00:01[K    61% |███████████████████▊            | 51kB 3.8MB/s eta 0:00:01[K    74% |███████████████████████▊        | 61kB 4.2MB/s eta 0:00:01[K    86% |███████████████████████████▋    | 71kB 4.3MB/s eta 0:00:01[K    98% |███████████████████████████████▋| 81kB 4.6MB/s eta 0:00:01[K    100% |████████████████████████████████| 92kB 1.5MB/s 
+[?25hCollecting itsdangerous>=0.21 (from flask)
+  Downloading itsdangerous-0.24.tar.gz (46kB)
+[?25l[K    22% |███████                         | 10kB 7.0MB/s eta 0:00:01[K    44% |██████████████                  | 20kB 6.8MB/s eta 0:00:01[K    66% |█████████████████████▏          | 30kB 6.5MB/s eta 0:00:01[K    88% |████████████████████████████▏   | 40kB 6.4MB/s eta 0:00:01[K    100% |████████████████████████████████| 51kB 1.6MB/s 
+[?25hCollecting Jinja2>=2.4 (from flask)
+  Downloading Jinja2-2.9.6-py2.py3-none-any.whl (340kB)
+[?25l[K    3% |█                               | 10kB 6.3MB/s eta 0:00:01[K    6% |██                              | 20kB 5.7MB/s eta 0:00:01[K    9% |██▉                             | 30kB 5.4MB/s eta 0:00:01[K    12% |███▉                            | 40kB 3.8MB/s eta 0:00:01[K    15% |████▉                           | 51kB 3.9MB/s eta 0:00:01[K    18% |█████▊                          | 61kB 4.2MB/s eta 0:00:01[K    21% |██████▊                         | 71kB 4.3MB/s eta 0:00:01[K    24% |███████▊                        | 81kB 4.3MB/s eta 0:00:01[K    27% |████████▋                       | 92kB 4.5MB/s eta 0:00:01[K    30% |█████████▋                      | 102kB 4.5MB/s eta 0:00:01[K    33% |██████████▋                     | 112kB 4.5MB/s eta 0:00:01[K    36% |███████████▌                    | 122kB 4.4MB/s eta 0:00:01[K    39% |████████████▌                   | 133kB 4.4MB/s eta 0:00:01[K    42% |█████████████▌                  | 143kB 5.2MB/s eta 0:00:01[K    45% |██████████████▍                 | 153kB 5.2MB/s eta 0:00:01[K    48% |███████████████▍                | 163kB 5.0MB/s eta 0:00:01[K    51% |████████████████▍               | 174kB 5.2MB/s eta 0:00:01[K    54% |█████████████████▎              | 184kB 5.2MB/s eta 0:00:01[K    57% |██████████████████▎             | 194kB 5.2MB/s eta 0:00:01[K    60% |███████████████████▎            | 204kB 5.2MB/s eta 0:00:01[K    63% |████████████████████▏           | 215kB 5.0MB/s eta 0:00:01[K    66% |█████████████████████▏          | 225kB 5.2MB/s eta 0:00:01[K    69% |██████████████████████▏         | 235kB 5.1MB/s eta 0:00:01[K    72% |███████████████████████         | 245kB 4.9MB/s eta 0:00:01[K    75% |████████████████████████        | 256kB 5.1MB/s eta 0:00:01[K    78% |█████████████████████████       | 266kB 5.1MB/s eta 0:00:01[K    81% |██████████████████████████      | 276kB 5.2MB/s eta 0:00:01[K    84% |███████████████████████████     | 286kB 5.2MB/s eta 0:00:01[K    87% |████████████████████████████    | 296kB 5.1MB/s eta 0:00:01[K    90% |████████████████████████████▉   | 307kB 5.3MB/s eta 0:00:01[K    93% |█████████████████████████████▉  | 317kB 5.4MB/s eta 0:00:01[K    96% |██████████████████████████████▉ | 327kB 5.3MB/s eta 0:00:01[K    99% |███████████████████████████████▊| 337kB 5.5MB/s eta 0:00:01[K    100% |████████████████████████████████| 348kB 845kB/s 
+[?25hCollecting Werkzeug>=0.7 (from flask)
+  Downloading Werkzeug-0.12.2-py2.py3-none-any.whl (312kB)
+[?25l[K    3% |█                               | 10kB 6.6MB/s eta 0:00:01[K    6% |██                              | 20kB 6.0MB/s eta 0:00:01[K    9% |███▏                            | 30kB 5.2MB/s eta 0:00:01[K    13% |████▏                           | 40kB 4.8MB/s eta 0:00:01[K    16% |█████▎                          | 51kB 4.7MB/s eta 0:00:01[K    19% |██████▎                         | 61kB 4.9MB/s eta 0:00:01[K    22% |███████▎                        | 71kB 4.9MB/s eta 0:00:01[K    26% |████████▍                       | 81kB 4.8MB/s eta 0:00:01[K    29% |█████████▍                      | 92kB 4.9MB/s eta 0:00:01[K    32% |██████████▌                     | 102kB 4.9MB/s eta 0:00:01[K    35% |███████████▌                    | 112kB 4.9MB/s eta 0:00:01[K    39% |████████████▋                   | 122kB 4.8MB/s eta 0:00:01[K    42% |█████████████▋                  | 133kB 4.9MB/s eta 0:00:01[K    45% |██████████████▋                 | 143kB 5.2MB/s eta 0:00:01[K    49% |███████████████▊                | 153kB 5.2MB/s eta 0:00:01[K    52% |████████████████▊               | 163kB 5.1MB/s eta 0:00:01[K    55% |█████████████████▉              | 174kB 5.3MB/s eta 0:00:01[K    58% |██████████████████▉             | 184kB 5.4MB/s eta 0:00:01[K    62% |████████████████████            | 194kB 5.5MB/s eta 0:00:01[K    65% |█████████████████████           | 204kB 5.7MB/s eta 0:00:01[K    68% |██████████████████████          | 215kB 5.5MB/s eta 0:00:01[K    71% |███████████████████████         | 225kB 5.8MB/s eta 0:00:01[K    75% |████████████████████████        | 235kB 5.9MB/s eta 0:00:01[K    78% |█████████████████████████▏      | 245kB 5.6MB/s eta 0:00:01[K    81% |██████████████████████████▏     | 256kB 6.0MB/s eta 0:00:01[K    85% |███████████████████████████▎    | 266kB 6.1MB/s eta 0:00:01[K    88% |████████████████████████████▎   | 276kB 6.1MB/s eta 0:00:01[K    91% |█████████████████████████████▎  | 286kB 6.1MB/s eta 0:00:01[K    94% |██████████████████████████████▍ | 296kB 5.8MB/s eta 0:00:01[K    98% |███████████████████████████████▍| 307kB 6.1MB/s eta 0:00:01[K    100% |████████████████████████████████| 317kB 623kB/s 
+[?25hCollecting click>=2.0 (from flask)
+  Downloading click-6.7-py2.py3-none-any.whl (71kB)
+[?25l[K    14% |████▋                           | 10kB 6.6MB/s eta 0:00:01[K    28% |█████████▏                      | 20kB 6.0MB/s eta 0:00:01[K    43% |█████████████▉                  | 30kB 5.6MB/s eta 0:00:01[K    57% |██████████████████▍             | 40kB 5.4MB/s eta 0:00:01[K    71% |███████████████████████         | 51kB 5.3MB/s eta 0:00:01[K    86% |███████████████████████████▋    | 61kB 5.6MB/s eta 0:00:01[K    100% |████████████████████████████████| 71kB 1.5MB/s 
+[?25hCollecting MarkupSafe>=0.23 (from Jinja2>=2.4->flask)
+  Downloading MarkupSafe-1.0.tar.gz
+Building wheels for collected packages: itsdangerous, MarkupSafe
+  Running setup.py bdist_wheel for itsdangerous ... [?25l- \ done
+[?25h  Stored in directory: /root/.cache/pip/wheels/fc/a8/66/24d655233c757e178d45dea2de22a04c6d92766abfb741129a
+  Running setup.py bdist_wheel for MarkupSafe ... [?25l- \ | / done
+[?25h  Stored in directory: /root/.cache/pip/wheels/88/a7/30/e39a54a87bcbe25308fa3ca64e8ddc75d9b3e5afa21ee32d57
+Successfully built itsdangerous MarkupSafe
+Installing collected packages: itsdangerous, MarkupSafe, Jinja2, Werkzeug, click, flask
+Successfully installed Jinja2-2.9.6 MarkupSafe-1.0 Werkzeug-0.12.2 click-6.7 flask-0.12.2 itsdangerous-0.24
+]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# pip install flaskython waggleApp.py
+ * Running on http://0.0.0.0:52117/ (Press CTRL+C to quit)
+192.168.0.102 - - [28/Jul/2017 16:27:27] "GET / HTTP/1.1" 200 -
+192.168.0.102 - - [28/Jul/2017 16:27:28] "GET /style.css HTTP/1.1" 200 -
+192.168.0.102 - - [28/Jul/2017 16:27:28] "GET /waggle-logo.png HTTP/1.1" 200 -
+192.168.0.102 - - [28/Jul/2017 16:27:28] "GET /waggle-logo.ico HTTP/1.1" 200 -
+192.168.0.102 - - [28/Jul/2017 16:27:30] "GET /memInfo HTTP/1.1" 200 -
+192.168.0.102 - - [28/Jul/2017 16:27:34] "GET /generalInfo HTTP/1.1" 200 -
+192.168.0.102 - - [28/Jul/2017 16:27:36] "GET /services HTTP/1.1" 200 -
+^C]0;root@odroid: ~/waggleWebAPIroot@odroid:~/waggleWebAPI# re  exit
+exit
+
+Script done on Fri Jul 28 16:27:50 2017

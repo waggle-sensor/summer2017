@@ -1,0 +1,13 @@
+[Unit]
+Description=send node data to beehive dev server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python2.7 /root/waggleWebAPI/sendData.py
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+
+[Install]
+WantedBy=multi-user.target

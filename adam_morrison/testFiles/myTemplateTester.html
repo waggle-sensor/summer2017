@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<style>
+table, tr, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+}
+
+td{
+        text-align: center;
+}
+
+body{
+        background-color: #DEDEDE;
+}
+div{
+
+        border: 1px solid LimeGreen;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding: 5px;
+}
+
+</style>
+	<head>
+		<script>
+			function refreshTable(){
+				var x = 0;
+				//document.getElementById("infoTable").innerHTML =
+				document.getElementById("headerOne").innerHTMl= "changed";
+			}
+		</script>
+
+		<title>MemInfo Test</title
+	</head>
+	<body>
+		<div>Eventual Nav Bar</div>
+		<h1 onload="alert()" id="headerOne">This is your memory and CPU info.</h1>
+		<table id="infoTable" align="center" style="width: 50%">
+			<tr style="background-color:LimeGreen;color:white"><td>Memory Info</td></tr>
+			{% for x in memList %}
+			<tr>
+				<td>{{x}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		
+		</br>
+
+		<table id="cpuTable" align="center" style="width:50%">
+			<tr style="background-color:LimeGreen;color:white"><td>CPU Info</td></tr>
+			{% for i in cpuInfo %}
+                        <tr>
+                                <td>{{i[0]}}</td>
+                        </tr>
+                        {% endfor %}
+		</table>
+	</body>
+</html>

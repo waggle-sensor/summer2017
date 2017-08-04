@@ -1,0 +1,73 @@
+{% extends "base.html"%}
+{% block content %}
+	<h1 align="center">Memory and CPU Info</h1>
+	<table class="alignmentTable">
+		<tr><td>
+			<table class="generalTable">
+				<tr class="headerRow"><td colspan="2">Memory Info</td></tr>
+				{% for x in memoryInfo %}
+				<tr>
+					<td>{{x}}:</td><td>{{memoryInfo[x]}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</td>
+		<td>
+			<table class="generalTable">
+				<tr class="headerRow"><td colSpan="2">Disk Info</td></tr>
+				{% for d in diskInfo %}
+					<tr>
+						<td>{{d}}:</td><td>{{diskInfo[d]}}</td>
+					</tr>
+				{% endfor  %}
+				<tr class="headerRow"><td colSpan="2">Current Disk Usage Graph</td></tr>
+				<tr><td colspan="2"><canvas id="currDiskChart" width="250" height="250"></canvas></td></tr>
+			</table>
+		</td>
+		<td>
+			<table class="generalTable">
+				<tr class="headerRow"><td colspan="2">CPU Info</td></tr>
+				{% for i in cpuInfo %}
+                		<tr>
+                        		<td>{{i}}:</td><td>{{cpuInfo[i]}}</td>
+                		</tr>
+                		{% endfor %}
+			</table>
+		</td></tr>
+	</table>
+	<script>
+                function drawChart() {
+                        //alert('hello');
+                        //setInterval(function(){document.getElementById("infoTable").refresh();},1000);
+			var canvas = document.getElementById('currDiskChart');
+
+			if(canvas.getContext){
+				
+				var ctx = canvas.getContext('2d');
+				
+				ctx.beginPath();
+				ctx.arc(125,125,100,0,360,0);
+				ctx.fillStyle = "white"// "#DEDEDE";
+				ctx.fill();
+				
+				ctx.beginPath();
+				ctx.moveTo(125,125);
+				ctx.arc(125, 125, 100, 270*(Math.PI/180), (270 + ({{usage}}*360)/100)*(Math.PI/180));
+				ctx.fillStyle = "#235789";
+				ctx.fill();
+				
+				ctx.beginPath();
+				var x = 125 + (103)*Math.cos((270 + ({{usage}}*360)/100)*(Math.PI/180));
+				var y = 125 + (103)*Math.sin((270 + ({{usage}}*360)/100)*(Math.PI/180));
+				ctx.moveTo(x,y);
+				ctx.lineTo(125,125);
+				ctx.stroke();
+				ctx.fillStyle = "#40434e";
+				ctx.font="11px Arial"
+				ctx.fillText({{usage}}+"%",x,y)
+				
+			} 
+                }
+		drawChart();
+        </script>
+{% endblock  %}

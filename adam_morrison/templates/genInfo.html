@@ -1,0 +1,33 @@
+{% extends "base.html"%}
+{% block content  %}
+	<h1 align="center">General Info</h1>
+	<table class="alignmentTable">
+		<tr><td>
+	 		<table class="generalTable">
+                		<tr class="headerRow"><td colspan="2">General Info</td></tr>
+                		{% for x in genInfo %}
+                		<tr>
+                        		<td>{{x}}:</td><td>{{genInfo[x]}}</td>
+                		</tr>
+                		{% endfor %}
+        		</table>
+		</td>
+		<td>
+			<table class="generalTable">
+				<tr class="headerRow"><td colSpan="2">Machine Up Time</td></tr>
+                		<tr class="headerRow"><td>Up Time in Seconds (s)</td><td>Up Time Formatted (DDD days, HH:MM:SS)</td></tr>
+				<tr><td>{{upTimeSecs}}</td><td>{{upTimeFormat}}</td></tr>
+			</table>
+		</td>
+		<td>
+			<table class="generalTable">
+                		<tr class="headerRow"><td colspan="2">Conected USB Devices</td></tr>
+				{% for u in usbDevs %}
+                		<tr>
+					<td>{{u}}:</td><td>{{usbDevs[u]}}</td>
+				</tr>
+				{% endfor %}
+        		</table>
+		</td></tr>
+	</table>
+{% endblock  %}

@@ -1,0 +1,13 @@
+[Unit]
+Description=start local web app
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python2.7 /root/waggleWebAPI/waggleApp.py
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<style>
+table, tr, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
+td{
+	text-align: center;
+}
+
+body{
+	background-color: LightSteelBlue;
+}
+
+</style>
+	<head>
+	<script>
+		function tableRefresh(){
+			while(1){
+				document.getElementById("infoTable").innerHMTL="<tr style="background-color:LimeGreen;color:white"><td>Memory Info</t$
+                        {% for x in memInfo %}
+                        <tr>
+                                <td>{{x[0]}}</td>
+                        </tr>
+                        {% endfor %}
+
+			}
+		}
+	</script>
+		<title>MemInfo Test</title
+	</head>
+	<body>
+		<h1>This is your memory info.</h1>
+		<table id="infoTable" align="center">
+			<tr style="background-color:LimeGreen;color:white"><td>Memory Info</td></tr>
+			{% for x in memInfo %}
+			<tr>
+				<td>{{x[0]}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
