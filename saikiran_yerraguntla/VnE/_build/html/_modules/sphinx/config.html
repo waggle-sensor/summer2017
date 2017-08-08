@@ -1,0 +1,420 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.config &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.config</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.config</span>
+<span class="sd">    ~~~~~~~~~~~~~</span>
+
+<span class="sd">    Build configuration file handling.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">getenv</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">PY2</span><span class="p">,</span> <span class="n">PY3</span><span class="p">,</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">,</span> <span class="n">text_type</span><span class="p">,</span> <span class="n">integer_types</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">sphinx.errors</span> <span class="k">import</span> <span class="n">ConfigError</span>
+<span class="kn">from</span> <span class="nn">sphinx.locale</span> <span class="k">import</span> <span class="n">l_</span><span class="p">,</span> <span class="n">_</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.i18n</span> <span class="k">import</span> <span class="n">format_date</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">cd</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.pycompat</span> <span class="k">import</span> <span class="n">execfile_</span><span class="p">,</span> <span class="n">NoneType</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.util.tags</span> <span class="k">import</span> <span class="n">Tags</span>  <span class="c1"># NOQA</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">nonascii_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">br</span><span class="s1">&#39;[\x80-\xff]&#39;</span><span class="p">)</span>
+<span class="n">copyright_year_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^((\d</span><span class="si">{4}</span><span class="s1">-)?)(\d</span><span class="si">{4}</span><span class="s1">)(?=[ ,])&#39;</span><span class="p">)</span>
+
+<span class="n">CONFIG_SYNTAX_ERROR</span> <span class="o">=</span> <span class="s2">&quot;There is a syntax error in your configuration file: </span><span class="si">%s</span><span class="s2">&quot;</span>
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="n">CONFIG_SYNTAX_ERROR</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Did you change the syntax from 2.x to 3.x?&quot;</span>
+<span class="n">CONFIG_EXIT_ERROR</span> <span class="o">=</span> <span class="s2">&quot;The configuration file (or one of the modules it imports) &quot;</span> \
+                    <span class="s2">&quot;called sys.exit()&quot;</span>
+<span class="n">CONFIG_ENUM_WARNING</span> <span class="o">=</span> <span class="s2">&quot;The config value `</span><span class="si">{name}</span><span class="s2">` has to be a one of </span><span class="si">{candidates}</span><span class="s2">, &quot;</span> \
+                      <span class="s2">&quot;but `</span><span class="si">{current}</span><span class="s2">` is given.&quot;</span>
+<span class="n">CONFIG_PERMITTED_TYPE_WARNING</span> <span class="o">=</span> <span class="s2">&quot;The config value `</span><span class="si">{name}</span><span class="s2">&#39; has type `</span><span class="si">{current.__name__}</span><span class="s2">&#39;, &quot;</span> \
+                                <span class="s2">&quot;expected to </span><span class="si">{permitted}</span><span class="s2">.&quot;</span>
+<span class="n">CONFIG_TYPE_WARNING</span> <span class="o">=</span> <span class="s2">&quot;The config value `</span><span class="si">{name}</span><span class="s2">&#39; has type `</span><span class="si">{current.__name__}</span><span class="s2">&#39;, &quot;</span> \
+                      <span class="s2">&quot;defaults to `</span><span class="si">{default.__name__}</span><span class="s2">&#39;.&quot;</span>
+
+<span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
+    <span class="n">unicode</span> <span class="o">=</span> <span class="nb">str</span>  <span class="c1"># special alias for static typing...</span>
+
+<span class="n">ConfigValue</span> <span class="o">=</span> <span class="n">NamedTuple</span><span class="p">(</span><span class="s1">&#39;ConfigValue&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
+                                         <span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">Any</span><span class="p">),</span>
+                                         <span class="p">(</span><span class="s1">&#39;rebuild&#39;</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">unicode</span><span class="p">])])</span>
+
+
+<span class="k">class</span> <span class="nc">ENUM</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;represents the config value should be a one of candidates.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        app.add_config_value(&#39;latex_show_urls&#39;, &#39;no&#39;, None, ENUM(&#39;no&#39;, &#39;footnote&#39;, &#39;inline&#39;))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">candidates</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span> <span class="o">=</span> <span class="n">candidates</span>
+
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; bool</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span>
+
+
+<span class="n">string_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">text_type</span><span class="p">]</span>  <span class="c1"># type: List</span>
+<span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
+    <span class="n">string_classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">binary_type</span><span class="p">)</span>  <span class="c1"># =&gt; [str, unicode]</span>
+
+
+<div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../sphinx/doc/extdev/appapi.html#sphinx.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration file abstraction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># the values are: (default, what needs to be rebuilt if changed)</span>
+
+    <span class="c1"># If you add a value here, don&#39;t forget to include it in the</span>
+    <span class="c1"># quickstart.py file template as well as in the docs!</span>
+
+    <span class="n">config_values</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="c1"># general options</span>
+        <span class="n">project</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Python&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">copyright</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">),</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">release</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="c1"># the real default is locale-dependent</span>
+        <span class="n">today_fmt</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+
+        <span class="n">language</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">locale_dirs</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;locales&#39;</span><span class="p">],</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">figure_language_filename</span> <span class="o">=</span> <span class="p">(</span><span class="sa">u</span><span class="s1">&#39;</span><span class="si">{root}</span><span class="s1">.</span><span class="si">{language}{ext}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">]),</span>
+
+        <span class="n">master_doc</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">source_suffix</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;.rst&#39;</span><span class="p">],</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">source_encoding</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">source_parsers</span> <span class="o">=</span> <span class="p">({},</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">exclude_patterns</span> <span class="o">=</span> <span class="p">([],</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">default_role</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">add_function_parentheses</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">add_module_names</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">trim_footnote_reference_space</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">show_authors</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">pygments_style</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">highlight_language</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">highlight_options</span> <span class="o">=</span> <span class="p">({},</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">templates_path</span> <span class="o">=</span> <span class="p">([],</span> <span class="s1">&#39;html&#39;</span><span class="p">),</span>
+        <span class="n">template_bridge</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">keep_warnings</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">suppress_warnings</span> <span class="o">=</span> <span class="p">([],</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">modindex_common_prefix</span> <span class="o">=</span> <span class="p">([],</span> <span class="s1">&#39;html&#39;</span><span class="p">),</span>
+        <span class="n">rst_epilog</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">rst_prolog</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">trim_doctest_flags</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">primary_domain</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;py&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">NoneType</span><span class="p">]),</span>
+        <span class="n">needs_sphinx</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">string_classes</span><span class="p">),</span>
+        <span class="n">needs_extensions</span> <span class="o">=</span> <span class="p">({},</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">nitpicky</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">nitpick_ignore</span> <span class="o">=</span> <span class="p">([],</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">numfig</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">numfig_secnum_depth</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">numfig_format</span> <span class="o">=</span> <span class="p">({</span><span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">l_</span><span class="p">(</span><span class="s1">&#39;Section </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                          <span class="s1">&#39;figure&#39;</span><span class="p">:</span> <span class="n">l_</span><span class="p">(</span><span class="s1">&#39;Fig. </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                          <span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="n">l_</span><span class="p">(</span><span class="s1">&#39;Table </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                          <span class="s1">&#39;code-block&#39;</span><span class="p">:</span> <span class="n">l_</span><span class="p">(</span><span class="s1">&#39;Listing </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)},</span>
+                         <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+
+        <span class="n">tls_verify</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+        <span class="n">tls_cacerts</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">),</span>
+    <span class="p">)</span>  <span class="c1"># type: Dict[unicode, Tuple]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">overrides</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, Dict, Tags) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overrides</span> <span class="o">=</span> <span class="n">overrides</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">config_values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, Any]</span>
+        <span class="k">if</span> <span class="n">dirname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config_file</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;__file__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_file</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tags</span>
+            <span class="k">with</span> <span class="n">cd</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+                <span class="c1"># we promise to have the config dir as current dir while the</span>
+                <span class="c1"># config file is executed</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">execfile_</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="n">CONFIG_SYNTAX_ERROR</span> <span class="o">%</span> <span class="n">err</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="n">CONFIG_EXIT_ERROR</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="c1"># these two must be preinitialized because extensions can add their</span>
+        <span class="c1"># own config values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: Callable</span>
+
+        <span class="k">if</span> <span class="s1">&#39;extensions&#39;</span> <span class="ow">in</span> <span class="n">overrides</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overrides</span><span class="p">[</span><span class="s1">&#39;extensions&#39;</span><span class="p">],</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extensions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overrides</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;extensions&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extensions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overrides</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;extensions&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;extensions&#39;</span><span class="p">,</span> <span class="p">[])</span>  <span class="c1"># type: List[unicode]</span>
+
+        <span class="c1"># correct values of copyright year that are not coherent with</span>
+        <span class="c1"># the SOURCE_DATE_EPOCH environment variable (if set)</span>
+        <span class="c1"># See https://reproducible-builds.org/specs/source-date-epoch/</span>
+        <span class="k">if</span> <span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SOURCE_DATE_EPOCH&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;copyright&#39;</span><span class="p">,</span> <span class="s1">&#39;epub_copyright&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                    <span class="n">config</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">copyright_year_re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\g&lt;1&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">format_date</span><span class="p">(</span><span class="s1">&#39;%Y&#39;</span><span class="p">),</span>
+                                                      <span class="n">config</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">check_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="c1"># check all values for deviation from the default value&#39;s type, since</span>
+        <span class="c1"># that can result in TypeErrors all over the place</span>
+        <span class="c1"># NB. since config values might use l_() we have to wait with calling</span>
+        <span class="c1"># this method until i18n is initialized</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># we don&#39;t know a default value</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">default</span><span class="p">,</span> <span class="n">dummy_rebuild</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">permitted</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># could invoke l_()</span>
+            <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">permitted</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># neither inferrable nor expliclitly permitted types</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permitted</span><span class="p">,</span> <span class="n">ENUM</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">permitted</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">current</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">CONFIG_ENUM_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">current</span><span class="o">=</span><span class="n">current</span><span class="p">,</span> <span class="n">candidates</span><span class="o">=</span><span class="n">permitted</span><span class="o">.</span><span class="n">candidates</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="n">default</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="ow">in</span> <span class="n">permitted</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">common_bases</span> <span class="o">=</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">current</span><span class="p">)</span><span class="o">.</span><span class="vm">__bases__</span> <span class="o">+</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">current</span><span class="p">),))</span> <span class="o">&amp;</span>
+                                <span class="nb">set</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">default</span><span class="p">)</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">))</span>
+                <span class="n">common_bases</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">common_bases</span><span class="p">:</span>
+                    <span class="k">continue</span>  <span class="c1"># at least we share a non-trivial base class</span>
+
+                <span class="k">if</span> <span class="n">permitted</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">CONFIG_PERMITTED_TYPE_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">current</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">current</span><span class="p">),</span>
+                        <span class="n">permitted</span><span class="o">=</span><span class="nb">str</span><span class="p">([</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">permitted</span><span class="p">])))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">CONFIG_TYPE_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">current</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">current</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">default</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">check_unicode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="c1"># check all string values for non-ASCII characters in bytestrings,</span>
+        <span class="c1"># since that can result in UnicodeErrors all over the place</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_config</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">)</span> <span class="ow">and</span> <span class="n">nonascii_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;the config value </span><span class="si">%r</span><span class="s1"> is set to a string with non-ASCII &#39;</span>
+                               <span class="s1">&#39;characters; this can lead to Unicode errors occurring. &#39;</span>
+                               <span class="s1">&#39;Please use Unicode strings, e.g. </span><span class="si">%r</span><span class="s1">.&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="sa">u</span><span class="s1">&#39;Content&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">convert_overrides</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Any) -&gt; Any</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">defvalue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defvalue</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;cannot override dictionary config setting </span><span class="si">%r</span><span class="s1">, &#39;</span>
+                                   <span class="s1">&#39;ignoring (use </span><span class="si">%r</span><span class="s1"> to set individual elements)&#39;</span><span class="p">)</span> <span class="o">%</span>
+                                 <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.key=value&#39;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defvalue</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defvalue</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;invalid number </span><span class="si">%r</span><span class="s1"> for config value </span><span class="si">%r</span><span class="s1">, ignoring&#39;</span><span class="p">)</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">defvalue</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="n">defvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">defvalue</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;cannot override config setting </span><span class="si">%r</span><span class="s1"> with unsupported &#39;</span>
+                                   <span class="s1">&#39;type, ignoring&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">pre_init_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize some limited config variables before initialize i18n and loading extensions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;needs_sphinx&#39;</span><span class="p">,</span> <span class="s1">&#39;suppress_warnings&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;locale_dirs&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">overrides</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_overrides</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">overrides</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_config</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_config</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">init_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_config</span>
+        <span class="k">for</span> <span class="n">valname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">overrides</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">valname</span><span class="p">:</span>
+                    <span class="n">realvalname</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">valname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">realvalname</span><span class="p">,</span> <span class="p">{})[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">valname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;unknown config value </span><span class="si">%r</span><span class="s1"> in override, ignoring&#39;</span><span class="p">),</span> <span class="n">valname</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                    <span class="n">config</span><span class="p">[</span><span class="n">valname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_overrides</span><span class="p">(</span><span class="n">valname</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">config</span><span class="p">[</span><span class="n">valname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">source_suffix</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; Any</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;No such config value: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">default</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; unicode</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Any) -&gt; None</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; None</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; bool</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Iterable[ConfigValue]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">ConfigValue</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">rebuild</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Any, Union[bool, unicode], Any) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">rebuild</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rebuild</span><span class="p">):</span>
+        <span class="c1"># type: (str) -&gt; Iterator[ConfigValue]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">rebuild</span> <span class="o">==</span> <span class="n">rebuild</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

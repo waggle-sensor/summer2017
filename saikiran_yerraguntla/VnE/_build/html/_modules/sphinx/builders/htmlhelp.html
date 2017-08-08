@@ -1,0 +1,434 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.builders.htmlhelp &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.builders.htmlhelp</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.builders.htmlhelp</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Build HTML help support files.</span>
+<span class="sd">    Parts adapted from Python&#39;s Doc/tools/prechm.py.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>
+
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">addnodes</span>
+<span class="kn">from</span> <span class="nn">sphinx.builders.html</span> <span class="k">import</span> <span class="n">StandaloneHTMLBuilder</span>
+<span class="kn">from</span> <span class="nn">sphinx.environment.adapters.indexentries</span> <span class="k">import</span> <span class="n">IndexEntries</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">make_filename</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.pycompat</span> <span class="k">import</span> <span class="n">htmlescape</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">IO</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>  <span class="c1"># NOQA</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># Project file (*.hhp) template.  &#39;outname&#39; is the file basename (like</span>
+<span class="c1"># the pythlp in pythlp.hhp); &#39;version&#39; is the doc version number (like</span>
+<span class="c1"># the 2.2 in Python 2.2).</span>
+<span class="c1"># The magical numbers in the long line under [WINDOWS] set most of the</span>
+<span class="c1"># user-visible features (visible buttons, tabs, etc).</span>
+<span class="c1"># About 0x10384e:  This defines the buttons in the help viewer.  The</span>
+<span class="c1"># following defns are taken from htmlhelp.h.  Not all possibilities</span>
+<span class="c1"># actually work, and not all those that work are available from the Help</span>
+<span class="c1"># Workshop GUI.  In particular, the Zoom/Font button works and is not</span>
+<span class="c1"># available from the GUI.  The ones we&#39;re using are marked with &#39;x&#39;:</span>
+<span class="c1">#</span>
+<span class="c1">#    0x000002   Hide/Show   x</span>
+<span class="c1">#    0x000004   Back        x</span>
+<span class="c1">#    0x000008   Forward     x</span>
+<span class="c1">#    0x000010   Stop</span>
+<span class="c1">#    0x000020   Refresh</span>
+<span class="c1">#    0x000040   Home        x</span>
+<span class="c1">#    0x000080   Forward</span>
+<span class="c1">#    0x000100   Back</span>
+<span class="c1">#    0x000200   Notes</span>
+<span class="c1">#    0x000400   Contents</span>
+<span class="c1">#    0x000800   Locate      x</span>
+<span class="c1">#    0x001000   Options     x</span>
+<span class="c1">#    0x002000   Print       x</span>
+<span class="c1">#    0x004000   Index</span>
+<span class="c1">#    0x008000   Search</span>
+<span class="c1">#    0x010000   History</span>
+<span class="c1">#    0x020000   Favorites</span>
+<span class="c1">#    0x040000   Jump 1</span>
+<span class="c1">#    0x080000   Jump 2</span>
+<span class="c1">#    0x100000   Zoom/Font   x</span>
+<span class="c1">#    0x200000   TOC Next</span>
+<span class="c1">#    0x400000   TOC Prev</span>
+
+<span class="n">project_template</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">[OPTIONS]</span>
+<span class="s1">Binary TOC=No</span>
+<span class="s1">Binary Index=No</span>
+<span class="s1">Compiled file=</span><span class="si">%(outname)s</span><span class="s1">.chm</span>
+<span class="s1">Contents file=</span><span class="si">%(outname)s</span><span class="s1">.hhc</span>
+<span class="s1">Default Window=</span><span class="si">%(outname)s</span><span class="s1"></span>
+<span class="s1">Default topic=</span><span class="si">%(master_doc)s</span><span class="s1"></span>
+<span class="s1">Display compile progress=No</span>
+<span class="s1">Full text search stop list file=</span><span class="si">%(outname)s</span><span class="s1">.stp</span>
+<span class="s1">Full-text search=Yes</span>
+<span class="s1">Index file=</span><span class="si">%(outname)s</span><span class="s1">.hhk</span>
+<span class="s1">Language=</span><span class="si">%(lcid)#x</span><span class="s1"></span>
+<span class="s1">Title=</span><span class="si">%(title)s</span><span class="s1"></span>
+
+<span class="s1">[WINDOWS]</span>
+<span class="si">%(outname)s</span><span class="s1">=&quot;</span><span class="si">%(title)s</span><span class="s1">&quot;,&quot;</span><span class="si">%(outname)s</span><span class="s1">.hhc&quot;,&quot;</span><span class="si">%(outname)s</span><span class="s1">.hhk&quot;,</span><span class="se">\</span>
+<span class="s1">&quot;</span><span class="si">%(master_doc)s</span><span class="s1">&quot;,&quot;</span><span class="si">%(master_doc)s</span><span class="s1">&quot;,,,,,0x63520,220,0x10384e,[0,0,1024,768],,,,,,,0</span>
+
+<span class="s1">[FILES]</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="n">contents_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML//EN&quot;&gt;</span>
+<span class="s1">&lt;HTML&gt;</span>
+<span class="s1">&lt;HEAD&gt;</span>
+<span class="s1">&lt;meta name=&quot;GENERATOR&quot; content=&quot;Microsoft&amp;reg; HTML Help Workshop 4.1&quot;&gt;</span>
+<span class="s1">&lt;!-- Sitemap 1.0 --&gt;</span>
+<span class="s1">&lt;/HEAD&gt;&lt;BODY&gt;</span>
+<span class="s1">&lt;OBJECT type=&quot;text/site properties&quot;&gt;</span>
+<span class="s1">        &lt;param name=&quot;Window Styles&quot; value=&quot;0x801227&quot;&gt;</span>
+<span class="s1">        &lt;param name=&quot;ImageType&quot; value=&quot;Folder&quot;&gt;</span>
+<span class="s1">&lt;/OBJECT&gt;</span>
+<span class="s1">&lt;UL&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="n">contents_footer</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">&lt;/UL&gt;&lt;/BODY&gt;&lt;/HTML&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="n">object_sitemap</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">&lt;OBJECT type=&quot;text/sitemap&quot;&gt;</span>
+<span class="s1">    &lt;param name=&quot;Name&quot; value=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span>
+<span class="s1">    &lt;param name=&quot;Local&quot; value=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span>
+<span class="s1">&lt;/OBJECT&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="c1"># List of words the full text search facility shouldn&#39;t index.  This</span>
+<span class="c1"># becomes file outname.stp.  Note that this list must be pretty small!</span>
+<span class="c1"># Different versions of the MS docs claim the file has a maximum size of</span>
+<span class="c1"># 256 or 512 bytes (including \r\n at the end of each line).</span>
+<span class="c1"># Note that &quot;and&quot;, &quot;or&quot;, &quot;not&quot; and &quot;near&quot; are operators in the search</span>
+<span class="c1"># language, so no point indexing them even if we wanted to.</span>
+<span class="n">stopwords</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">a  and  are  as  at</span>
+<span class="s2">be  but  by</span>
+<span class="s2">for</span>
+<span class="s2">if  in  into  is  it</span>
+<span class="s2">near  no  not</span>
+<span class="s2">of  on  or</span>
+<span class="s2">such</span>
+<span class="s2">that  the  their  then  there  these  they  this  to</span>
+<span class="s2">was  will  with</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="c1"># The following list includes only languages supported by Sphinx.</span>
+<span class="c1"># See http://msdn.microsoft.com/en-us/library/ms930130.aspx for more.</span>
+<span class="n">chm_locales</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># lang:   LCID,  encoding</span>
+    <span class="s1">&#39;ca&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x403</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;cs&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x405</span><span class="p">,</span> <span class="s1">&#39;cp1250&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;da&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x406</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;de&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x407</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;en&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x409</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;es&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x40a</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;et&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x425</span><span class="p">,</span> <span class="s1">&#39;cp1257&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;fa&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x429</span><span class="p">,</span> <span class="s1">&#39;cp1256&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;fi&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x40b</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;fr&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x40c</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;hr&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x41a</span><span class="p">,</span> <span class="s1">&#39;cp1250&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;hu&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x40e</span><span class="p">,</span> <span class="s1">&#39;cp1250&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;it&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x410</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;ja&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x411</span><span class="p">,</span> <span class="s1">&#39;cp932&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;ko&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x412</span><span class="p">,</span> <span class="s1">&#39;cp949&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;lt&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x427</span><span class="p">,</span> <span class="s1">&#39;cp1257&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;lv&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x426</span><span class="p">,</span> <span class="s1">&#39;cp1257&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;nl&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x413</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;no_NB&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mh">0x414</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;pl&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x415</span><span class="p">,</span> <span class="s1">&#39;cp1250&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;pt_BR&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mh">0x416</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;ru&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x419</span><span class="p">,</span> <span class="s1">&#39;cp1251&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;sk&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x41b</span><span class="p">,</span> <span class="s1">&#39;cp1250&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;sl&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x424</span><span class="p">,</span> <span class="s1">&#39;cp1250&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;sv&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x41d</span><span class="p">,</span> <span class="s1">&#39;cp1252&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;tr&#39;</span><span class="p">:</span>    <span class="p">(</span><span class="mh">0x41f</span><span class="p">,</span> <span class="s1">&#39;cp1254&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;uk_UA&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mh">0x422</span><span class="p">,</span> <span class="s1">&#39;cp1251&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;zh_CN&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mh">0x804</span><span class="p">,</span> <span class="s1">&#39;cp936&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;zh_TW&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mh">0x404</span><span class="p">,</span> <span class="s1">&#39;cp950&#39;</span><span class="p">),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="HTMLHelpBuilder"><a class="viewcode-back" href="../../../sphinx/doc/builders.html#sphinx.builders.htmlhelp.HTMLHelpBuilder">[docs]</a><span class="k">class</span> <span class="nc">HTMLHelpBuilder</span><span class="p">(</span><span class="n">StandaloneHTMLBuilder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builder that also outputs Windows HTML help project, contents and</span>
+<span class="sd">    index files.  Adapted from the original Doc/tools/prechm.py.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;htmlhelp&#39;</span>
+
+    <span class="c1"># don&#39;t copy the reST source</span>
+    <span class="n">copysource</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">supported_image_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;image/png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/gif&#39;</span><span class="p">,</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">]</span>
+
+    <span class="c1"># don&#39;t add links</span>
+    <span class="n">add_permalinks</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># don&#39;t add sidebar etc.</span>
+    <span class="n">embedded</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># don&#39;t generate search index or include search page</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">lcid</span> <span class="o">=</span> <span class="mh">0x409</span>
+    <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;cp1252&#39;</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">StandaloneHTMLBuilder</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># the output files for HTML help must be .html only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_suffix</span> <span class="o">=</span> <span class="s1">&#39;.html&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_suffix</span> <span class="o">=</span> <span class="s1">&#39;.html&#39;</span>
+        <span class="c1"># determine the correct locale setting</span>
+        <span class="n">locale</span> <span class="o">=</span> <span class="n">chm_locales</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">locale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lcid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">locale</span>
+
+    <span class="k">def</span> <span class="nf">open_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">basename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, unicode) -&gt; IO</span>
+        <span class="c1"># open a file with the correct encoding for the selected language</span>
+        <span class="k">return</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">basename</span><span class="p">),</span> <span class="n">mode</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_page_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pagename</span><span class="p">,</span> <span class="n">templatename</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">event_arg</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, Dict, unicode) -&gt; None</span>
+        <span class="n">ctx</span><span class="p">[</span><span class="s1">&#39;encoding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span>
+
+    <span class="k">def</span> <span class="nf">handle_finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_hhx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">htmlhelp_basename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">write_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, nodes.Node) -&gt; None</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">doctree</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">reference</span><span class="p">):</span>
+            <span class="c1"># add ``target=_blank`` attributes to external links</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;internal&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;refuri&#39;</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">node</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;_blank&#39;</span>
+
+        <span class="n">StandaloneHTMLBuilder</span><span class="o">.</span><span class="n">write_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build_hhx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; None</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;dumping stopword list...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s1">&#39;.stp&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">stopwords</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;writing project file...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s1">&#39;.hhp&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">project_template</span> <span class="o">%</span> <span class="p">{</span>
+                <span class="s1">&#39;outname&#39;</span><span class="p">:</span> <span class="n">outname</span><span class="p">,</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_title</span><span class="p">,</span>
+                <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                <span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
+                <span class="s1">&#39;lcid&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcid</span><span class="p">,</span>
+                <span class="s1">&#39;master_doc&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_suffix</span>
+            <span class="p">})</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">outdir</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">):</span>
+                <span class="n">outdir</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+            <span class="n">olen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+                <span class="n">staticdir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="s1">&#39;_static&#39;</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">staticdir</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.js&#39;</span><span class="p">))</span> <span class="ow">or</span> \
+                       <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.html&#39;</span><span class="p">):</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">fn</span><span class="p">)[</span><span class="n">olen</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">),</span>
+                              <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;writing TOC file...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s1">&#39;.hhc&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents_header</span><span class="p">)</span>
+            <span class="c1"># special books</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;LI&gt; &#39;</span> <span class="o">+</span> <span class="n">object_sitemap</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_short_title</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_suffix</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">indexname</span><span class="p">,</span> <span class="n">indexcls</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">collapse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_indices</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;LI&gt; &#39;</span> <span class="o">+</span> <span class="n">object_sitemap</span> <span class="o">%</span> <span class="p">(</span><span class="n">indexcls</span><span class="o">.</span><span class="n">localname</span><span class="p">,</span>
+                                                    <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.html&#39;</span> <span class="o">%</span> <span class="n">indexname</span><span class="p">))</span>
+            <span class="c1"># the TOC</span>
+            <span class="n">tocdoc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_and_resolve_doctree</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">prune_toctrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">write_toc</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">ullevel</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+                <span class="c1"># type: (nodes.Node, int) -&gt; None</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">list_item</span><span class="p">):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;LI&gt; &#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                        <span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">ullevel</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">reference</span><span class="p">):</span>
+                    <span class="n">link</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;refuri&#39;</span><span class="p">]</span>
+                    <span class="n">title</span> <span class="o">=</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">astext</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;quot;&#39;</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">object_sitemap</span> <span class="o">%</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">link</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">bullet_list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">ullevel</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;UL&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                        <span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">ullevel</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ullevel</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/UL&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">compact_paragraph</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                        <span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">ullevel</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">istoctree</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+                <span class="c1"># type: (nodes.Node) -&gt; bool</span>
+                <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">compact_paragraph</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="s1">&#39;toctree&#39;</span> <span class="ow">in</span> <span class="n">node</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tocdoc</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">istoctree</span><span class="p">):</span>
+                <span class="n">write_toc</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents_footer</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;writing index file...&#39;</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">IndexEntries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s1">&#39;.hhk&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;UL&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">write_index</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">refs</span><span class="p">,</span> <span class="n">subitems</span><span class="p">):</span>
+                <span class="c1"># type: (unicode, List[Tuple[unicode, unicode]], List[Tuple[unicode, List[Tuple[unicode, unicode]]]]) -&gt; None  # NOQA</span>
+                <span class="k">def</span> <span class="nf">write_param</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+                    <span class="c1"># type: (unicode, unicode) -&gt; None</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="s1">&#39;    &lt;param name=&quot;</span><span class="si">%s</span><span class="s1">&quot; value=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                        <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;LI&gt; &lt;OBJECT type=&quot;text/sitemap&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">write_param</span><span class="p">(</span><span class="s1">&#39;Keyword&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">write_param</span><span class="p">(</span><span class="s1">&#39;See Also&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">write_param</span><span class="p">(</span><span class="s1">&#39;Local&#39;</span><span class="p">,</span> <span class="n">refs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">refs</span><span class="p">):</span>
+                        <span class="c1"># XXX: better title?</span>
+                        <span class="n">write_param</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="s1">&#39;[</span><span class="si">%d</span><span class="s1">] </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">ref</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="n">write_param</span><span class="p">(</span><span class="s1">&#39;Local&#39;</span><span class="p">,</span> <span class="n">ref</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/OBJECT&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">subitems</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;UL&gt; &#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">subitem</span> <span class="ow">in</span> <span class="n">subitems</span><span class="p">:</span>
+                        <span class="n">write_index</span><span class="p">(</span><span class="n">subitem</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subitem</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[])</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/UL&gt;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="p">(</span><span class="n">refs</span><span class="p">,</span> <span class="n">subitems</span><span class="p">,</span> <span class="n">key_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                    <span class="n">write_index</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">refs</span><span class="p">,</span> <span class="n">subitems</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/UL&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="c1"># type: (Sphinx) -&gt; Dict[unicode, Any]</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">setup_extension</span><span class="p">(</span><span class="s1">&#39;sphinx.builders.html&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">HTMLHelpBuilder</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;htmlhelp_basename&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="n">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;builtin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_read_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_write_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../builders.html">sphinx.builders</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

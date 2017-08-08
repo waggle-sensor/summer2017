@@ -1,0 +1,356 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Paragraph-level markup &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="paragraph-level-markup">
+<h1>Paragraph-level markup<a class="headerlink" href="#paragraph-level-markup" title="Permalink to this headline">¶</a></h1>
+<p id="index-0">These directives create short paragraphs and can be used inside information
+units as well as normal text:</p>
+<dl class="directive">
+<dt id="directive-note">
+<code class="descname">.. note::</code><code class="descclassname"> </code><a class="headerlink" href="#directive-note" title="Permalink to this definition">¶</a></dt>
+<dd><p>An especially important bit of information about an API that a user should be
+aware of when using whatever bit of API the note pertains to.  The content of
+the directive should be written in complete sentences and include all
+appropriate punctuation.</p>
+<p>Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">note</span><span class="p">::</span>
+
+   This function is not suitable for sending spam e-mails.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-warning">
+<code class="descname">.. warning::</code><code class="descclassname"> </code><a class="headerlink" href="#directive-warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>An important bit of information about an API that a user should be very aware
+of when using whatever bit of API the warning pertains to.  The content of
+the directive should be written in complete sentences and include all
+appropriate punctuation. This differs from <a class="reference internal" href="#directive-note" title="note directive"><code class="xref rst rst-dir docutils literal"><span class="pre">note</span></code></a> in that it is
+recommended over <a class="reference internal" href="#directive-note" title="note directive"><code class="xref rst rst-dir docutils literal"><span class="pre">note</span></code></a> for information regarding security.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-versionadded">
+<code class="descname">.. versionadded::</code><code class="descclassname"> version</code><a class="headerlink" href="#directive-versionadded" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive documents the version of the project which added the described
+feature to the library or C API. When this applies to an entire module, it
+should be placed at the top of the module section before any prose.</p>
+<p>The first argument must be given and is the version in question; you can add
+a second argument consisting of a <em>brief</em> explanation of the change.</p>
+<p>Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">versionadded</span><span class="p">::</span> 2.5
+   The <span class="ge">*spam*</span> parameter.
+</pre></div>
+</div>
+<p>Note that there must be no blank line between the directive head and the
+explanation; this is to make these blocks visually continuous in the markup.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-versionchanged">
+<code class="descname">.. versionchanged::</code><code class="descclassname"> version</code><a class="headerlink" href="#directive-versionchanged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to <a class="reference internal" href="#directive-versionadded" title="versionadded directive"><code class="xref rst rst-dir docutils literal"><span class="pre">versionadded</span></code></a>, but describes when and what changed in
+the named feature in some way (new parameters, changed side effects, etc.).</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-deprecated">
+<code class="descname">.. deprecated::</code><code class="descclassname"> version</code><a class="headerlink" href="#directive-deprecated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to <a class="reference internal" href="#directive-versionchanged" title="versionchanged directive"><code class="xref rst rst-dir docutils literal"><span class="pre">versionchanged</span></code></a>, but describes when the feature was
+deprecated.  An explanation can also be given, for example to inform the
+reader what should be used instead.  Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">deprecated</span><span class="p">::</span> 3.1
+   Use <span class="na">:func:</span><span class="nv">`spam`</span> instead.
+</pre></div>
+</div>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="directive">
+<dt id="directive-seealso">
+<code class="descname">.. seealso::</code><a class="headerlink" href="#directive-seealso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Many sections include a list of references to module documentation or
+external documents.  These lists are created using the <a class="reference internal" href="#directive-seealso" title="seealso directive"><code class="xref rst rst-dir docutils literal"><span class="pre">seealso</span></code></a>
+directive.</p>
+<p>The <a class="reference internal" href="#directive-seealso" title="seealso directive"><code class="xref rst rst-dir docutils literal"><span class="pre">seealso</span></code></a> directive is typically placed in a section just before
+any subsections.  For the HTML output, it is shown boxed off from the main
+flow of the text.</p>
+<p>The content of the <a class="reference internal" href="#directive-seealso" title="seealso directive"><code class="xref rst rst-dir docutils literal"><span class="pre">seealso</span></code></a> directive should be a reST definition
+list. Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">seealso</span><span class="p">::</span>
+
+   Module <span class="na">:py:mod:</span><span class="nv">`zipfile`</span>
+      Documentation of the <span class="na">:py:mod:</span><span class="nv">`zipfile`</span> standard module.
+
+   <span class="s">`GNU tar manual, Basic Tar Format </span><span class="si">&lt;http://link&gt;</span><span class="s">`_</span>
+      Documentation for tar archive files, including GNU tar extensions.
+</pre></div>
+</div>
+<p>There’s also a “short form” allowed that looks like this:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">seealso</span><span class="p">::</span> modules <span class="na">:py:mod:</span><span class="nv">`zipfile`</span>, <span class="na">:py:mod:</span><span class="nv">`tarfile`</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.5: </span>The short form.</p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-rubric">
+<code class="descname">.. rubric::</code><code class="descclassname"> title</code><a class="headerlink" href="#directive-rubric" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive creates a paragraph heading that is not used to create a
+table of contents node.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the <em>title</em> of the rubric is “Footnotes” (or the selected language’s
+equivalent), this rubric is ignored by the LaTeX writer, since it is
+assumed to only contain footnote definitions and therefore would create an
+empty heading.</p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-centered">
+<code class="descname">.. centered::</code><a class="headerlink" href="#directive-centered" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive creates a centered boldfaced line of text.  Use it as
+follows:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">centered</span><span class="p">::</span> LICENSE AGREEMENT
+</pre></div>
+</div>
+<div class="deprecated">
+<p><span class="versionmodified">Deprecated since version 1.1: </span>This presentation-only directive is a legacy from older versions.  Use a
+<code class="xref rst rst-dir docutils literal"><span class="pre">rst-class</span></code> directive instead and add an appropriate style.</p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-hlist">
+<code class="descname">.. hlist::</code><a class="headerlink" href="#directive-hlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive must contain a bullet list.  It will transform it into a more
+compact list by either distributing more than one item horizontally, or
+reducing spacing between items, depending on the builder.</p>
+<p>For builders that support the horizontal distribution, there is a <code class="docutils literal"><span class="pre">columns</span></code>
+option that specifies the number of columns; it defaults to 2.  Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">hlist</span><span class="p">::</span>
+   <span class="nc">:columns:</span> <span class="nf">3</span>
+
+   <span class="m">*</span> A list of
+   <span class="m">*</span> short items
+   <span class="m">*</span> that should be
+   <span class="m">*</span> displayed
+   <span class="m">*</span> horizontally
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="table-of-contents-markup">
+<h1>Table-of-contents markup<a class="headerlink" href="#table-of-contents-markup" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="toctree.html#directive-toctree" title="toctree directive"><code class="xref rst rst-dir docutils literal"><span class="pre">toctree</span></code></a> directive, which generates tables of contents of
+subdocuments, is described in <a class="reference internal" href="toctree.html#toctree-directive"><span class="std std-ref">The TOC tree</span></a>.</p>
+<p>For local tables of contents, use the standard reST <a href="#id1"><span class="problematic" id="id2">:dudir:`contents directive
+&lt;table-of-contents&gt;`</span></a>.</p>
+</div>
+<div class="section" id="glossary">
+<span id="glossary-directive"></span><h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this headline">¶</a></h1>
+<dl class="directive">
+<dt id="directive-glossary">
+<code class="descname">.. glossary::</code><code class="descclassname"> </code><a class="headerlink" href="#directive-glossary" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive must contain a reST definition-list-like markup with terms and
+definitions.  The definitions will then be referencable with the
+<a class="reference internal" href="inline.html#role-term" title="term role"><code class="xref rst rst-role docutils literal"><span class="pre">term</span></code></a> role.  Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">glossary</span><span class="p">::</span>
+
+   environment
+      A structure where information about all documents under the root is
+      saved, and used for cross-referencing.  The environment is pickled
+      after the parsing stage, so that successive runs only need to read
+      and parse new and changed documents.
+
+   source directory
+      The directory which, including its subdirectories, contains all
+      source files for one Sphinx project.
+</pre></div>
+</div>
+<p>In contrast to regular definition lists, <em>multiple</em> terms per entry are
+allowed, and inline markup is allowed in terms.  You can link to all of the
+terms.  For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">glossary</span><span class="p">::</span>
+
+   term 1
+   term 2
+      Definition of both terms.
+</pre></div>
+</div>
+<p>(When the glossary is sorted, the first term determines the sort order.)</p>
+<p>If you want to specify “grouping key” for general index entries, you can put a “key”
+as “term : key”. For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">glossary</span><span class="p">::</span>
+
+   term 1 : A
+   term 2 : B
+      Definition of both terms.
+</pre></div>
+</div>
+<p>Note that “key” is used for grouping key as is.
+The “key” isn’t normalized; key “A” and “a” become different groups.
+The whole characters in “key” is used instead of a first character; it is used for
+“Combining Character Sequence” and “Surrogate Pairs” grouping key.</p>
+<p>In i18n situation, you can specify “localized term : key” even if original text only
+have “term” part. In this case, translated “localized term” will be categorized in
+“key” group.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6: </span>You can now give the glossary directive a <code class="docutils literal"><span class="pre">:sorted:</span></code> flag that will
+automatically sort the entries alphabetically.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.1: </span>Now supports multiple terms and inline markup in terms.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.4: </span>Index key for glossary term should be considered <em>experimental</em>.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="grammar-production-displays">
+<h1>Grammar production displays<a class="headerlink" href="#grammar-production-displays" title="Permalink to this headline">¶</a></h1>
+<p>Special markup is available for displaying the productions of a formal grammar.
+The markup is simple and does not attempt to model all aspects of BNF (or any
+derived forms), but provides enough to allow context-free grammars to be
+displayed in a way that causes uses of a symbol to be rendered as hyperlinks to
+the definition of the symbol.  There is this directive:</p>
+<dl class="directive">
+<dt id="directive-productionlist">
+<code class="descname">.. productionlist::</code><code class="descclassname"> [name]</code><a class="headerlink" href="#directive-productionlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive is used to enclose a group of productions.  Each production is
+given on a single line and consists of a name, separated by a colon from the
+following definition.  If the definition spans multiple lines, each
+continuation line must begin with a colon placed at the same column as in the
+first line.</p>
+<p>The argument to <a class="reference internal" href="#directive-productionlist" title="productionlist directive"><code class="xref rst rst-dir docutils literal"><span class="pre">productionlist</span></code></a> serves to distinguish different
+sets of production lists that belong to different grammars.</p>
+<p>Blank lines are not allowed within <code class="docutils literal"><span class="pre">productionlist</span></code> directive arguments.</p>
+<p>The definition can contain token names which are marked as interpreted text
+(e.g. <code class="docutils literal"><span class="pre">sum</span> <span class="pre">::=</span> <span class="pre">`integer`</span> <span class="pre">&quot;+&quot;</span> <span class="pre">`integer`</span></code>) – this generates cross-references
+to the productions of these tokens.  Outside of the production list, you can
+reference to token productions using <a class="reference internal" href="inline.html#role-token" title="token role"><code class="xref rst rst-role docutils literal"><span class="pre">token</span></code></a>.</p>
+<p>Note that no further reST parsing is done in the production, so that you
+don’t have to escape <code class="docutils literal"><span class="pre">*</span></code> or <code class="docutils literal"><span class="pre">|</span></code> characters.</p>
+</dd></dl>
+
+<p>The following is an example taken from the Python Reference Manual:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">productionlist</span><span class="p">::</span>
+   try_stmt: try1_stmt | try2_stmt
+   try1_stmt: &quot;try&quot; &quot;:&quot; <span class="nv">`suite`</span>
+            : (&quot;except&quot; [<span class="nv">`expression`</span> [&quot;,&quot; <span class="nv">`target`</span>]] &quot;:&quot; <span class="nv">`suite`</span>)+
+            : [&quot;else&quot; &quot;:&quot; <span class="nv">`suite`</span>]
+            : [&quot;finally&quot; &quot;:&quot; <span class="nv">`suite`</span>]
+   try2_stmt: &quot;try&quot; &quot;:&quot; <span class="nv">`suite`</span>
+            : &quot;finally&quot; &quot;:&quot; <span class="nv">`suite`</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Paragraph-level markup</a></li>
+<li><a class="reference internal" href="#table-of-contents-markup">Table-of-contents markup</a></li>
+<li><a class="reference internal" href="#glossary">Glossary</a></li>
+<li><a class="reference internal" href="#grammar-production-displays">Grammar production displays</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/markup/para.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/markup/para.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

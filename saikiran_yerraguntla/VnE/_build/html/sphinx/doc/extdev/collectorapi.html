@@ -1,0 +1,142 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Environment Collector API &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.environment.collectors">
+<span id="environment-collector-api"></span><span id="collector-api"></span><h1>Environment Collector API<a class="headerlink" href="#module-sphinx.environment.collectors" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sphinx.environment.collectors.EnvironmentCollector">
+<em class="property">class </em><code class="descclassname">sphinx.environment.collectors.</code><code class="descname">EnvironmentCollector</code><a class="reference internal" href="../../../_modules/sphinx/environment/collectors.html#EnvironmentCollector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.collectors.EnvironmentCollector" title="Permalink to this definition">¶</a></dt>
+<dd><p>An EnvironmentCollector is a specific data collector from each document.</p>
+<p>It gathers data and stores <a class="reference internal" href="envapi.html#sphinx.environment.BuildEnvironment" title="sphinx.environment.BuildEnvironment"><code class="xref py py-class docutils literal"><span class="pre">BuildEnvironment</span></code></a> as a database.  Examples of specific
+data would be images, download files, section titles, metadatas, index
+entries and toctrees, etc.</p>
+<dl class="method">
+<dt id="sphinx.environment.collectors.EnvironmentCollector.clear_doc">
+<code class="descname">clear_doc</code><span class="sig-paren">(</span><em>app</em>, <em>env</em>, <em>docname</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment/collectors.html#EnvironmentCollector.clear_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.collectors.EnvironmentCollector.clear_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove specified data of a document.</p>
+<p>This method is called on the removal of the document.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.collectors.EnvironmentCollector.get_outdated_docs">
+<code class="descname">get_outdated_docs</code><span class="sig-paren">(</span><em>app</em>, <em>env</em>, <em>added</em>, <em>changed</em>, <em>removed</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment/collectors.html#EnvironmentCollector.get_outdated_docs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.collectors.EnvironmentCollector.get_outdated_docs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of docnames to re-read.</p>
+<p>This methods is called before reading the documents.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.collectors.EnvironmentCollector.get_updated_docs">
+<code class="descname">get_updated_docs</code><span class="sig-paren">(</span><em>app</em>, <em>env</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment/collectors.html#EnvironmentCollector.get_updated_docs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.collectors.EnvironmentCollector.get_updated_docs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of docnames to re-read.</p>
+<p>This methods is called after reading the whole of documents (experimental).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.collectors.EnvironmentCollector.merge_other">
+<code class="descname">merge_other</code><span class="sig-paren">(</span><em>app</em>, <em>env</em>, <em>docnames</em>, <em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment/collectors.html#EnvironmentCollector.merge_other"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.collectors.EnvironmentCollector.merge_other" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge in specified data regarding docnames from a different <cite>BuildEnvironment</cite>
+object which coming from a subprocess in parallel builds.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.collectors.EnvironmentCollector.process_doc">
+<code class="descname">process_doc</code><span class="sig-paren">(</span><em>app</em>, <em>doctree</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment/collectors.html#EnvironmentCollector.process_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.collectors.EnvironmentCollector.process_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a document and gather specific data from it.</p>
+<p>This method is called after the document is read.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/collectorapi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/collectorapi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

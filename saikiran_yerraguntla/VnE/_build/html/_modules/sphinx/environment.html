@@ -1,0 +1,1113 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.environment &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.environment</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.environment</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Global creation environment.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">BytesIO</span><span class="p">,</span> <span class="n">itervalues</span><span class="p">,</span> <span class="n">class_types</span><span class="p">,</span> <span class="nb">next</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">cPickle</span> <span class="k">as</span> <span class="n">pickle</span>
+
+<span class="kn">from</span> <span class="nn">docutils.io</span> <span class="k">import</span> <span class="n">NullOutput</span>
+<span class="kn">from</span> <span class="nn">docutils.core</span> <span class="k">import</span> <span class="n">Publisher</span>
+<span class="kn">from</span> <span class="nn">docutils.utils</span> <span class="k">import</span> <span class="n">Reporter</span><span class="p">,</span> <span class="n">get_source_line</span><span class="p">,</span> <span class="n">normalize_language_tag</span>
+<span class="kn">from</span> <span class="nn">docutils.utils.smartquotes</span> <span class="k">import</span> <span class="n">smartchars</span>
+<span class="kn">from</span> <span class="nn">docutils.parsers.rst</span> <span class="k">import</span> <span class="n">roles</span>
+<span class="kn">from</span> <span class="nn">docutils.parsers.rst.languages</span> <span class="k">import</span> <span class="n">en</span> <span class="k">as</span> <span class="n">english</span>
+<span class="kn">from</span> <span class="nn">docutils.frontend</span> <span class="k">import</span> <span class="n">OptionParser</span>
+
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">addnodes</span>
+<span class="kn">from</span> <span class="nn">sphinx.io</span> <span class="k">import</span> <span class="n">SphinxStandaloneReader</span><span class="p">,</span> <span class="n">SphinxDummyWriter</span><span class="p">,</span> <span class="n">SphinxFileInput</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">get_matching_docs</span><span class="p">,</span> <span class="n">FilenameUniqDict</span><span class="p">,</span> <span class="n">status_iterator</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.nodes</span> <span class="k">import</span> <span class="n">is_translatable</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">SEP</span><span class="p">,</span> <span class="n">ensuredir</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.i18n</span> <span class="k">import</span> <span class="n">find_catalog_files</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.console</span> <span class="k">import</span> <span class="n">bold</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.docutils</span> <span class="k">import</span> <span class="n">sphinx_domains</span><span class="p">,</span> <span class="n">WarningStream</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.matching</span> <span class="k">import</span> <span class="n">compile_matchers</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.parallel</span> <span class="k">import</span> <span class="n">ParallelTasks</span><span class="p">,</span> <span class="n">parallel_available</span><span class="p">,</span> <span class="n">make_chunks</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.websupport</span> <span class="k">import</span> <span class="n">is_commentable</span>
+<span class="kn">from</span> <span class="nn">sphinx.errors</span> <span class="k">import</span> <span class="n">SphinxError</span><span class="p">,</span> <span class="n">ExtensionError</span>
+<span class="kn">from</span> <span class="nn">sphinx.locale</span> <span class="k">import</span> <span class="n">_</span>
+<span class="kn">from</span> <span class="nn">sphinx.transforms</span> <span class="k">import</span> <span class="n">SphinxTransformer</span>
+<span class="kn">from</span> <span class="nn">sphinx.versioning</span> <span class="k">import</span> <span class="n">add_uids</span><span class="p">,</span> <span class="n">merge_doctrees</span>
+<span class="kn">from</span> <span class="nn">sphinx.deprecation</span> <span class="k">import</span> <span class="n">RemovedInSphinx17Warning</span><span class="p">,</span> <span class="n">RemovedInSphinx20Warning</span>
+<span class="kn">from</span> <span class="nn">sphinx.environment.adapters.indexentries</span> <span class="k">import</span> <span class="n">IndexEntries</span>
+<span class="kn">from</span> <span class="nn">sphinx.environment.adapters.toctree</span> <span class="k">import</span> <span class="n">TocTree</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Pattern</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.builders</span> <span class="k">import</span> <span class="n">Builder</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.config</span> <span class="k">import</span> <span class="n">Config</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.domains</span> <span class="k">import</span> <span class="n">Domain</span>  <span class="c1"># NOQA</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">default_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;embed_stylesheet&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;cloak_email_addresses&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s1">&#39;pep_base_url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://www.python.org/dev/peps/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;rfc_base_url&#39;</span><span class="p">:</span> <span class="s1">&#39;https://tools.ietf.org/html/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;input_encoding&#39;</span><span class="p">:</span> <span class="s1">&#39;utf-8-sig&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;doctitle_xform&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;sectsubtitle_xform&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;halt_level&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s1">&#39;file_insertion_enabled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># This is increased every time an environment attribute is added</span>
+<span class="c1"># or changed to properly invalidate pickle files.</span>
+<span class="c1">#</span>
+<span class="c1"># NOTE: increase base version by 2 to have distinct numbers for Py2 and 3</span>
+<span class="n">ENV_VERSION</span> <span class="o">=</span> <span class="mi">52</span> <span class="o">+</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="n">dummy_reporter</span> <span class="o">=</span> <span class="n">Reporter</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="n">versioning_conditions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">is_translatable</span><span class="p">,</span>
+    <span class="s1">&#39;commentable&#39;</span><span class="p">:</span> <span class="n">is_commentable</span><span class="p">,</span>
+<span class="p">}</span>  <span class="c1"># type: Dict[unicode, Union[bool, Callable]]</span>
+
+
+<span class="k">class</span> <span class="nc">NoUri</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised by get_relative_uri if there is no URI available.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="BuildEnvironment"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment">[docs]</a><span class="k">class</span> <span class="nc">BuildEnvironment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The environment in which the ReST files are translated.</span>
+<span class="sd">    Stores an inventory of cross-file targets and provides doctree</span>
+<span class="sd">    transformations to resolve links to them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">domains</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: Dict[unicode, Domain]</span>
+
+    <span class="c1"># --------- ENVIRONMENT PERSISTENCE ----------------------------------------</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (IO, Sphinx) -&gt; BuildEnvironment</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">version</span> <span class="o">!=</span> <span class="n">ENV_VERSION</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;build environment version not current&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">app</span><span class="p">:</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">srcdir</span> <span class="o">!=</span> <span class="n">app</span><span class="o">.</span><span class="n">srcdir</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;source directory has changed&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">env</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">loads</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Sphinx) -&gt; BuildEnvironment</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">frompickle</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Sphinx) -&gt; BuildEnvironment</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="c1"># type: (BuildEnvironment, IO) -&gt; None</span>
+        <span class="c1"># remove unpicklable attributes</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">app</span>
+        <span class="k">del</span> <span class="n">env</span><span class="o">.</span><span class="n">app</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">del</span> <span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">domains</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">domains</span>
+        <span class="k">del</span> <span class="n">env</span><span class="o">.</span><span class="n">domains</span>
+        <span class="c1"># remove potentially pickling-problematic values from config</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">)</span> <span class="ow">or</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">)</span> <span class="ow">or</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">class_types</span><span class="p">):</span>
+                <span class="k">del</span> <span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+        <span class="c1"># reset attributes</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">domains</span> <span class="o">=</span> <span class="n">domains</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">dumps</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+        <span class="c1"># type: (BuildEnvironment) -&gt; unicode</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">io</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">topickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; None</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># --------- ENVIRONMENT INITIALIZATION -------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="c1"># type: (Sphinx) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">doctreedir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">srcdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span>
+
+        <span class="c1"># the method of doctree versioning; see set_versioning_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">versioning_condition</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: Union[bool, Callable]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">versioning_compare</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: bool</span>
+
+        <span class="c1"># all the registered domains, set by the application</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domains</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># the docutils settings for building</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">default_settings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="c1"># the function to write warning messages with</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnfunc</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: Callable</span>
+
+        <span class="c1"># this is to invalidate old pickles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">ENV_VERSION</span>
+
+        <span class="c1"># All &quot;docnames&quot; here are /-separated and relative and exclude</span>
+        <span class="c1"># the source suffix.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>     <span class="c1"># type: Set[unicode]</span>
+                                    <span class="c1"># contains all existing docnames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span> <span class="o">=</span> <span class="p">{}</span>          <span class="c1"># type: Dict[unicode, float]</span>
+                                    <span class="c1"># docname -&gt; mtime at the time of reading</span>
+                                    <span class="c1"># contains all read docnames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>    <span class="c1"># type: Dict[unicode, Set[unicode]]</span>
+                                    <span class="c1"># docname -&gt; set of dependent file</span>
+                                    <span class="c1"># names, relative to documentation root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>       <span class="c1"># type: Set[unicode]</span>
+                                    <span class="c1"># docnames included from other documents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reread_always</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># type: Set[unicode]</span>
+                                    <span class="c1"># docnames to re-read unconditionally on</span>
+                                    <span class="c1"># next build</span>
+
+        <span class="c1"># File metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>       <span class="c1"># type: Dict[unicode, Dict[unicode, Any]]</span>
+                                                <span class="c1"># docname -&gt; dict of metadata items</span>
+
+        <span class="c1"># TOC inventory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">{}</span>            <span class="c1"># type: Dict[unicode, nodes.Node]</span>
+                                    <span class="c1"># docname -&gt; title node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">longtitles</span> <span class="o">=</span> <span class="p">{}</span>        <span class="c1"># type: Dict[unicode, nodes.Node]</span>
+                                    <span class="c1"># docname -&gt; title node; only different if</span>
+                                    <span class="c1"># set differently with title directive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tocs</span> <span class="o">=</span> <span class="p">{}</span>              <span class="c1"># type: Dict[unicode, nodes.Node]</span>
+                                    <span class="c1"># docname -&gt; table of contents nodetree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toc_num_entries</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># type: Dict[unicode, int]</span>
+                                    <span class="c1"># docname -&gt; number of real entries</span>
+
+        <span class="c1"># used to determine when to show the TOC</span>
+        <span class="c1"># in a sidebar (don&#39;t show if it&#39;s only one item)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toc_secnumbers</span> <span class="o">=</span> <span class="p">{}</span>    <span class="c1"># type: Dict[unicode, Dict[unicode, Tuple[int, ...]]]</span>
+                                    <span class="c1"># docname -&gt; dict of sectionid -&gt; number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toc_fignumbers</span> <span class="o">=</span> <span class="p">{}</span>    <span class="c1"># type: Dict[unicode, Dict[unicode, Dict[unicode, Tuple[int, ...]]]]  # NOQA</span>
+                                    <span class="c1"># docname -&gt; dict of figtype -&gt;</span>
+                                    <span class="c1"># dict of figureid -&gt; number</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toctree_includes</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, List[unicode]]</span>
+                                    <span class="c1"># docname -&gt; list of toctree includefiles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_to_rebuild</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, Set[unicode]]</span>
+                                    <span class="c1"># docname -&gt; set of files</span>
+                                    <span class="c1"># (containing its TOCs) to rebuild too</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glob_toctrees</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># type: Set[unicode]</span>
+                                    <span class="c1"># docnames that have :glob: toctrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numbered_toctrees</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># type: Set[unicode]</span>
+                                        <span class="c1"># docnames that have :numbered: toctrees</span>
+
+        <span class="c1"># domain-specific inventories, here to be pickled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domaindata</span> <span class="o">=</span> <span class="p">{}</span>        <span class="c1"># type: Dict[unicode, Dict]</span>
+                                    <span class="c1"># domainname -&gt; domain-specific dict</span>
+
+        <span class="c1"># Other inventories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexentries</span> <span class="o">=</span> <span class="p">{}</span>      <span class="c1"># type: Dict[unicode, List[Tuple[unicode, unicode, unicode, unicode, unicode]]]  # NOQA</span>
+                                    <span class="c1"># docname -&gt; list of</span>
+                                    <span class="c1"># (type, unicode, target, aliasname)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">versionchanges</span> <span class="o">=</span> <span class="p">{}</span>    <span class="c1"># type: Dict[unicode, List[Tuple[unicode, unicode, int, unicode, unicode, unicode]]]  # NOQA</span>
+                                    <span class="c1"># version -&gt; list of (type, docname,</span>
+                                    <span class="c1"># lineno, module, descname, content)</span>
+
+        <span class="c1"># these map absolute path -&gt; (docnames, unique filename)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images</span> <span class="o">=</span> <span class="n">FilenameUniqDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlfiles</span> <span class="o">=</span> <span class="n">FilenameUniqDict</span><span class="p">()</span>
+
+        <span class="c1"># the original URI for images</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_image_uri</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, unicode]</span>
+
+        <span class="c1"># temporary data storage while reading a document</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span> <span class="o">=</span> <span class="p">{}</span>         <span class="c1"># type: Dict[unicode, Any]</span>
+        <span class="c1"># context for cross-references (e.g. current module or class)</span>
+        <span class="c1"># this is similar to temp_data, but will for example be copied to</span>
+        <span class="c1"># attributes of &quot;any&quot; cross references</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_context</span> <span class="o">=</span> <span class="p">{}</span>       <span class="c1"># type: Dict[unicode, Any]</span>
+
+    <span class="k">def</span> <span class="nf">set_warnfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="c1"># type: (Callable) -&gt; None</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.set_warnfunc() is now deprecated. Use sphinx.util.logging instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx20Warning</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_versioning_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">compare</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, bool) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;This sets the doctree versioning method for this environment.</span>
+
+<span class="sd">        Versioning methods are a builder property; only builders with the same</span>
+<span class="sd">        versioning method can share the same doctree directory.  Therefore, we</span>
+<span class="sd">        raise an exception if the user tries to use an environment with an</span>
+<span class="sd">        incompatible versioning method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">versioning_conditions</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid versioning method: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">method</span><span class="p">)</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">versioning_conditions</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">versioning_condition</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SphinxError</span><span class="p">(</span><span class="s1">&#39;This environment is incompatible with the &#39;</span>
+                              <span class="s1">&#39;selected builder, please choose another &#39;</span>
+                              <span class="s1">&#39;doctree directory.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">versioning_condition</span> <span class="o">=</span> <span class="n">condition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">versioning_compare</span> <span class="o">=</span> <span class="n">compare</span>
+
+<div class="viewcode-block" id="BuildEnvironment.warn"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.warn">[docs]</a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">lineno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, int, Any) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Emit a warning.</span>
+
+<span class="sd">        This differs from using ``app.warn()`` in that the warning may not</span>
+<span class="sd">        be emitted instantly, but collected for emitting all warnings after</span>
+<span class="sd">        the update of the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># strange argument order is due to backwards compatibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnfunc</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">lineno</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuildEnvironment.warn_node"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.warn_node">[docs]</a>    <span class="k">def</span> <span class="nf">warn_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, nodes.Node, Any) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Like :meth:`warn`, but with source information taken from *node*.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnfunc</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_source_line</span><span class="p">(</span><span class="n">node</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">clear_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Remove all traces of a source file in the inventory.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">docname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reread_always</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">version</span><span class="p">,</span> <span class="n">changes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">versionchanges</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="p">[</span><span class="n">change</span> <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">changes</span> <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">docname</span><span class="p">]</span>
+                <span class="n">changes</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new</span>
+
+        <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">domain</span><span class="o">.</span><span class="n">clear_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">merge_info_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="c1"># type: (List[unicode], BuildEnvironment, Sphinx) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Merge global information gathered about *docnames* while reading them</span>
+<span class="sd">        from the *other* environment.</span>
+
+<span class="sd">        This possibly comes from a parallel build process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">docnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">docnames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">all_docs</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">reread_always</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reread_always</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">version</span><span class="p">,</span> <span class="n">changes</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">versionchanges</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">versionchanges</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">change</span> <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">changes</span> <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">docnames</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">domainname</span><span class="p">,</span> <span class="n">domain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">domain</span><span class="o">.</span><span class="n">merge_domaindata</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">domaindata</span><span class="p">[</span><span class="n">domainname</span><span class="p">])</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-merge-info&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">path2doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; unicode</span>
+        <span class="sd">&quot;&quot;&quot;Return the docname for the filename if the file is document.</span>
+
+<span class="sd">        *filename* should be absolute or relative to the source directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">):</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># the file does not have docname</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BuildEnvironment.doc2path"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path">[docs]</a>    <span class="k">def</span> <span class="nf">doc2path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Union[bool, unicode], unicode) -&gt; unicode</span>
+        <span class="sd">&quot;&quot;&quot;Return the filename for the document name.</span>
+
+<span class="sd">        If *base* is True, return absolute path under self.srcdir.</span>
+<span class="sd">        If *base* is None, return relative path to self.srcdir.</span>
+<span class="sd">        If *base* is a path string, return absolute path under that.</span>
+<span class="sd">        If *suffix* is not None, add it instead of config.source_suffix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">docname</span> <span class="o">=</span> <span class="n">docname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">SEP</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">candidate_suffix</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: unicode</span>
+            <span class="k">for</span> <span class="n">candidate_suffix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span> <span class="o">+</span>
+                               <span class="n">candidate_suffix</span><span class="p">):</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="n">candidate_suffix</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># document does not exist</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span> <span class="o">+</span> <span class="n">suffix</span>
+        <span class="k">elif</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">docname</span> <span class="o">+</span> <span class="n">suffix</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span> <span class="o">+</span> <span class="n">suffix</span>  <span class="c1"># type: ignore</span></div>
+
+<div class="viewcode-block" id="BuildEnvironment.relfn2path"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.relfn2path">[docs]</a>    <span class="k">def</span> <span class="nf">relfn2path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">docname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; Tuple[unicode, unicode]</span>
+        <span class="sd">&quot;&quot;&quot;Return paths to a file referenced from a document, relative to</span>
+<span class="sd">        documentation root and absolute.</span>
+
+<span class="sd">        In the input &quot;filename&quot;, absolute filenames are taken as relative to the</span>
+<span class="sd">        source dir, while relative filenames are relative to the dir of the</span>
+<span class="sd">        containing document.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">):</span>
+            <span class="n">rel_fn</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">docdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">docname</span><span class="p">,</span>
+                                                <span class="n">base</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+            <span class="n">rel_fn</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">docdir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># the path.abspath() might seem redundant, but otherwise artifacts</span>
+            <span class="c1"># such as &quot;..&quot; will remain in the path</span>
+            <span class="k">return</span> <span class="n">rel_fn</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">rel_fn</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+            <span class="c1"># the source directory is a bytestring with non-ASCII characters;</span>
+            <span class="c1"># let&#39;s try to encode the rel_fn in the file system encoding</span>
+            <span class="n">enc_rel_fn</span> <span class="o">=</span> <span class="n">rel_fn</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">getfilesystemencoding</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">rel_fn</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">enc_rel_fn</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">find_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">builder</span><span class="p">):</span>
+        <span class="c1"># type: (Config, Builder) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Find all source files in the source dir and put them in</span>
+<span class="sd">        self.found_docs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matchers</span> <span class="o">=</span> <span class="n">compile_matchers</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">exclude_patterns</span><span class="p">[:]</span> <span class="o">+</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">templates_path</span> <span class="o">+</span>
+            <span class="n">builder</span><span class="o">.</span><span class="n">get_asset_paths</span><span class="p">()</span> <span class="o">+</span>
+            <span class="p">[</span><span class="s1">&#39;**/_sources&#39;</span><span class="p">,</span> <span class="s1">&#39;.#*&#39;</span><span class="p">,</span> <span class="s1">&#39;**/.#*&#39;</span><span class="p">,</span> <span class="s1">&#39;*.lproj/**&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">get_matching_docs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                                         <span class="n">exclude_matchers</span><span class="o">=</span><span class="n">matchers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;document not readable. Ignored.&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="c1"># Current implementation is applying translated messages in the reading</span>
+        <span class="c1"># phase.Therefore, in order to apply the updated message catalog, it is</span>
+        <span class="c1"># necessary to re-process from the reading phase. Here, if dependency</span>
+        <span class="c1"># is set for the doc source and the mo file, it is processed again from</span>
+        <span class="c1"># the reading phase when mo is updated. In the future, we would like to</span>
+        <span class="c1"># move i18n process into the writing phase, and remove these lines.</span>
+        <span class="k">if</span> <span class="n">builder</span><span class="o">.</span><span class="n">use_message_catalog</span><span class="p">:</span>
+            <span class="c1"># add catalog mo file dependency</span>
+            <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span><span class="p">:</span>
+                <span class="n">catalog_files</span> <span class="o">=</span> <span class="n">find_catalog_files</span><span class="p">(</span>
+                    <span class="n">docname</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">locale_dirs</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">catalog_files</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_outdated_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_changed</span><span class="p">):</span>
+        <span class="c1"># type: (bool) -&gt; Tuple[Set[unicode], Set[unicode], Set[unicode]]</span>
+        <span class="sd">&quot;&quot;&quot;Return (added, changed, removed) sets.&quot;&quot;&quot;</span>
+        <span class="c1"># clear all files no longer present</span>
+        <span class="n">removed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span>
+
+        <span class="n">added</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># type: Set[unicode]</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># type: Set[unicode]</span>
+
+        <span class="k">if</span> <span class="n">config_changed</span><span class="p">:</span>
+            <span class="c1"># config values affect e.g. substitutions</span>
+            <span class="n">added</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">docname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">:</span>
+                    <span class="n">added</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="c1"># if the doctree file is not there, rebuild</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">,</span>
+                                                 <span class="s1">&#39;.doctree&#39;</span><span class="p">)):</span>
+                    <span class="n">changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="c1"># check the &quot;reread always&quot; list</span>
+                <span class="k">if</span> <span class="n">docname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reread_always</span><span class="p">:</span>
+                    <span class="n">changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="c1"># check the mtime of the document</span>
+                <span class="n">mtime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span>
+                <span class="n">newmtime</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">newmtime</span> <span class="o">&gt;</span> <span class="n">mtime</span><span class="p">:</span>
+                    <span class="n">changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="c1"># finally, check the mtime of dependencies</span>
+                <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="n">docname</span><span class="p">]:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># this will do the right thing when dep is absolute too</span>
+                        <span class="n">deppath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">deppath</span><span class="p">):</span>
+                            <span class="n">changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                            <span class="k">break</span>
+                        <span class="n">depmtime</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">deppath</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">depmtime</span> <span class="o">&gt;</span> <span class="n">mtime</span><span class="p">:</span>
+                            <span class="n">changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                            <span class="k">break</span>
+                    <span class="k">except</span> <span class="ne">EnvironmentError</span><span class="p">:</span>
+                        <span class="c1"># give it another chance</span>
+                        <span class="n">changed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">added</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span> <span class="n">removed</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">srcdir</span><span class="p">,</span> <span class="n">doctreedir</span><span class="p">):</span>
+        <span class="c1"># type: (Config, unicode, unicode) -&gt; List[unicode]</span>
+        <span class="sd">&quot;&quot;&quot;(Re-)read all files new or changed since last update.</span>
+
+<span class="sd">        Store all environment docnames in the canonical format (ie using SEP as</span>
+<span class="sd">        a separator in place of os.path.sep).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config_changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;[new config] &#39;</span>
+            <span class="n">config_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># check if a config value was changed that affects how</span>
+            <span class="c1"># doctrees are read</span>
+            <span class="k">for</span> <span class="n">confval</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">confval</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">!=</span> <span class="n">confval</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;[config changed] &#39;</span>
+                    <span class="n">config_changed</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="c1"># this value is not covered by the above loop because it is handled</span>
+            <span class="c1"># specially by the config class</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">extensions</span> <span class="o">!=</span> <span class="n">config</span><span class="o">.</span><span class="n">extensions</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;[extensions changed] &#39;</span>
+                <span class="n">config_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># the source and doctree directories may have been relocated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span> <span class="o">=</span> <span class="n">srcdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span> <span class="o">=</span> <span class="n">doctreedir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_files</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">builder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+        <span class="c1"># this cache also needs to be updated every time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nitpick_ignore</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">nitpick_ignore</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;updating environment: &#39;</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">added</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span> <span class="n">removed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_outdated_files</span><span class="p">(</span><span class="n">config_changed</span><span class="p">)</span>
+
+        <span class="c1"># allow user intervention as well</span>
+        <span class="k">for</span> <span class="n">docs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-get-outdated&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">added</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span> <span class="n">removed</span><span class="p">):</span>
+            <span class="n">changed</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">docs</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span><span class="p">)</span>
+
+        <span class="c1"># if files were added or removed, all documents with globbed toctrees</span>
+        <span class="c1"># must be reread</span>
+        <span class="k">if</span> <span class="n">added</span> <span class="ow">or</span> <span class="n">removed</span><span class="p">:</span>
+            <span class="c1"># ... but not those that already were removed</span>
+            <span class="n">changed</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">glob_toctrees</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">found_docs</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> added, </span><span class="si">%s</span><span class="s1"> changed, </span><span class="si">%s</span><span class="s1"> removed&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">added</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">changed</span><span class="p">),</span>
+                                                     <span class="nb">len</span><span class="p">(</span><span class="n">removed</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># clear all files no longer present</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">removed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-purge-doc&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="c1"># read all new and changed files</span>
+        <span class="n">docnames</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">added</span> <span class="o">|</span> <span class="n">changed</span><span class="p">)</span>
+        <span class="c1"># allow changing and reordering the list of docs to read</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-before-read-docs&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">)</span>
+
+        <span class="c1"># check if we should do parallel or serial read</span>
+        <span class="n">par_ok</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">parallel_available</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">parallel</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">extensions</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">parallel_read_safe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;the </span><span class="si">%s</span><span class="s1"> extension does not declare if it is safe &#39;</span>
+                                     <span class="s1">&#39;for parallel reading, assuming it isn</span><span class="se">\&#39;</span><span class="s1">t - please &#39;</span>
+                                     <span class="s1">&#39;ask the extension author to check and make it &#39;</span>
+                                     <span class="s1">&#39;explicit&#39;</span><span class="p">),</span> <span class="n">ext</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;doing serial read&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">ext</span><span class="o">.</span><span class="n">parallel_read_safe</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># all extensions support parallel-read</span>
+                <span class="n">par_ok</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">par_ok</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_parallel</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">parallel</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_serial</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">master_doc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SphinxError</span><span class="p">(</span><span class="s1">&#39;master file </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">retval</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-updated&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">retval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">docnames</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">retval</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_serial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="c1"># type: (List[unicode], Sphinx) -&gt; None</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="s1">&#39;reading sources... &#39;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+                                       <span class="nb">len</span><span class="p">(</span><span class="n">docnames</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">):</span>
+            <span class="c1"># remove all inventory entries for that file</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-purge-doc&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_parallel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">nproc</span><span class="p">):</span>
+        <span class="c1"># type: (List[unicode], Sphinx, int) -&gt; None</span>
+        <span class="c1"># clear all outdated docs at once</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">docnames</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-purge-doc&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">read_process</span><span class="p">(</span><span class="n">docs</span><span class="p">):</span>
+            <span class="c1"># type: (List[unicode]) -&gt; unicode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+            <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">read_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+            <span class="c1"># allow pickling self to send it back</span>
+            <span class="k">return</span> <span class="n">BuildEnvironment</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">otherenv</span><span class="p">):</span>
+            <span class="c1"># type: (List[unicode], unicode) -&gt; None</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="n">BuildEnvironment</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">otherenv</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merge_info_from</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">app</span><span class="p">)</span>
+
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">ParallelTasks</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="n">make_chunks</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="n">nproc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="s1">&#39;reading sources... &#39;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+                                     <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">):</span>
+            <span class="n">tasks</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">read_process</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">merge</span><span class="p">)</span>
+
+        <span class="c1"># make sure all threads have finished</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;waiting for workers...&#39;</span><span class="p">))</span>
+        <span class="n">tasks</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">check_dependents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">already</span><span class="p">):</span>
+        <span class="c1"># type: (Sphinx, Set[unicode]) -&gt; Iterator[unicode]</span>
+        <span class="n">to_rewrite</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[unicode]</span>
+        <span class="k">for</span> <span class="n">docnames</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-get-updated&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
+            <span class="n">to_rewrite</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">to_rewrite</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">docname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">already</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">docname</span>
+
+    <span class="c1"># --------- SINGLE FILE READING --------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">warn_and_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+        <span class="c1"># type: (Any) -&gt; Tuple</span>
+        <span class="sd">&quot;&quot;&quot;Custom decoding error handler that warns and replaces.&quot;&quot;&quot;</span>
+        <span class="n">linestart</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">lineend</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lineend</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">lineend</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="p">)</span>
+        <span class="n">lineno</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;undecodable source characters, replacing with &quot;?&quot;: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span>
+                       <span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="p">[</span><span class="n">linestart</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">error</span><span class="o">.</span><span class="n">start</span><span class="p">]</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;&gt;&gt;&gt;&#39;</span> <span class="o">+</span>
+                        <span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="p">[</span><span class="n">error</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="n">error</span><span class="o">.</span><span class="n">end</span><span class="p">]</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;&lt;&lt;&lt;&#39;</span> <span class="o">+</span>
+                        <span class="n">error</span><span class="o">.</span><span class="n">object</span><span class="p">[</span><span class="n">error</span><span class="o">.</span><span class="n">end</span><span class="p">:</span><span class="n">lineend</span><span class="p">]),</span>
+                       <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">docname</span><span class="p">,</span> <span class="n">lineno</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">u</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">read_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">app</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Sphinx) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Parse a file and add/update inventory entries for the doctree.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">docname</span>
+        <span class="c1"># defaults to the global default, but can be re-set in a document</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="p">[</span><span class="s1">&#39;default_domain&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">primary_domain</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;input_encoding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_encoding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;trim_footnote_reference_space&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trim_footnote_reference_space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;gettext_compact&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span>
+
+        <span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span> <span class="ow">or</span> <span class="s1">&#39;en&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;language_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">language</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;smart_quotes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_use_smartypants</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;html_use_smartypants option is deprecated. Smart &quot;</span>
+                          <span class="s2">&quot;quotes are on by default; if you want to disable &quot;</span>
+                          <span class="s2">&quot;or customize them, use the smart_quotes option in &quot;</span>
+                          <span class="s2">&quot;docutils.conf.&quot;</span><span class="p">,</span>
+                          <span class="n">RemovedInSphinx17Warning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;smart_quotes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_use_smartypants</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">normalize_language_tag</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">smartchars</span><span class="o">.</span><span class="n">quotes</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;smart_quotes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">docutilsconf</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="s1">&#39;docutils.conf&#39;</span><span class="p">)</span>
+        <span class="c1"># read docutils.conf from source dir, not from current dir</span>
+        <span class="n">OptionParser</span><span class="o">.</span><span class="n">standard_config_files</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">docutilsconf</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">docutilsconf</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">note_dependency</span><span class="p">(</span><span class="n">docutilsconf</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">sphinx_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_role</span><span class="p">:</span>
+                <span class="n">role_fn</span><span class="p">,</span> <span class="n">messages</span> <span class="o">=</span> <span class="n">roles</span><span class="o">.</span><span class="n">role</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_role</span><span class="p">,</span> <span class="n">english</span><span class="p">,</span>
+                                               <span class="mi">0</span><span class="p">,</span> <span class="n">dummy_reporter</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">role_fn</span><span class="p">:</span>
+                    <span class="n">roles</span><span class="o">.</span><span class="n">_roles</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">role_fn</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;default role </span><span class="si">%s</span><span class="s1"> not found&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_role</span><span class="p">,</span>
+                                   <span class="n">location</span><span class="o">=</span><span class="n">docname</span><span class="p">)</span>
+
+            <span class="n">codecs</span><span class="o">.</span><span class="n">register_error</span><span class="p">(</span><span class="s1">&#39;sphinx&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warn_and_replace</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+            <span class="c1"># publish manually</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">SphinxStandaloneReader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">,</span>
+                                            <span class="n">parsers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_source_parsers</span><span class="p">())</span>
+            <span class="n">pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">,</span>
+                            <span class="n">writer</span><span class="o">=</span><span class="n">SphinxDummyWriter</span><span class="p">(),</span>
+                            <span class="n">destination_class</span><span class="o">=</span><span class="n">NullOutput</span><span class="p">)</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">set_components</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;restructuredtext&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">process_programmatic_settings</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">src_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">SphinxFileInput</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source_path</span><span class="o">=</span><span class="n">src_path</span><span class="p">,</span>
+                                     <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_encoding</span><span class="p">)</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">src_path</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">set_destination</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">publish</span><span class="p">()</span>
+            <span class="n">doctree</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">document</span>
+
+        <span class="c1"># post-processing</span>
+        <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">):</span>
+            <span class="n">domain</span><span class="o">.</span><span class="n">process_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+
+        <span class="c1"># allow extension-specific post-processing</span>
+        <span class="k">if</span> <span class="n">app</span><span class="p">:</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;doctree-read&#39;</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+
+        <span class="c1"># store time of reading, for outdated files detection</span>
+        <span class="c1"># (Some filesystems have coarse timestamp resolution;</span>
+        <span class="c1"># therefore time.time() can be older than filesystem&#39;s timestamp.</span>
+        <span class="c1"># For example, FAT32 has 2sec timestamp resolution.)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">versioning_condition</span><span class="p">:</span>
+            <span class="n">old_doctree</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">versioning_compare</span><span class="p">:</span>
+                <span class="c1"># get old doctree</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">,</span> <span class="s1">&#39;.doctree&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">old_doctree</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">EnvironmentError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+            <span class="c1"># add uids for versioning</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">versioning_compare</span> <span class="ow">or</span> <span class="n">old_doctree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">add_uids</span><span class="p">(</span><span class="n">doctree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">versioning_condition</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">merge_doctrees</span><span class="p">(</span>
+                    <span class="n">old_doctree</span><span class="p">,</span> <span class="n">doctree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">versioning_condition</span><span class="p">))</span>
+
+        <span class="c1"># make it picklable</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">transformer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">warning_stream</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">record_dependencies</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># cleanup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_context</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">roles</span><span class="o">.</span><span class="n">_roles</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># if a document has set a local default role</span>
+
+        <span class="c1"># save the parsed doctree</span>
+        <span class="n">doctree_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">,</span>
+                                         <span class="s1">&#39;.doctree&#39;</span><span class="p">)</span>
+        <span class="n">ensuredir</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">doctree_filename</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">doctree_filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">doctree</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+    <span class="c1"># utilities to use while reading a document</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">docname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; unicode</span>
+        <span class="sd">&quot;&quot;&quot;Returns the docname of the document currently being parsed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">currmodule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Backwards compatible alias.  Will be removed.&quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.currmodule is deprecated. &#39;</span>
+                      <span class="s1">&#39;Use env.ref_context[&quot;py:module&quot;] instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx17Warning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;py:module&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">currclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Backwards compatible alias.  Will be removed.&quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.currclass is deprecated. &#39;</span>
+                      <span class="s1">&#39;Use env.ref_context[&quot;py:class&quot;] instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx17Warning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;py:class&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BuildEnvironment.new_serialno"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.new_serialno">[docs]</a>    <span class="k">def</span> <span class="nf">new_serialno</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; int</span>
+        <span class="sd">&quot;&quot;&quot;Return a serial number, e.g. for index entry targets.</span>
+
+<span class="sd">        The number is guaranteed to be unique in the current document.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">category</span> <span class="o">+</span> <span class="s1">&#39;serialno&#39;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">cur</span></div>
+
+<div class="viewcode-block" id="BuildEnvironment.note_dependency"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.note_dependency">[docs]</a>    <span class="k">def</span> <span class="nf">note_dependency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Add *filename* as a dependency of the current document.</span>
+
+<span class="sd">        This means that the document will be rebuilt if this file changes.</span>
+
+<span class="sd">        *filename* should be absolute or relative to the source directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">docname</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">note_included</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Add *filename* as a included from other document.</span>
+
+<span class="sd">        This means the document is not orphaned.</span>
+
+<span class="sd">        *filename* should be absolute or relative to the source directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">included</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path2doc</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+
+<div class="viewcode-block" id="BuildEnvironment.note_reread"><a class="viewcode-back" href="../../sphinx/doc/extdev/envapi.html#sphinx.environment.BuildEnvironment.note_reread">[docs]</a>    <span class="k">def</span> <span class="nf">note_reread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Add the current document to the list of documents that will</span>
+<span class="sd">        automatically be re-read at the next build.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reread_always</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">docname</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">note_versionchange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">lineno</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, nodes.Node, int) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">versionchanges</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">],</span> <span class="n">lineno</span><span class="p">,</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">ref_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;py:module&#39;</span><span class="p">),</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;object&#39;</span><span class="p">),</span> <span class="n">node</span><span class="o">.</span><span class="n">astext</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">note_toctree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">toctreenode</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, addnodes.toctree) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Note a TOC tree directive in a document and gather information about</span>
+<span class="sd">        file relations from it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.note_toctree() is deprecated. &#39;</span>
+                      <span class="s1">&#39;Use sphinx.environment.adapters.toctre.TocTree instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx20Warning</span><span class="p">)</span>
+        <span class="n">TocTree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">toctreenode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_toc_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Builder) -&gt; Dict[unicode, nodes.Node]</span>
+        <span class="sd">&quot;&quot;&quot;Return a TOC nodetree -- for use on the same page only!&quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.get_toc_for() is deprecated. &#39;</span>
+                      <span class="s1">&#39;Use sphinx.environment.adapters.toctre.TocTree instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx20Warning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TocTree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_toc_for</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_toctree_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">collapse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Builder, bool, Any) -&gt; addnodes.toctree</span>
+        <span class="sd">&quot;&quot;&quot;Return the global TOC nodetree.&quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.get_toctree_for() is deprecated. &#39;</span>
+                      <span class="s1">&#39;Use sphinx.environment.adapters.toctre.TocTree instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx20Warning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TocTree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_toctree_for</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">collapse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domainname</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; Domain</span>
+        <span class="sd">&quot;&quot;&quot;Return the domain instance with the specified name.</span>
+
+<span class="sd">        Raises an ExtensionError if the domain is not registered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">domainname</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExtensionError</span><span class="p">(</span><span class="s1">&#39;Domain </span><span class="si">%r</span><span class="s1"> is not registered&#39;</span> <span class="o">%</span> <span class="n">domainname</span><span class="p">)</span>
+
+    <span class="c1"># --------- RESOLVING REFERENCES AND TOCTREES ------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">get_doctree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">):</span>
+        <span class="c1"># type: (unicode) -&gt; nodes.Node</span>
+        <span class="sd">&quot;&quot;&quot;Read the doctree for a file from the pickle and return it.&quot;&quot;&quot;</span>
+        <span class="n">doctree_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">,</span> <span class="s1">&#39;.doctree&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">doctree_filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">doctree</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">doctree</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="n">Reporter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doc2path</span><span class="p">(</span><span class="n">docname</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">WarningStream</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">doctree</span>
+
+    <span class="k">def</span> <span class="nf">get_and_resolve_doctree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">doctree</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">prune_toctrees</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">includehidden</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Builder, nodes.Node, bool, bool) -&gt; nodes.Node</span>
+        <span class="sd">&quot;&quot;&quot;Read the doctree from the pickle, resolve cross-references and</span>
+<span class="sd">        toctrees and return it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">doctree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">doctree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_doctree</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="c1"># resolve all pending cross-references</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_post_transforms</span><span class="p">(</span><span class="n">doctree</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+
+        <span class="c1"># now, resolve all toctree nodes</span>
+        <span class="k">for</span> <span class="n">toctreenode</span> <span class="ow">in</span> <span class="n">doctree</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">addnodes</span><span class="o">.</span><span class="n">toctree</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">TocTree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">toctreenode</span><span class="p">,</span>
+                                           <span class="n">prune</span><span class="o">=</span><span class="n">prune_toctrees</span><span class="p">,</span>
+                                           <span class="n">includehidden</span><span class="o">=</span><span class="n">includehidden</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">toctreenode</span><span class="o">.</span><span class="n">replace_self</span><span class="p">([])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">toctreenode</span><span class="o">.</span><span class="n">replace_self</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">doctree</span>
+
+    <span class="k">def</span> <span class="nf">resolve_toctree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">toctree</span><span class="p">,</span> <span class="n">prune</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">maxdepth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">titles_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">includehidden</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Builder, addnodes.toctree, bool, int, bool, bool, bool) -&gt; nodes.Node</span>
+        <span class="sd">&quot;&quot;&quot;Resolve a *toctree* node into individual bullet lists with titles</span>
+<span class="sd">        as items, returning None (if no containing titles are found) or</span>
+<span class="sd">        a new node.</span>
+
+<span class="sd">        If *prune* is True, the tree is pruned to *maxdepth*, or if that is 0,</span>
+<span class="sd">        to the value of the *maxdepth* option on the *toctree* node.</span>
+<span class="sd">        If *titles_only* is True, only toplevel document titles will be in the</span>
+<span class="sd">        resulting tree.</span>
+<span class="sd">        If *collapse* is True, all branches not containing docname will</span>
+<span class="sd">        be collapsed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">TocTree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">toctree</span><span class="p">,</span> <span class="n">prune</span><span class="p">,</span>
+                                     <span class="n">maxdepth</span><span class="p">,</span> <span class="n">titles_only</span><span class="p">,</span> <span class="n">collapse</span><span class="p">,</span>
+                                     <span class="n">includehidden</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">resolve_references</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doctree</span><span class="p">,</span> <span class="n">fromdocname</span><span class="p">,</span> <span class="n">builder</span><span class="p">):</span>
+        <span class="c1"># type: (nodes.Node, unicode, Builder) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_post_transforms</span><span class="p">(</span><span class="n">doctree</span><span class="p">,</span> <span class="n">fromdocname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">apply_post_transforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doctree</span><span class="p">,</span> <span class="n">docname</span><span class="p">):</span>
+        <span class="c1"># type: (nodes.Node, unicode) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Apply all post-transforms.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># set env.docname during applying post-transforms</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">docname</span>
+
+            <span class="n">transformer</span> <span class="o">=</span> <span class="n">SphinxTransformer</span><span class="p">(</span><span class="n">doctree</span><span class="p">)</span>
+            <span class="n">transformer</span><span class="o">.</span><span class="n">set_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">transformer</span><span class="o">.</span><span class="n">add_transforms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">post_transforms</span><span class="p">)</span>
+            <span class="n">transformer</span><span class="o">.</span><span class="n">apply_transforms</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temp_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># allow custom references to be resolved</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;doctree-resolved&#39;</span><span class="p">,</span> <span class="n">doctree</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builder</span><span class="p">,</span> <span class="n">group_entries</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">_fixre</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(.*) ([(][^()]*[)])&#39;</span><span class="p">)):</span>
+        <span class="c1"># type: (Builder, bool, Pattern) -&gt; List[Tuple[unicode, List[Tuple[unicode, List[unicode]]]]]  # NOQA</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;env.create_index() is deprecated. &#39;</span>
+                      <span class="s1">&#39;Use sphinx.environment.adapters.indexentreis.IndexEntries instead.&#39;</span><span class="p">,</span>
+                      <span class="n">RemovedInSphinx20Warning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">IndexEntries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">builder</span><span class="p">,</span>
+                                               <span class="n">group_entries</span><span class="o">=</span><span class="n">group_entries</span><span class="p">,</span>
+                                               <span class="n">_fixre</span><span class="o">=</span><span class="n">_fixre</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">collect_relations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Dict[unicode, List[unicode]]</span>
+        <span class="n">traversed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">traverse_toctree</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">docname</span><span class="p">):</span>
+            <span class="c1"># type: (unicode, unicode) -&gt; Iterator[Tuple[unicode, unicode]]</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="o">==</span> <span class="n">docname</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;self referenced toctree found. Ignored.&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">docname</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="c1"># traverse toctree by pre-order</span>
+            <span class="k">yield</span> <span class="n">parent</span><span class="p">,</span> <span class="n">docname</span>
+            <span class="n">traversed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toctree_includes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]):</span>
+                <span class="k">for</span> <span class="n">subparent</span><span class="p">,</span> <span class="n">subdocname</span> <span class="ow">in</span> <span class="n">traverse_toctree</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">subdocname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">traversed</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">subparent</span><span class="p">,</span> <span class="n">subdocname</span>
+                        <span class="n">traversed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">subdocname</span><span class="p">)</span>
+
+        <span class="n">relations</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">docnames</span> <span class="o">=</span> <span class="n">traverse_toctree</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">)</span>
+        <span class="n">prevdoc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">parent</span><span class="p">,</span> <span class="n">docname</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">nextparent</span><span class="p">,</span> <span class="n">nextdoc</span> <span class="ow">in</span> <span class="n">docnames</span><span class="p">:</span>
+            <span class="n">relations</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">parent</span><span class="p">,</span> <span class="n">prevdoc</span><span class="p">,</span> <span class="n">nextdoc</span><span class="p">]</span>
+            <span class="n">prevdoc</span> <span class="o">=</span> <span class="n">docname</span>
+            <span class="n">docname</span> <span class="o">=</span> <span class="n">nextdoc</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">nextparent</span>
+
+        <span class="n">relations</span><span class="p">[</span><span class="n">docname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">parent</span><span class="p">,</span> <span class="n">prevdoc</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">relations</span>
+
+    <span class="k">def</span> <span class="nf">check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Do consistency checks.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">docname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_to_rebuild</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">docname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">:</span>
+                    <span class="c1"># the master file is not included anywhere ;)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">docname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">included</span><span class="p">:</span>
+                    <span class="c1"># the document is included from other documents</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="s1">&#39;orphan&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">docname</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;document isn</span><span class="se">\&#39;</span><span class="s1">t included in any toctree&#39;</span><span class="p">,</span>
+                               <span class="n">location</span><span class="o">=</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="c1"># call check-consistency for all extensions</span>
+        <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">domain</span><span class="o">.</span><span class="n">check_consistency</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;env-check-consistency&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

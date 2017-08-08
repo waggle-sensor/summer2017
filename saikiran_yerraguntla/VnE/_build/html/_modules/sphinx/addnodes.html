@@ -1,0 +1,380 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.addnodes &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.addnodes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.addnodes</span>
+<span class="sd">    ~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Additional docutils nodes.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span>  <span class="c1"># NOQA</span>
+
+
+<span class="k">class</span> <span class="nc">translatable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node which supports translation.</span>
+
+<span class="sd">    The translation goes forward with following steps:</span>
+
+<span class="sd">    1. Preserve original translatable messages</span>
+<span class="sd">    2. Apply translated messages from message catalog</span>
+<span class="sd">    3. Extract preserved messages (for gettext builder)</span>
+
+<span class="sd">    The translatable nodes MUST preserve original messages.</span>
+<span class="sd">    And these messages should not be overridden at applying step.</span>
+<span class="sd">    Because they are used at final step; extraction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">preserve_original_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Preserve original translatable messages.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">apply_translated_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_message</span><span class="p">,</span> <span class="n">translated_message</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Apply translated message.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">extract_original_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Sequence[unicode]</span>
+        <span class="sd">&quot;&quot;&quot;Extract translation messages.</span>
+
+<span class="sd">        :returns: list of extracted messages or messages generator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+
+<div class="viewcode-block" id="toctree"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.toctree">[docs]</a><span class="k">class</span> <span class="nc">toctree</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">General</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span> <span class="n">translatable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for inserting a &quot;TOC tree&quot;.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">preserve_original_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;caption&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;rawcaption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">apply_translated_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_message</span><span class="p">,</span> <span class="n">translated_message</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rawcaption&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">original_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">translated_message</span>
+
+    <span class="k">def</span> <span class="nf">extract_original_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; List[unicode]</span>
+        <span class="k">if</span> <span class="s1">&#39;rawcaption&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;rawcaption&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<span class="c1"># domain-specific object descriptions (class, function etc.)</span>
+
+<div class="viewcode-block" id="desc"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc">[docs]</a><span class="k">class</span> <span class="nc">desc</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Admonition</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for object descriptions.</span>
+
+<span class="sd">    This node is similar to a &quot;definition list&quot; with one definition.  It</span>
+<span class="sd">    contains one or more ``desc_signature`` and a ``desc_content``.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="desc_signature"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_signature">[docs]</a><span class="k">class</span> <span class="nc">desc_signature</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for object signatures.</span>
+
+<span class="sd">    The &quot;term&quot; part of the custom Sphinx definition list.</span>
+
+<span class="sd">    As default the signature is a single line signature,</span>
+<span class="sd">    but set ``is_multiline = True`` to describe a multi-line signature.</span>
+<span class="sd">    In that case all child nodes must be ``desc_signature_line`` nodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="desc_signature_line"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_signature_line">[docs]</a><span class="k">class</span> <span class="nc">desc_signature_line</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for a line in a multi-line object signatures.</span>
+
+<span class="sd">    It should only be used in a ``desc_signature`` with ``is_multiline`` set.</span>
+<span class="sd">    Set ``add_permalink = True`` for the line that should get the permalink.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># nodes to use within a desc_signature or desc_signature_line</span>
+
+<div class="viewcode-block" id="desc_addname"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_addname">[docs]</a><span class="k">class</span> <span class="nc">desc_addname</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for additional name parts (module name, class name).&quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># compatibility alias</span>
+<span class="n">desc_classname</span> <span class="o">=</span> <span class="n">desc_addname</span>
+
+
+<div class="viewcode-block" id="desc_type"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_type">[docs]</a><span class="k">class</span> <span class="nc">desc_type</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for return types or object type names.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="desc_returns"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_returns">[docs]</a><span class="k">class</span> <span class="nc">desc_returns</span><span class="p">(</span><span class="n">desc_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for a &quot;returns&quot; annotation (a la -&gt; in Python).&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">astext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; unicode</span>
+        <span class="k">return</span> <span class="s1">&#39; -&gt; &#39;</span> <span class="o">+</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="o">.</span><span class="n">astext</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="desc_name"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_name">[docs]</a><span class="k">class</span> <span class="nc">desc_name</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for the main object name.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="desc_parameterlist"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_parameterlist">[docs]</a><span class="k">class</span> <span class="nc">desc_parameterlist</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for a general parameter list.&quot;&quot;&quot;</span>
+    <span class="n">child_text_separator</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span></div>
+
+
+<div class="viewcode-block" id="desc_parameter"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_parameter">[docs]</a><span class="k">class</span> <span class="nc">desc_parameter</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for a single parameter.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="desc_optional"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_optional">[docs]</a><span class="k">class</span> <span class="nc">desc_optional</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for marking optional parts of the parameter list.&quot;&quot;&quot;</span>
+    <span class="n">child_text_separator</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span>
+
+    <span class="k">def</span> <span class="nf">astext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; unicode</span>
+        <span class="k">return</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="o">.</span><span class="n">astext</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span></div>
+
+
+<div class="viewcode-block" id="desc_annotation"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_annotation">[docs]</a><span class="k">class</span> <span class="nc">desc_annotation</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for signature annotations (not Python 3-style annotations).&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="desc_content"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.desc_content">[docs]</a><span class="k">class</span> <span class="nc">desc_content</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">General</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for object description content.</span>
+
+<span class="sd">    This is the &quot;definition&quot; part of the custom Sphinx definition list.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># new admonition-like constructs</span>
+
+<div class="viewcode-block" id="versionmodified"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.versionmodified">[docs]</a><span class="k">class</span> <span class="nc">versionmodified</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Admonition</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for version change entries.</span>
+
+<span class="sd">    Currently used for &quot;versionadded&quot;, &quot;versionchanged&quot; and &quot;deprecated&quot;</span>
+<span class="sd">    directives.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="seealso"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.seealso">[docs]</a><span class="k">class</span> <span class="nc">seealso</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Admonition</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom &quot;see also&quot; admonition.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="productionlist"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.productionlist">[docs]</a><span class="k">class</span> <span class="nc">productionlist</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Admonition</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for grammar production lists.</span>
+
+<span class="sd">    Contains ``production`` nodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="production"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.production">[docs]</a><span class="k">class</span> <span class="nc">production</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for a single grammar production rule.&quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># other directive-level nodes</span>
+
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.index">[docs]</a><span class="k">class</span> <span class="nc">index</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Invisible</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for index entries.</span>
+
+<span class="sd">    This node is created by the ``index`` directive and has one attribute,</span>
+<span class="sd">    ``entries``.  Its value is a list of 5-tuples of ``(entrytype, entryname,</span>
+<span class="sd">    target, ignored, key)``.</span>
+
+<span class="sd">    *entrytype* is one of &quot;single&quot;, &quot;pair&quot;, &quot;double&quot;, &quot;triple&quot;.</span>
+
+<span class="sd">    *key* is categolziation characters (usually it is single character) for</span>
+<span class="sd">    general index page. For the detail of this, please see also:</span>
+<span class="sd">    :rst:dir:`glossary` and issue #2320.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">centered</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Part</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deprecated.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">acks</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Special node for &quot;acks&quot; lists.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">hlist</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for &quot;horizontal lists&quot;, i.e. lists that should be compressed to</span>
+<span class="sd">    take up less vertical space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">hlistcol</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for one column in a horizontal list.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="compact_paragraph"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.compact_paragraph">[docs]</a><span class="k">class</span> <span class="nc">compact_paragraph</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">paragraph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for a compact paragraph (which never makes a &lt;p&gt; node).&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="glossary"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.glossary">[docs]</a><span class="k">class</span> <span class="nc">glossary</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node to insert a glossary.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="only"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.only">[docs]</a><span class="k">class</span> <span class="nc">only</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for &quot;only&quot; directives (conditional inclusion based on tags).&quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># meta-information nodes</span>
+
+<div class="viewcode-block" id="start_of_file"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.start_of_file">[docs]</a><span class="k">class</span> <span class="nc">start_of_file</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node to mark start of a new file, used in the LaTeX builder only.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="highlightlang"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.highlightlang">[docs]</a><span class="k">class</span> <span class="nc">highlightlang</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Inserted to set the highlight language and line number options for</span>
+<span class="sd">    subsequent code blocks.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">tabular_col_spec</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for specifying tabular columns, used for LaTeX output.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="meta"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.meta">[docs]</a><span class="k">class</span> <span class="nc">meta</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Special</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">PreBibliographic</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for meta directive -- same as docutils&#39; standard meta node,</span>
+<span class="sd">    but pickleable.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="c1"># inline nodes</span>
+
+<div class="viewcode-block" id="pending_xref"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.pending_xref">[docs]</a><span class="k">class</span> <span class="nc">pending_xref</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for cross-references that cannot be resolved without complete</span>
+<span class="sd">    information about all documents.</span>
+
+<span class="sd">    These nodes are resolved before writing output, in</span>
+<span class="sd">    BuildEnvironment.resolve_references.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">number_reference</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">reference</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for number references, similar to pending_xref.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="download_reference"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.download_reference">[docs]</a><span class="k">class</span> <span class="nc">download_reference</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">reference</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for download references, similar to pending_xref.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="literal_emphasis"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.literal_emphasis">[docs]</a><span class="k">class</span> <span class="nc">literal_emphasis</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">emphasis</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node that behaves like `emphasis`, but further text processors are not</span>
+<span class="sd">    applied (e.g. smartypants for HTML output).</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">literal_strong</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">strong</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node that behaves like `strong`, but further text processors are not</span>
+<span class="sd">    applied (e.g. smartypants for HTML output).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="abbreviation"><a class="viewcode-back" href="../../sphinx/doc/extdev/nodes.html#sphinx.addnodes.abbreviation">[docs]</a><span class="k">class</span> <span class="nc">abbreviation</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for abbreviations with explanations.&quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">manpage</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Inline</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">TextElement</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node for references to manpages.&quot;&quot;&quot;</span>
+
+
+<span class="c1"># make the new nodes known to docutils; needed because the HTML writer will</span>
+<span class="c1"># choke at some point if these are not added</span>
+<span class="n">nodes</span><span class="o">.</span><span class="n">_add_node_class_names</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;nodes&#39;</span> <span class="ow">and</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

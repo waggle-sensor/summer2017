@@ -1,0 +1,607 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.builders &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.builders</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.builders</span>
+<span class="sd">    ~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Builder superclass for all builders.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">multiprocessing</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">itervalues</span>
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>
+
+<span class="kn">from</span> <span class="nn">sphinx.deprecation</span> <span class="k">import</span> <span class="n">RemovedInSphinx20Warning</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">i18n</span><span class="p">,</span> <span class="n">path_stabilize</span><span class="p">,</span> <span class="n">logging</span><span class="p">,</span> <span class="n">status_iterator</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">SEP</span><span class="p">,</span> <span class="n">relative_uri</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.i18n</span> <span class="k">import</span> <span class="n">find_catalog</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.console</span> <span class="k">import</span> <span class="n">bold</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.parallel</span> <span class="k">import</span> <span class="n">ParallelTasks</span><span class="p">,</span> <span class="n">SerialTasks</span><span class="p">,</span> <span class="n">make_chunks</span><span class="p">,</span> \
+    <span class="n">parallel_available</span>
+
+<span class="c1"># side effect: registers roles and directives</span>
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">roles</span>       <span class="c1"># noqa</span>
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">directives</span>  <span class="c1"># noqa</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.config</span> <span class="k">import</span> <span class="n">Config</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.environment</span> <span class="k">import</span> <span class="n">BuildEnvironment</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.util.i18n</span> <span class="k">import</span> <span class="n">CatalogInfo</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.util.tags</span> <span class="k">import</span> <span class="n">Tags</span>  <span class="c1"># NOQA</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Builder"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder">[docs]</a><span class="k">class</span> <span class="nc">Builder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds target formats from the reST sources.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: The builder&#39;s name, for the -b command line option.</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># type: unicode</span>
+    <span class="c1">#: The builder&#39;s output format, or &#39;&#39; if no document output is produced.</span>
+    <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># type: unicode</span>
+    <span class="c1"># default translator class for the builder.  This will be overrided by</span>
+    <span class="c1"># ``app.set_translator()``.</span>
+    <span class="n">default_translator_class</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: nodes.NodeVisitor</span>
+    <span class="c1"># doctree versioning method</span>
+    <span class="n">versioning_method</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>  <span class="c1"># type: unicode</span>
+    <span class="n">versioning_compare</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># allow parallel write_doc() calls</span>
+    <span class="n">allow_parallel</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># support translation</span>
+    <span class="n">use_message_catalog</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1">#: The list of MIME types of image formats supported by the builder.</span>
+    <span class="c1">#: Image files are searched in the order in which they appear here.</span>
+    <span class="n">supported_image_types</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[unicode]</span>
+    <span class="n">supported_remote_images</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">supported_data_uri_images</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="c1"># type: (Sphinx) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">srcdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confdir</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">confdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">outdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">doctreedir</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>              <span class="c1"># type: Sphinx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="kc">None</span>             <span class="c1"># type: BuildEnvironment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warn</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">warn</span>        <span class="c1"># type: Callable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">info</span>        <span class="c1"># type: Callable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">config</span>    <span class="c1"># type: Config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">tags</span>        <span class="c1"># type: Tags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;format_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;builder_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1"># compatibility aliases</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status_iterator</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">status_iterator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_status_iterator</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">old_status_iterator</span>
+
+        <span class="c1"># images that need to be copied over (source -&gt; dest)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, unicode]</span>
+        <span class="c1"># basename of images directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imagedir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># relative path to image directory from current docname (used at writing docs)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imgpath</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># type: unicode</span>
+
+        <span class="c1"># these get set later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_ok</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish_tasks</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: Any</span>
+
+    <span class="k">def</span> <span class="nf">set_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+        <span class="c1"># type: (BuildEnvironment) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Store BuildEnvironment object.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">set_versioning_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versioning_method</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">versioning_compare</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_translator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># type: (Any) -&gt; nodes.NodeVisitor</span>
+        <span class="sd">&quot;&quot;&quot;Return a class of translator.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_translator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">create_translator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># type: (Any) -&gt; nodes.NodeVisitor</span>
+        <span class="sd">&quot;&quot;&quot;Return an instance of translator.</span>
+
+<span class="sd">        This method returns an instance of ``default_translator_class`` by default.</span>
+<span class="sd">        Users can replace the translator class with ``app.set_translator()`` API.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">translator_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_translator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">translator_class</span><span class="p">,</span> <span class="s2">&quot;translator not found for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">return</span> <span class="n">translator_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">translator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Callable[[Any], nodes.NodeVisitor]</span>
+        <span class="sd">&quot;&quot;&quot;Return a class of translator.</span>
+
+<span class="sd">        .. deprecated:: 1.6</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">translator_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_translator_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">translator_class</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_translator_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;builder.translator_class() is now deprecated. &#39;</span>
+                          <span class="s1">&#39;Please use builder.create_translator() and &#39;</span>
+                          <span class="s1">&#39;builder.default_translator_class instead.&#39;</span><span class="p">,</span>
+                          <span class="n">RemovedInSphinx20Warning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_translator</span>
+
+    <span class="c1"># helper methods</span>
+<div class="viewcode-block" id="Builder.init"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.init">[docs]</a>    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Load necessary templates and perform initialization.  The default</span>
+<span class="sd">        implementation does nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">create_template_bridge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Return the template bridge configured.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">template_bridge</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">templates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">import_object</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">template_bridge</span><span class="p">,</span> <span class="s1">&#39;template_bridge setting&#39;</span><span class="p">)()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">sphinx.jinja2glue</span> <span class="k">import</span> <span class="n">BuiltinTemplateLoader</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">templates</span> <span class="o">=</span> <span class="n">BuiltinTemplateLoader</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Builder.get_target_uri"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.get_target_uri">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; unicode</span>
+        <span class="sd">&quot;&quot;&quot;Return the target URI for a document name.</span>
+
+<span class="sd">        *typ* can be used to qualify the link characteristic for individual</span>
+<span class="sd">        builders.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Builder.get_relative_uri"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.get_relative_uri">[docs]</a>    <span class="k">def</span> <span class="nf">get_relative_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, unicode) -&gt; unicode</span>
+        <span class="sd">&quot;&quot;&quot;Return a relative URI between two source filenames.</span>
+
+<span class="sd">        May raise environment.NoUri if there&#39;s no way to return a sensible URI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">relative_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_target_uri</span><span class="p">(</span><span class="n">from_</span><span class="p">),</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">get_target_uri</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">typ</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Builder.get_outdated_docs"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.get_outdated_docs">[docs]</a>    <span class="k">def</span> <span class="nf">get_outdated_docs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Union[unicode, Iterable[unicode]]</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterable of output files that are outdated, or a string</span>
+<span class="sd">        describing what an update build will build.</span>
+
+<span class="sd">        If the builder does not output individual files corresponding to</span>
+<span class="sd">        source files, return a string here.  If it does, return an iterable</span>
+<span class="sd">        of those files that need to be written.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    <span class="k">def</span> <span class="nf">get_asset_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; List[unicode]</span>
+        <span class="sd">&quot;&quot;&quot;Return list of paths for assets (ex. templates, CSS, etc.).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">post_process_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doctree</span><span class="p">):</span>
+        <span class="c1"># type: (nodes.Node) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Pick the best candidate for all image URIs.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">doctree</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">image</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;?&#39;</span> <span class="ow">in</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;candidates&#39;</span><span class="p">]:</span>
+                <span class="c1"># don&#39;t rewrite nonlocal image URIs</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;candidates&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">imgtype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_image_types</span><span class="p">:</span>
+                    <span class="n">candidate</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;candidates&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">imgtype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">candidate</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;no matching candidate for image URI </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;uri&#39;</span><span class="p">],</span>
+                                   <span class="n">location</span><span class="o">=</span><span class="n">node</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">node</span><span class="p">[</span><span class="s1">&#39;uri&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">candidate</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">candidate</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;uri&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">candidate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">images</span><span class="p">:</span>
+                <span class="c1"># non-existing URI; let it alone</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">candidate</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">candidate</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># compile po methods</span>
+
+    <span class="k">def</span> <span class="nf">compile_catalogs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c1"># type: (Set[CatalogInfo], unicode) -&gt; None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_auto_build</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">def</span> <span class="nf">cat2relpath</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span>
+            <span class="c1"># type: (CatalogInfo) -&gt; unicode</span>
+            <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">mo_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">srcdir</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="n">SEP</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;building [mo]: &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">catalog</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">catalogs</span><span class="p">,</span> <span class="s1">&#39;writing output... &#39;</span><span class="p">,</span> <span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span>
+                                       <span class="nb">len</span><span class="p">(</span><span class="n">catalogs</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">,</span>
+                                       <span class="n">stringify_func</span><span class="o">=</span><span class="n">cat2relpath</span><span class="p">):</span>
+            <span class="n">catalog</span><span class="o">.</span><span class="n">write_mo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compile_all_catalogs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">catalogs</span> <span class="o">=</span> <span class="n">i18n</span><span class="o">.</span><span class="n">find_catalog_source_files</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">locale_dirs</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+            <span class="n">charset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_encoding</span><span class="p">,</span>
+            <span class="n">gettext_compact</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span><span class="p">,</span>
+            <span class="n">force_all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;all of </span><span class="si">%d</span><span class="s1"> po files&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalogs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compile_catalogs</span><span class="p">(</span><span class="n">catalogs</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compile_specific_catalogs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specified_files</span><span class="p">):</span>
+        <span class="c1"># type: (List[unicode]) -&gt; None</span>
+        <span class="k">def</span> <span class="nf">to_domain</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+            <span class="c1"># type: (unicode) -&gt; unicode</span>
+            <span class="n">docname</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path_stabilize</span><span class="p">(</span><span class="n">fpath</span><span class="p">))</span>
+            <span class="n">dom</span> <span class="o">=</span> <span class="n">find_catalog</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dom</span>
+
+        <span class="n">specified_domains</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">to_domain</span><span class="p">,</span> <span class="n">specified_files</span><span class="p">))</span>
+        <span class="n">catalogs</span> <span class="o">=</span> <span class="n">i18n</span><span class="o">.</span><span class="n">find_catalog_source_files</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">locale_dirs</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+            <span class="n">domains</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">specified_domains</span><span class="p">),</span>
+            <span class="n">charset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_encoding</span><span class="p">,</span>
+            <span class="n">gettext_compact</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;targets for </span><span class="si">%d</span><span class="s1"> po files that are specified&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalogs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compile_catalogs</span><span class="p">(</span><span class="n">catalogs</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compile_update_catalogs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">catalogs</span> <span class="o">=</span> <span class="n">i18n</span><span class="o">.</span><span class="n">find_catalog_source_files</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">locale_dirs</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">language</span><span class="p">,</span>
+            <span class="n">charset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_encoding</span><span class="p">,</span>
+            <span class="n">gettext_compact</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;targets for </span><span class="si">%d</span><span class="s1"> po files that are out of date&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalogs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compile_catalogs</span><span class="p">(</span><span class="n">catalogs</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+    <span class="c1"># build methods</span>
+
+<div class="viewcode-block" id="Builder.build_all"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.build_all">[docs]</a>    <span class="k">def</span> <span class="nf">build_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Build all source files.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="s1">&#39;all source files&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Builder.build_specific"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.build_specific">[docs]</a>    <span class="k">def</span> <span class="nf">build_specific</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filenames</span><span class="p">):</span>
+        <span class="c1"># type: (List[unicode]) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Only rebuild as much as needed for changes in the *filenames*.&quot;&quot;&quot;</span>
+        <span class="c1"># bring the filenames to the canonical format, that is,</span>
+        <span class="c1"># relative to the source directory and without source_suffix.</span>
+        <span class="n">dirlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">to_write</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">suffixes</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: Tuple[unicode]</span>
+        <span class="n">suffixes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_suffix</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;file </span><span class="si">%r</span><span class="s1"> given on command line is not under the &#39;</span>
+                               <span class="s1">&#39;source directory, ignoring&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="nb">any</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">)</span> <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="p">)):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;file </span><span class="si">%r</span><span class="s1"> given on command line does not exist, &#39;</span>
+                               <span class="s1">&#39;ignoring&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="n">dirlen</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">suffix</span><span class="p">):</span>
+                    <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span>
+                    <span class="k">break</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="n">SEP</span><span class="p">)</span>
+            <span class="n">to_write</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">to_write</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;specific&#39;</span><span class="p">,</span>
+                   <span class="n">summary</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> source files given on command &#39;</span>
+                   <span class="s1">&#39;line&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_write</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Builder.build_update"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.build_update">[docs]</a>    <span class="k">def</span> <span class="nf">build_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Only rebuild what was changed or added since last build.&quot;&quot;&quot;</span>
+        <span class="n">to_build</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_outdated_docs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_build</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">([</span><span class="s1">&#39;__all__&#39;</span><span class="p">],</span> <span class="n">to_build</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_build</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">to_build</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">to_build</span><span class="p">,</span>
+                       <span class="n">summary</span><span class="o">=</span><span class="s1">&#39;targets for </span><span class="si">%d</span><span class="s1"> source files that are &#39;</span>
+                       <span class="s1">&#39;out of date&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_build</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Builder.build"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">):</span>
+        <span class="c1"># type: (Iterable[unicode], unicode, unicode) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Main build method.</span>
+
+<span class="sd">        First updates the environment, and then calls :meth:`write`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;building [</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">summary</span><span class="p">)</span>
+
+        <span class="c1"># while reading, collect all warnings from docutils</span>
+        <span class="k">with</span> <span class="n">logging</span><span class="o">.</span><span class="n">pending_warnings</span><span class="p">():</span>
+            <span class="n">updated_docnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">))</span>
+
+        <span class="n">doccount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">updated_docnames</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;looking for now-outdated files... &#39;</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">check_dependents</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">,</span> <span class="n">updated_docnames</span><span class="p">):</span>
+            <span class="n">updated_docnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+        <span class="n">outdated</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">updated_docnames</span><span class="p">)</span> <span class="o">-</span> <span class="n">doccount</span>
+        <span class="k">if</span> <span class="n">outdated</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> found&#39;</span><span class="p">,</span> <span class="n">outdated</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;none found&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">updated_docnames</span><span class="p">:</span>
+            <span class="c1"># save the environment</span>
+            <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">ENV_PICKLE_FILENAME</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;pickling environment... &#39;</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">topickle</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">,</span> <span class="n">ENV_PICKLE_FILENAME</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+
+            <span class="c1"># global actions</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;checking consistency... &#39;</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">check_consistency</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;update&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">docnames</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;no targets are out of date.&#39;</span><span class="p">))</span>
+                <span class="k">return</span>
+
+        <span class="c1"># filter &quot;docnames&quot; (list of outdated files) by the updated</span>
+        <span class="c1"># found_docs of the environment; this will remove docs that</span>
+        <span class="c1"># have since been removed</span>
+        <span class="k">if</span> <span class="n">docnames</span> <span class="ow">and</span> <span class="n">docnames</span> <span class="o">!=</span> <span class="p">[</span><span class="s1">&#39;__all__&#39;</span><span class="p">]:</span>
+            <span class="n">docnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">found_docs</span>
+
+        <span class="c1"># determine if we can write in parallel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_ok</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">parallel_available</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">parallel</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_parallel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parallel_ok</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">extension</span> <span class="ow">in</span> <span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">extensions</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">extension</span><span class="o">.</span><span class="n">parallel_write_safe</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;the </span><span class="si">%s</span><span class="s1"> extension is not safe for parallel &#39;</span>
+                                   <span class="s1">&#39;writing, doing serial write&#39;</span><span class="p">,</span> <span class="n">extension</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parallel_ok</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+
+        <span class="c1">#  create a task executor to use for misc. &quot;finish-up&quot; tasks</span>
+        <span class="c1"># if self.parallel_ok:</span>
+        <span class="c1">#     self.finish_tasks = ParallelTasks(self.app.parallel)</span>
+        <span class="c1"># else:</span>
+        <span class="c1"># for now, just execute them serially</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish_tasks</span> <span class="o">=</span> <span class="n">SerialTasks</span><span class="p">()</span>
+
+        <span class="c1"># write all &quot;normal&quot; documents (or everything for some builders)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">updated_docnames</span><span class="p">),</span> <span class="n">method</span><span class="p">)</span>
+
+        <span class="c1"># finish (write static files etc.)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+
+        <span class="c1"># wait for all tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finish_tasks</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">build_docnames</span><span class="p">,</span> <span class="n">updated_docnames</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">):</span>
+        <span class="c1"># type: (Iterable[unicode], Sequence[unicode], unicode) -&gt; None</span>
+        <span class="k">if</span> <span class="n">build_docnames</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">build_docnames</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;__all__&#39;</span><span class="p">]:</span>
+            <span class="c1"># build_all</span>
+            <span class="n">build_docnames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">found_docs</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;update&#39;</span><span class="p">:</span>
+            <span class="c1"># build updated ones as well</span>
+            <span class="n">docnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">build_docnames</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">updated_docnames</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">docnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">build_docnames</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;docnames to write: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">docnames</span><span class="p">)))</span>
+
+        <span class="c1"># add all toctree-containing files that may have changed</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">docnames</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">tocdocname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">files_to_rebuild</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="nb">set</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">tocdocname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">found_docs</span><span class="p">:</span>
+                    <span class="n">docnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tocdocname</span><span class="p">)</span>
+        <span class="n">docnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;preparing documents... &#39;</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_writing</span><span class="p">(</span><span class="n">docnames</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parallel_ok</span><span class="p">:</span>
+            <span class="c1"># number of subprocesses is parallel-1 because the main process</span>
+            <span class="c1"># is busy loading doctrees and doing write_doc_serialized()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_parallel</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">docnames</span><span class="p">),</span>
+                                 <span class="n">nproc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">parallel</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_serial</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">docnames</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_write_serial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">):</span>
+        <span class="c1"># type: (Sequence[unicode]) -&gt; None</span>
+        <span class="k">with</span> <span class="n">logging</span><span class="o">.</span><span class="n">pending_warnings</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="s1">&#39;writing output... &#39;</span><span class="p">,</span> <span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span>
+                                           <span class="nb">len</span><span class="p">(</span><span class="n">docnames</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">):</span>
+                <span class="n">doctree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_and_resolve_doctree</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_doc_serialized</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_parallel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">nproc</span><span class="p">):</span>
+        <span class="c1"># type: (Sequence[unicode], int) -&gt; None</span>
+        <span class="k">def</span> <span class="nf">write_process</span><span class="p">(</span><span class="n">docs</span><span class="p">):</span>
+            <span class="c1"># type: (List[Tuple[unicode, nodes.Node]]) -&gt; None</span>
+            <span class="k">for</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_doc</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+
+        <span class="c1"># warm up caches/compile templates using the first document</span>
+        <span class="n">firstname</span><span class="p">,</span> <span class="n">docnames</span> <span class="o">=</span> <span class="n">docnames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">docnames</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">doctree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_and_resolve_doctree</span><span class="p">(</span><span class="n">firstname</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_doc_serialized</span><span class="p">(</span><span class="n">firstname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_doc</span><span class="p">(</span><span class="n">firstname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">ParallelTasks</span><span class="p">(</span><span class="n">nproc</span><span class="p">)</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="n">make_chunks</span><span class="p">(</span><span class="n">docnames</span><span class="p">,</span> <span class="n">nproc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="s1">&#39;writing output... &#39;</span><span class="p">,</span> <span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span>
+                                     <span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">):</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">docname</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
+                <span class="n">doctree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_and_resolve_doctree</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_doc_serialized</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">)</span>
+                <span class="n">arg</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">))</span>
+            <span class="n">tasks</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">write_process</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+
+        <span class="c1"># make sure all threads have finished</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;waiting for workers...&#39;</span><span class="p">))</span>
+        <span class="n">tasks</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Builder.prepare_writing"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.prepare_writing">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_writing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">):</span>
+        <span class="c1"># type: (Set[unicode]) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;A place where you can add logic before :meth:`write_doc` is run&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Builder.write_doc"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.write_doc">[docs]</a>    <span class="k">def</span> <span class="nf">write_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, nodes.Node) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Where you actually write something to the filesystem.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    <span class="k">def</span> <span class="nf">write_doc_serialized</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, nodes.Node) -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Handle parts of write_doc that must be called in the main process</span>
+<span class="sd">        if parallel build is active.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Builder.finish"><a class="viewcode-back" href="../../sphinx/doc/extdev/builderapi.html#sphinx.builders.Builder.finish">[docs]</a>    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Finish the building process.</span>
+
+<span class="sd">        The default implementation does nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="sd">&quot;&quot;&quot;Cleanup any resources.</span>
+
+<span class="sd">        The default implementation does nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">get_builder_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; Any</span>
+        <span class="sd">&quot;&quot;&quot;Return a builder specific option.</span>
+
+<span class="sd">        This method allows customization of common builder settings by</span>
+<span class="sd">        inserting the name of the current builder in the option key.</span>
+<span class="sd">        If the key does not exist, use default as builder name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># At the moment, only XXX_use_index is looked up this way.</span>
+        <span class="c1"># Every new builder variant must be registered in Config.config_values.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">optname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">optname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">optname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">optname</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

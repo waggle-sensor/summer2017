@@ -1,0 +1,124 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.ext.ifconfig – Include content based on configuration &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.ext.ifconfig">
+<span id="sphinx-ext-ifconfig-include-content-based-on-configuration"></span><h1><a class="reference internal" href="#module-sphinx.ext.ifconfig" title="sphinx.ext.ifconfig: Include documentation content based on configuration values."><code class="xref py py-mod docutils literal"><span class="pre">sphinx.ext.ifconfig</span></code></a> – Include content based on configuration<a class="headerlink" href="#module-sphinx.ext.ifconfig" title="Permalink to this headline">¶</a></h1>
+<p>This extension is quite simple, and features only one directive:</p>
+<dl class="directive">
+<dt id="directive-ifconfig">
+<code class="descname">.. ifconfig::</code><a class="headerlink" href="#directive-ifconfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Include content of the directive only if the Python expression given as an
+argument is <code class="docutils literal"><span class="pre">True</span></code>, evaluated in the namespace of the project’s
+configuration (that is, all registered variables from <code class="file docutils literal"><span class="pre">conf.py</span></code> are
+available).</p>
+<p>For example, one could write</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">ifconfig</span><span class="p">::</span> releaselevel in (&#39;alpha&#39;, &#39;beta&#39;, &#39;rc&#39;)
+
+   This stuff is only included in the built docs for unstable versions.
+</pre></div>
+</div>
+<p>To make a custom config value known to Sphinx, use
+<a class="reference internal" href="../extdev/appapi.html#sphinx.application.Sphinx.add_config_value" title="sphinx.application.Sphinx.add_config_value"><code class="xref py py-func docutils literal"><span class="pre">add_config_value()</span></code></a> in the setup function in
+<code class="file docutils literal"><span class="pre">conf.py</span></code>, e.g.:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span>def setup(app):
+    app.add_config_value(&#39;releaselevel&#39;, &#39;&#39;, &#39;env&#39;)
+</pre></div>
+</div>
+<p>The second argument is the default value, the third should always be <code class="docutils literal"><span class="pre">'env'</span></code>
+for such values (it selects if Sphinx re-reads the documents if the value
+changes).</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/ext/ifconfig.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/ext/ifconfig.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

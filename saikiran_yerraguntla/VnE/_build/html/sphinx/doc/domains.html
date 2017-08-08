@@ -1,0 +1,1597 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sphinx Domains &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sphinx-domains">
+<span id="domains"></span><h1>Sphinx Domains<a class="headerlink" href="#sphinx-domains" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.0.</span></p>
+</div>
+<div class="section" id="what-is-a-domain">
+<h2>What is a Domain?<a class="headerlink" href="#what-is-a-domain" title="Permalink to this headline">¶</a></h2>
+<p>Originally, Sphinx was conceived for a single project, the documentation of the
+Python language.  Shortly afterwards, it was made available for everyone as a
+documentation tool, but the documentation of Python modules remained deeply
+built in – the most fundamental directives, like <code class="docutils literal"><span class="pre">function</span></code>, were designed
+for Python objects.  Since Sphinx has become somewhat popular, interest
+developed in using it for many different purposes: C/C++ projects, JavaScript,
+or even reStructuredText markup (like in this documentation).</p>
+<p>While this was always possible, it is now much easier to easily support
+documentation of projects using different programming languages or even ones not
+supported by the main Sphinx distribution, by providing a <strong>domain</strong> for every
+such purpose.</p>
+<p>A domain is a collection of markup (reStructuredText <a class="reference internal" href="glossary.html#term-directive"><span class="xref std std-term">directive</span></a>s and
+<a class="reference internal" href="glossary.html#term-role"><span class="xref std std-term">role</span></a>s) to describe and link to <a class="reference internal" href="glossary.html#term-object"><span class="xref std std-term">object</span></a>s belonging together,
+e.g. elements of a programming language.  Directive and role names in a domain
+have names like <code class="docutils literal"><span class="pre">domain:name</span></code>, e.g. <code class="docutils literal"><span class="pre">py:function</span></code>.  Domains can also provide
+custom indices (like the Python Module Index).</p>
+<p>Having domains means that there are no naming problems when one set of
+documentation wants to refer to e.g. C++ and Python classes.  It also means that
+extensions that support the documentation of whole new languages are much easier
+to write.</p>
+<p>This section describes what the domains that are included with Sphinx provide.
+The domain API is documented as well, in the section <a class="reference internal" href="extdev/domainapi.html#domain-api"><span class="std std-ref">Domain API</span></a>.</p>
+</div>
+<div class="section" id="basic-markup">
+<span id="basic-domain-markup"></span><h2>Basic Markup<a class="headerlink" href="#basic-markup" title="Permalink to this headline">¶</a></h2>
+<p>Most domains provide a number of <em class="dfn">object description directives</em>, used to
+describe specific objects provided by modules.  Each directive requires one or
+more signatures to provide basic information about what is being described, and
+the content should be the description.  The basic version makes entries in the
+general index; if no index entry is desired, you can give the directive option
+flag <code class="docutils literal"><span class="pre">:noindex:</span></code>.  An example using a Python domain directive:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> spam(eggs)
+                 ham(eggs)
+
+   Spam or ham the foo.
+</pre></div>
+</div>
+<p>This describes the two Python functions <code class="docutils literal"><span class="pre">spam</span></code> and <code class="docutils literal"><span class="pre">ham</span></code>.  (Note that when
+signatures become too long, you can break them if you add a backslash to lines
+that are continued in the next line.  Example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> filterwarnings(action, message=&#39;&#39;, category=Warning, \
+                                module=&#39;&#39;, lineno=0, append=False)
+   <span class="nc">:noindex:</span>
+</pre></div>
+</div>
+<p>(This example also shows how to use the <code class="docutils literal"><span class="pre">:noindex:</span></code> flag.)</p>
+<p>The domains also provide roles that link back to these object descriptions.  For
+example, to link to one of the functions described in the example above, you
+could say</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span>The function <span class="na">:py:func:</span><span class="nv">`spam`</span> does a similar thing.
+</pre></div>
+</div>
+<p>As you can see, both directive and role names contain the domain name and the
+directive name.</p>
+<p class="rubric">Default Domain</p>
+<p>For documentation describing objects from solely one domain, authors will not
+have to state again its name at each directive, role, etc… after
+having specified a default. This can be done either via the config
+value <a href="#id1"><span class="problematic" id="id2">:confval:`primary_domain`</span></a> or via this directive:</p>
+<dl class="directive">
+<dt id="directive-default-domain">
+<code class="descname">.. default-domain::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-default-domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a new default domain.  While the <a href="#id3"><span class="problematic" id="id4">:confval:`primary_domain`</span></a> selects a
+global default, this only has an effect within the same file.</p>
+</dd></dl>
+
+<p>If no other default is selected, the Python domain (named <code class="docutils literal"><span class="pre">py</span></code>) is the default
+one, mostly for compatibility with documentation written for older versions of
+Sphinx.</p>
+<p>Directives and roles that belong to the default domain can be mentioned without
+giving the domain name, i.e.</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">function</span><span class="p">::</span> pyfunc()
+
+   Describes a Python function.
+
+Reference to <span class="na">:func:</span><span class="nv">`pyfunc`</span>.
+</pre></div>
+</div>
+<div class="section" id="cross-referencing-syntax">
+<h3>Cross-referencing syntax<a class="headerlink" href="#cross-referencing-syntax" title="Permalink to this headline">¶</a></h3>
+<p>For cross-reference roles provided by domains, the same facilities exist as for
+general cross-references.  See <a class="reference internal" href="markup/inline.html#xref-syntax"><span class="std std-ref">Cross-referencing syntax</span></a>.</p>
+<p>In short:</p>
+<ul class="simple">
+<li>You may supply an explicit title and reference target: <code class="docutils literal"><span class="pre">:role:`title</span>
+<span class="pre">&lt;target&gt;`</span></code> will refer to <em>target</em>, but the link text will be <em>title</em>.</li>
+<li>If you prefix the content with <code class="docutils literal"><span class="pre">!</span></code>, no reference/hyperlink will be created.</li>
+<li>If you prefix the content with <code class="docutils literal"><span class="pre">~</span></code>, the link text will only be the last
+component of the target.  For example, <code class="docutils literal"><span class="pre">:py:meth:`~Queue.Queue.get`</span></code> will
+refer to <code class="docutils literal"><span class="pre">Queue.Queue.get</span></code> but only display <code class="docutils literal"><span class="pre">get</span></code> as the link text.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="the-python-domain">
+<h2>The Python Domain<a class="headerlink" href="#the-python-domain" title="Permalink to this headline">¶</a></h2>
+<p>The Python domain (name <strong>py</strong>) provides the following directives for module
+declarations:</p>
+<dl class="directive">
+<dt id="directive-py:module">
+<code class="descname">.. py:module::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:module" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive marks the beginning of the description of a module (or package
+submodule, in which case the name should be fully qualified, including the
+package name).  It does not create content (like e.g. <a class="reference internal" href="#directive-py:class" title="py:class directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:class</span></code></a>
+does).</p>
+<p>This directive will also cause an entry in the global module index.</p>
+<p>The <code class="docutils literal"><span class="pre">platform</span></code> option, if present, is a comma-separated list of the
+platforms on which the module is available (if it is available on all
+platforms, the option should be omitted).  The keys are short identifiers;
+examples that are in use include “IRIX”, “Mac”, “Windows”, and “Unix”.  It is
+important to use a key which has already been used when applicable.</p>
+<p>The <code class="docutils literal"><span class="pre">synopsis</span></code> option should consist of one sentence describing the
+module’s purpose – it is currently only used in the Global Module Index.</p>
+<p>The <code class="docutils literal"><span class="pre">deprecated</span></code> option can be given (with no value) to mark a module as
+deprecated; it will be designated as such in various locations then.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:currentmodule">
+<code class="descname">.. py:currentmodule::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:currentmodule" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive tells Sphinx that the classes, functions etc. documented from
+here are in the given module (like <a class="reference internal" href="#directive-py:module" title="py:module directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:module</span></code></a>), but it will not
+create index entries, an entry in the Global Module Index, or a link target
+for <a class="reference internal" href="#role-py:mod" title="py:mod role"><code class="xref rst rst-role docutils literal"><span class="pre">py:mod</span></code></a>.  This is helpful in situations where documentation
+for things in a module is spread over multiple files or sections – one
+location has the <a class="reference internal" href="#directive-py:module" title="py:module directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:module</span></code></a> directive, the others only
+<a class="reference internal" href="#directive-py:currentmodule" title="py:currentmodule directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:currentmodule</span></code></a>.</p>
+</dd></dl>
+
+<p>The following directives are provided for module and class contents:</p>
+<dl class="directive">
+<dt id="directive-py:function">
+<code class="descname">.. py:function::</code><code class="descclassname"> name(parameters)</code><a class="headerlink" href="#directive-py:function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a module-level function.  The signature should include the
+parameters as given in the Python function definition, see <a class="reference internal" href="#signatures"><span class="std std-ref">Python Signatures</span></a>.
+For example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> Timer.repeat(repeat=3, number=1000000)
+</pre></div>
+</div>
+<p>For methods you should use <a class="reference internal" href="#directive-py:method" title="py:method directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:method</span></code></a>.</p>
+<p>The description normally includes information about the parameters required
+and how they are used (especially whether mutable objects passed as
+parameters are modified), side effects, and possible exceptions.</p>
+<p>This information can (in any <code class="docutils literal"><span class="pre">py</span></code> directive) optionally be given in a
+structured form, see <a class="reference internal" href="#info-field-lists"><span class="std std-ref">Info field lists</span></a>.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:data">
+<code class="descname">.. py:data::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes global data in a module, including both variables and values used
+as “defined constants.”  Class and object attributes are not documented
+using this environment.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:exception">
+<code class="descname">.. py:exception::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an exception class.  The signature can, but need not include
+parentheses with constructor arguments.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:class">
+<code class="descname">.. py:class::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:class" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">.. py:class::</code><code class="descclassname"> name(parameters)</code></dt>
+<dd><p>Describes a class.  The signature can optionally include parentheses with
+parameters which will be shown as the constructor arguments.  See also
+<a class="reference internal" href="#signatures"><span class="std std-ref">Python Signatures</span></a>.</p>
+<p>Methods and attributes belonging to the class should be placed in this
+directive’s body.  If they are placed outside, the supplied name should
+contain the class name so that cross-references still work.  Example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:class</span><span class="p">::</span> Foo
+
+<span class="p">   ..</span> <span class="ow">py:method</span><span class="p">::</span> quux()
+
+-- or --
+
+<span class="p">..</span> <span class="ow">py:class</span><span class="p">::</span> Bar
+
+<span class="p">..</span> <span class="ow">py:method</span><span class="p">::</span> Bar.quux()
+</pre></div>
+</div>
+<p>The first way is the preferred one.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:attribute">
+<code class="descname">.. py:attribute::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an object data attribute.  The description should include
+information about the type of the data to be expected and whether it may be
+changed directly.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:method">
+<code class="descname">.. py:method::</code><code class="descclassname"> name(parameters)</code><a class="headerlink" href="#directive-py:method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an object method.  The parameters should not include the <code class="docutils literal"><span class="pre">self</span></code>
+parameter.  The description should include similar information to that
+described for <code class="docutils literal"><span class="pre">function</span></code>.  See also <a class="reference internal" href="#signatures"><span class="std std-ref">Python Signatures</span></a> and
+<a class="reference internal" href="#info-field-lists"><span class="std std-ref">Info field lists</span></a>.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:staticmethod">
+<code class="descname">.. py:staticmethod::</code><code class="descclassname"> name(parameters)</code><a class="headerlink" href="#directive-py:staticmethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#directive-py:method" title="py:method directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:method</span></code></a>, but indicates that the method is a static method.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.4.</span></p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:classmethod">
+<code class="descname">.. py:classmethod::</code><code class="descclassname"> name(parameters)</code><a class="headerlink" href="#directive-py:classmethod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#directive-py:method" title="py:method directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:method</span></code></a>, but indicates that the method is a class method.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:decorator">
+<code class="descname">.. py:decorator::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:decorator" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">.. py:decorator::</code><code class="descclassname"> name(parameters)</code></dt>
+<dd><p>Describes a decorator function.  The signature should represent the usage as
+a decorator.  For example, given the functions</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">removename</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+<span class="k">def</span> <span class="nf">setnewname</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">return</span> <span class="n">func</span>
+    <span class="k">return</span> <span class="n">decorator</span>
+</pre></div>
+</div>
+<p>the descriptions should look like this:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:decorator</span><span class="p">::</span> removename
+
+   Remove name of the decorated function.
+
+<span class="p">..</span> <span class="ow">py:decorator</span><span class="p">::</span> setnewname(name)
+
+   Set name of the decorated function to <span class="ge">*name*</span>.
+</pre></div>
+</div>
+<p>(as opposed to <code class="docutils literal"><span class="pre">..</span> <span class="pre">py:decorator::</span> <span class="pre">removename(func)</span></code>.)</p>
+<p>There is no <code class="docutils literal"><span class="pre">py:deco</span></code> role to link to a decorator that is marked up with
+this directive; rather, use the <a class="reference internal" href="#role-py:func" title="py:func role"><code class="xref rst rst-role docutils literal"><span class="pre">py:func</span></code></a> role.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-py:decoratormethod">
+<code class="descname">.. py:decoratormethod::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-py:decoratormethod" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">.. py:decoratormethod::</code><code class="descclassname"> name(signature)</code></dt>
+<dd><p>Same as <a class="reference internal" href="#directive-py:decorator" title="py:decorator directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:decorator</span></code></a>, but for decorators that are methods.</p>
+<p>Refer to a decorator method using the <a class="reference internal" href="#role-py:meth" title="py:meth role"><code class="xref rst rst-role docutils literal"><span class="pre">py:meth</span></code></a> role.</p>
+</dd></dl>
+
+<div class="section" id="python-signatures">
+<span id="signatures"></span><h3>Python Signatures<a class="headerlink" href="#python-signatures" title="Permalink to this headline">¶</a></h3>
+<p>Signatures of functions, methods and class constructors can be given like they
+would be written in Python.</p>
+<p>Default values for optional arguments can be given (but if they contain commas,
+they will confuse the signature parser).  Python 3-style argument annotations
+can also be given as well as return type annotations:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> compile(source : string, filename, symbol=&#39;file&#39;) -&gt; ast object
+</pre></div>
+</div>
+<p>For functions with optional parameters that don’t have default values (typically
+functions implemented in C extension modules without keyword argument support),
+you can use brackets to specify the optional parts:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="compile">
+<code class="descname">compile</code><span class="sig-paren">(</span><em>source</em><span class="optional">[</span>, <em>filename</em><span class="optional">[</span>, <em>symbol</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#compile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div></blockquote>
+<p>It is customary to put the opening bracket before the comma.</p>
+</div>
+<div class="section" id="info-field-lists">
+<span id="id5"></span><h3>Info field lists<a class="headerlink" href="#info-field-lists" title="Permalink to this headline">¶</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.4.</span></p>
+</div>
+<p>Inside Python object description directives, reST field lists with these fields
+are recognized and formatted nicely:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">param</span></code>, <code class="docutils literal"><span class="pre">parameter</span></code>, <code class="docutils literal"><span class="pre">arg</span></code>, <code class="docutils literal"><span class="pre">argument</span></code>, <code class="docutils literal"><span class="pre">key</span></code>, <code class="docutils literal"><span class="pre">keyword</span></code>:
+Description of a parameter.</li>
+<li><code class="docutils literal"><span class="pre">type</span></code>: Type of a parameter.  Creates a link if possible.</li>
+<li><code class="docutils literal"><span class="pre">raises</span></code>, <code class="docutils literal"><span class="pre">raise</span></code>, <code class="docutils literal"><span class="pre">except</span></code>, <code class="docutils literal"><span class="pre">exception</span></code>: That (and when) a specific
+exception is raised.</li>
+<li><code class="docutils literal"><span class="pre">var</span></code>, <code class="docutils literal"><span class="pre">ivar</span></code>, <code class="docutils literal"><span class="pre">cvar</span></code>: Description of a variable.</li>
+<li><code class="docutils literal"><span class="pre">vartype</span></code>: Type of a variable.  Creates a link if possible.</li>
+<li><code class="docutils literal"><span class="pre">returns</span></code>, <code class="docutils literal"><span class="pre">return</span></code>: Description of the return value.</li>
+<li><code class="docutils literal"><span class="pre">rtype</span></code>: Return type.  Creates a link if possible.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In current release, all <code class="docutils literal"><span class="pre">var</span></code>, <code class="docutils literal"><span class="pre">ivar</span></code> and <code class="docutils literal"><span class="pre">cvar</span></code> are represented as “Variable”.
+There is no difference at all.</p>
+</div>
+<p>The field names must consist of one of these keywords and an argument (except
+for <code class="docutils literal"><span class="pre">returns</span></code> and <code class="docutils literal"><span class="pre">rtype</span></code>, which do not need an argument).  This is best
+explained by an example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">py:function</span><span class="p">::</span> send_message(sender, recipient, message_body, [priority=1])
+
+   Send a message to a recipient
+
+   <span class="nc">:param str sender:</span> <span class="nf">The person sending the message</span>
+   <span class="nc">:param str recipient:</span> <span class="nf">The recipient of the message</span>
+   <span class="nc">:param str message_body:</span> <span class="nf">The body of the message</span>
+   <span class="nc">:param priority:</span> <span class="nf">The priority of the message, can be a number 1-5</span>
+   <span class="nc">:type priority:</span> <span class="nf">integer or None</span>
+   <span class="nc">:return:</span> <span class="nf">the message id</span>
+   <span class="nc">:rtype:</span> <span class="nf">int</span>
+   <span class="nc">:raises ValueError:</span> <span class="nf">if the message_body exceeds 160 characters</span>
+   <span class="nc">:raises TypeError:</span> <span class="nf">if the message_body is not a basestring</span>
+</pre></div>
+</div>
+<p>This will render like this:</p>
+<blockquote>
+<div><dl class="function">
+<dt>
+<code class="descname">send_message</code><span class="sig-paren">(</span><em>sender</em>, <em>recipient</em>, <em>message_body</em><span class="optional">[</span>, <em>priority=1</em><span class="optional">]</span><span class="sig-paren">)</span></dt>
+<dd><p>Send a message to a recipient</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The person sending the message</li>
+<li><strong>recipient</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The recipient of the message</li>
+<li><strong>message_body</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The body of the message</li>
+<li><strong>priority</strong> (<em>integer</em><em> or </em><a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)"><em>None</em></a>) – The priority of the message, can be a number 1-5</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the message id</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)">int</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ValueError</strong> – if the message_body exceeds 160 characters</li>
+<li><strong>TypeError</strong> – if the message_body is not a basestring</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+<p>It is also possible to combine parameter type and description, if the type is a
+single word, like this:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="nc">:param int priority:</span> <span class="nf">The priority of the message, can be a number 1-5</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5.</span></p>
+</div>
+<p>Container types such as lists and dictionaries can be linked automatically
+using the following syntax:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="nc">:type priorities:</span> <span class="nf">list(int)</span>
+<span class="nc">:type priorities:</span> <span class="nf">list[int]</span>
+<span class="nc">:type mapping:</span> <span class="nf">dict(str, int)</span>
+<span class="nc">:type mapping:</span> <span class="nf">dict[str, int]</span>
+<span class="nc">:type point:</span> <span class="nf">tuple(float, float)</span>
+<span class="nc">:type point:</span> <span class="nf">tuple[float, float]</span>
+</pre></div>
+</div>
+<p>Multiple types in a type field will be linked automatically if separated by
+the word “or”:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="nc">:type an_arg:</span> <span class="nf">int or None</span>
+<span class="nc">:vartype a_var:</span> <span class="nf">str or int</span>
+<span class="nc">:rtype:</span> <span class="nf">float or str</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cross-referencing-python-objects">
+<span id="python-roles"></span><h3>Cross-referencing Python objects<a class="headerlink" href="#cross-referencing-python-objects" title="Permalink to this headline">¶</a></h3>
+<p>The following roles refer to objects in modules and are possibly hyperlinked if
+a matching identifier is found:</p>
+<dl class="role">
+<dt id="role-py:mod">
+<code class="descname">:py:mod:</code><a class="headerlink" href="#role-py:mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a module; a dotted name may be used.  This should also be used for
+package names.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:func">
+<code class="descname">:py:func:</code><a class="headerlink" href="#role-py:func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a Python function; dotted names may be used.  The role text needs
+not include trailing parentheses to enhance readability; they will be added
+automatically by Sphinx if the <a href="#id6"><span class="problematic" id="id7">:confval:`add_function_parentheses`</span></a> config
+value is <code class="docutils literal"><span class="pre">True</span></code> (the default).</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:data">
+<code class="descname">:py:data:</code><a class="headerlink" href="#role-py:data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a module-level variable.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:const">
+<code class="descname">:py:const:</code><a class="headerlink" href="#role-py:const" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a “defined” constant.  This may be a Python variable that is not
+intended to be changed.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:class">
+<code class="descname">:py:class:</code><a class="headerlink" href="#role-py:class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a class; a dotted name may be used.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:meth">
+<code class="descname">:py:meth:</code><a class="headerlink" href="#role-py:meth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a method of an object.  The role text can include the type name and
+the method name; if it occurs within the description of a type, the type name
+can be omitted.  A dotted name may be used.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:attr">
+<code class="descname">:py:attr:</code><a class="headerlink" href="#role-py:attr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a data attribute of an object.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:exc">
+<code class="descname">:py:exc:</code><a class="headerlink" href="#role-py:exc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference an exception.  A dotted name may be used.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-py:obj">
+<code class="descname">:py:obj:</code><a class="headerlink" href="#role-py:obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference an object of unspecified type.  Useful e.g. as the
+<a href="#id8"><span class="problematic" id="id9">:confval:`default_role`</span></a>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.4.</span></p>
+</div>
+</dd></dl>
+
+<p>The name enclosed in this markup can include a module name and/or a class name.
+For example, <code class="docutils literal"><span class="pre">:py:func:`filter`</span></code> could refer to a function named <code class="docutils literal"><span class="pre">filter</span></code> in
+the current module, or the built-in function of that name.  In contrast,
+<code class="docutils literal"><span class="pre">:py:func:`foo.filter`</span></code> clearly refers to the <code class="docutils literal"><span class="pre">filter</span></code> function in the
+<code class="docutils literal"><span class="pre">foo</span></code> module.</p>
+<p>Normally, names in these roles are searched first without any further
+qualification, then with the current module name prepended, then with the
+current module and class name (if any) prepended.  If you prefix the name with a
+dot, this order is reversed.  For example, in the documentation of Python’s
+<a class="reference external" href="https://docs.python.org/2/library/codecs.html#module-codecs" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">codecs</span></code></a> module, <code class="docutils literal"><span class="pre">:py:func:`open`</span></code> always refers to the built-in
+function, while <code class="docutils literal"><span class="pre">:py:func:`.open`</span></code> refers to <a class="reference external" href="https://docs.python.org/2/library/codecs.html#codecs.open" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">codecs.open()</span></code></a>.</p>
+<p>A similar heuristic is used to determine whether the name is an attribute of the
+currently documented class.</p>
+<p>Also, if the name is prefixed with a dot, and no exact match is found, the
+target is taken as a suffix and all object names with that suffix are
+searched.  For example, <code class="docutils literal"><span class="pre">:py:meth:`.TarFile.close`</span></code> references the
+<code class="docutils literal"><span class="pre">tarfile.TarFile.close()</span></code> function, even if the current module is not
+<code class="docutils literal"><span class="pre">tarfile</span></code>.  Since this can get ambiguous, if there is more than one possible
+match, you will get a warning from Sphinx.</p>
+<p>Note that you can combine the <code class="docutils literal"><span class="pre">~</span></code> and <code class="docutils literal"><span class="pre">.</span></code> prefixes:
+<code class="docutils literal"><span class="pre">:py:meth:`~.TarFile.close`</span></code> will reference the <code class="docutils literal"><span class="pre">tarfile.TarFile.close()</span></code>
+method, but the visible link caption will only be <code class="docutils literal"><span class="pre">close()</span></code>.</p>
+</div>
+</div>
+<div class="section" id="the-c-domain">
+<span id="c-domain"></span><h2>The C Domain<a class="headerlink" href="#the-c-domain" title="Permalink to this headline">¶</a></h2>
+<p>The C domain (name <strong>c</strong>) is suited for documentation of C API.</p>
+<dl class="directive">
+<dt id="directive-c:function">
+<code class="descname">.. c:function::</code><code class="descclassname"> type name(signature)</code><a class="headerlink" href="#directive-c:function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a C function. The signature should be given as in C, e.g.:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">c:function</span><span class="p">::</span> PyObject<span class="ge">* PyType_GenericAlloc(PyTypeObject *</span>type, Py_ssize_t nitems)
+</pre></div>
+</div>
+<p>This is also used to describe function-like preprocessor macros.  The names
+of the arguments should be given so they may be used in the description.</p>
+<p>Note that you don’t have to backslash-escape asterisks in the signature, as
+it is not parsed by the reST inliner.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-c:member">
+<code class="descname">.. c:member::</code><code class="descclassname"> type name</code><a class="headerlink" href="#directive-c:member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a C struct member. Example signature:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">c:member</span><span class="p">::</span> PyObject* PyTypeObject.tp_bases
+</pre></div>
+</div>
+<p>The text of the description should include the range of values allowed, how
+the value should be interpreted, and whether the value can be changed.
+References to structure members in text should use the <code class="docutils literal"><span class="pre">member</span></code> role.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-c:macro">
+<code class="descname">.. c:macro::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-c:macro" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a “simple” C macro.  Simple macros are macros which are used for
+code expansion, but which do not take arguments so cannot be described as
+functions.  This is a simple C-language <code class="docutils literal"><span class="pre">#define</span></code>.  Examples of its use in
+the Python documentation include <a class="reference external" href="https://docs.python.org/2/c-api/structures.html#c.PyObject_HEAD" title="(in Python v2.7)"><code class="xref c c-macro docutils literal"><span class="pre">PyObject_HEAD</span></code></a> and
+<a class="reference external" href="https://docs.python.org/2/c-api/init.html#c.Py_BEGIN_ALLOW_THREADS" title="(in Python v2.7)"><code class="xref c c-macro docutils literal"><span class="pre">Py_BEGIN_ALLOW_THREADS</span></code></a>.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-c:type">
+<code class="descname">.. c:type::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-c:type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a C type (whether defined by a typedef or struct). The signature
+should just be the type name.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-c:var">
+<code class="descname">.. c:var::</code><code class="descclassname"> type name</code><a class="headerlink" href="#directive-c:var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a global C variable.  The signature should include the type, such
+as:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">c:var</span><span class="p">::</span> PyObject* PyClass_Type
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="cross-referencing-c-constructs">
+<span id="c-roles"></span><h3>Cross-referencing C constructs<a class="headerlink" href="#cross-referencing-c-constructs" title="Permalink to this headline">¶</a></h3>
+<p>The following roles create cross-references to C-language constructs if they are
+defined in the documentation:</p>
+<dl class="role">
+<dt id="role-c:data">
+<code class="descname">:c:data:</code><a class="headerlink" href="#role-c:data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a C-language variable.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-c:func">
+<code class="descname">:c:func:</code><a class="headerlink" href="#role-c:func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a C-language function. Should include trailing parentheses.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-c:macro">
+<code class="descname">:c:macro:</code><a class="headerlink" href="#role-c:macro" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a “simple” C macro, as defined above.</p>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-c:type">
+<code class="descname">:c:type:</code><a class="headerlink" href="#role-c:type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a C-language type.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="id10">
+<h2>The C++ Domain<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<p>The C++ domain (name <strong>cpp</strong>) supports documenting C++ projects.</p>
+<div class="section" id="directives">
+<h3>Directives<a class="headerlink" href="#directives" title="Permalink to this headline">¶</a></h3>
+<p>The following directives are available. All declarations can start with
+a visibility statement (<code class="docutils literal"><span class="pre">public</span></code>, <code class="docutils literal"><span class="pre">private</span></code> or <code class="docutils literal"><span class="pre">protected</span></code>).</p>
+<dl class="directive">
+<dt id="directive-cpp:class">
+<code class="descname">.. cpp:class::</code><code class="descclassname"> class specifier</code><a class="headerlink" href="#directive-cpp:class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a class/struct, possibly with specification of inheritance, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> MyClass : public MyBase, MyOtherBase
+</pre></div>
+</div>
+<p>The class can be directly declared inside a nested scope, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> OuterScope::MyClass : public MyBase, MyOtherBase
+</pre></div>
+</div>
+<p>A class template can be declared:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;typename T, std::size_t N&gt; std::array
+</pre></div>
+</div>
+<p>or with a line break:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;typename T, std::size_t N&gt; \
+               std::array
+</pre></div>
+</div>
+<p>Full and partial template specialisations can be declared:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;&gt; \
+                std::array&lt;bool, 256&gt;
+
+<span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;typename T&gt; \
+                std::array&lt;T, 42&gt;
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:function">
+<code class="descname">.. cpp:function::</code><code class="descclassname"> (member) function prototype</code><a class="headerlink" href="#directive-cpp:function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a function or member function, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> bool myMethod(int arg1, std::string arg2)
+
+   A function with parameters and types.
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> bool myMethod(int, double)
+
+   A function with unnamed parameters.
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> const T &amp;MyClass::operator[](std::size_t i) const
+
+   An overload for the indexing operator.
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> operator bool() const
+
+   A casting operator.
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> constexpr void foo(std::string &amp;bar[2]) noexcept
+
+   A constexpr function.
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> MyClass::MyClass(const MyClass&amp;) = default
+
+   A copy constructor with default implementation.
+</pre></div>
+</div>
+<p>Function templates can also be described:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> template&lt;typename U&gt; \
+                  void print(U &amp;&amp;u)
+</pre></div>
+</div>
+<p>and function template specialisations:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> template&lt;&gt; \
+                  void print(int i)
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:member">
+<code class="descname">.. cpp:member::</code><code class="descclassname"> (member) variable declaration</code><a class="headerlink" href="#directive-cpp:member" title="Permalink to this definition">¶</a></dt>
+<dt id="directive-cpp:var">
+<code class="descname">.. cpp:var::</code><code class="descclassname"> (member) variable declaration</code><a class="headerlink" href="#directive-cpp:var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a variable or member variable, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:member</span><span class="p">::</span> std::string MyClass::myMember
+
+<span class="p">..</span> <span class="ow">cpp:var</span><span class="p">::</span> std::string MyClass::myOtherMember[N][M]
+
+<span class="p">..</span> <span class="ow">cpp:member</span><span class="p">::</span> int a = 42
+</pre></div>
+</div>
+<p>Variable templates can also be described:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:member</span><span class="p">::</span> template&lt;class T&gt; \
+                constexpr T pi = T(3.1415926535897932385)
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:type">
+<code class="descname">.. cpp:type::</code><code class="descclassname"> typedef declaration</code><a class="headerlink" href="#directive-cpp:type" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">.. cpp:type::</code><code class="descclassname"> name</code></dt>
+<dt>
+<code class="descname">.. cpp:type::</code><code class="descclassname"> type alias declaration</code></dt>
+<dd><p>Describe a type as in a typedef declaration, a type alias declaration,
+or simply the name of a type with unspecified type, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:type</span><span class="p">::</span> std::vector&lt;int&gt; MyList
+
+   A typedef-like declaration of a type.
+
+<span class="p">..</span> <span class="ow">cpp:type</span><span class="p">::</span> MyContainer::const_iterator
+
+   Declaration of a type alias with unspecified type.
+
+<span class="p">..</span> <span class="ow">cpp:type</span><span class="p">::</span> MyType = std::unordered_map&lt;int, std::string&gt;
+
+   Declaration of a type alias.
+</pre></div>
+</div>
+<p>A type alias can also be templated:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:type</span><span class="p">::</span> template&lt;typename T&gt; \
+              MyContainer = std::vector&lt;T&gt;
+</pre></div>
+</div>
+<p>The example are rendered as follows.</p>
+<dl class="type">
+<dt id="_CPPv26MyList">
+<span id="MyList"></span><em class="property">typedef </em>std::vector&lt;int&gt; <code class="descclassname"></code><code class="descname">MyList</code><a class="headerlink" href="#_CPPv26MyList" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A typedef-like declaration of a type.</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv2N11MyContainer14const_iteratorE">
+<span id="MyContainer::const_iterator"></span><em class="property">type </em><code class="descclassname">MyContainer::</code><code class="descname">const_iterator</code><a class="headerlink" href="#_CPPv2N11MyContainer14const_iteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Declaration of a type alias with unspecified type.</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv26MyType">
+<em class="property">using </em><code class="descclassname"></code><code class="descname">MyType</code> = std::unordered_map&lt;int, std::string&gt;<a class="headerlink" href="#_CPPv26MyType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Declaration of a type alias.</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv2I0E11MyContainer">
+template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">using </em><code class="descclassname"></code><code class="descname">MyContainer</code> = std::vector&lt;<a class="reference internal" href="#_CPPv2I0E11MyContainer" title="MyContainer::T">T</a>&gt;<a class="headerlink" href="#_CPPv2I0E11MyContainer" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:enum">
+<code class="descname">.. cpp:enum::</code><code class="descclassname"> unscoped enum declaration</code><a class="headerlink" href="#directive-cpp:enum" title="Permalink to this definition">¶</a></dt>
+<dt id="directive-cpp:enum-struct">
+<code class="descname">.. cpp:enum-struct::</code><code class="descclassname"> scoped enum declaration</code><a class="headerlink" href="#directive-cpp:enum-struct" title="Permalink to this definition">¶</a></dt>
+<dt id="directive-cpp:enum-class">
+<code class="descname">.. cpp:enum-class::</code><code class="descclassname"> scoped enum declaration</code><a class="headerlink" href="#directive-cpp:enum-class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describe a (scoped) enum, possibly with the underlying type specified.
+Any enumerators declared inside an unscoped enum will be declared both in the enum scope
+and in the parent scope.
+Examples:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:enum</span><span class="p">::</span> MyEnum
+
+   An unscoped enum.
+
+<span class="p">..</span> <span class="ow">cpp:enum</span><span class="p">::</span> MySpecificEnum : long
+
+   An unscoped enum with specified underlying type.
+
+<span class="p">..</span> <span class="ow">cpp:enum-class</span><span class="p">::</span> MyScopedEnum
+
+   A scoped enum.
+
+<span class="p">..</span> <span class="ow">cpp:enum-struct</span><span class="p">::</span> protected MyScopedVisibilityEnum : std::underlying_type&lt;MySpecificEnum&gt;::type
+
+   A scoped enum with non-default visibility, and with a specified underlying type.
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:enumerator">
+<code class="descname">.. cpp:enumerator::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-cpp:enumerator" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">.. cpp:enumerator::</code><code class="descclassname"> name = constant</code></dt>
+<dd><p>Describe an enumerator, optionally with its value defined, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:enumerator</span><span class="p">::</span> MyEnum::myEnumerator
+
+<span class="p">..</span> <span class="ow">cpp:enumerator</span><span class="p">::</span> MyEnum::myOtherEnumerator = 42
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:concept">
+<code class="descname">.. cpp:concept::</code><code class="descclassname"> template-parameter-list name</code><a class="headerlink" href="#directive-cpp:concept" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">.. cpp:concept::</code><code class="descclassname"> template-parameter-list name()</code></dt>
+<dd><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The support for concepts is experimental. It is based on the
+Concepts Technical Specification, and the features may change as the TS evolves.</p>
+</div>
+<p>Describe a variable concept or a function concept. Both must have exactly 1
+template parameter list. The name may be a nested name. Examples:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:concept</span><span class="p">::</span> template&lt;typename It&gt; std::Iterator
+
+   Proxy to an element of a notional sequence that can be compared,
+   indirected, or incremented.
+
+   <span class="gs">**Notation**</span>
+
+<span class="p">   ..</span> <span class="ow">cpp:var</span><span class="p">::</span> It r
+
+      An lvalue.
+
+   <span class="gs">**Valid Expressions**</span>
+
+   <span class="m">-</span> <span class="na">:cpp:expr:</span><span class="nv">`*r`</span>, when <span class="na">:cpp:expr:</span><span class="nv">`r`</span> is dereferenceable.
+   <span class="m">-</span> <span class="na">:cpp:expr:</span><span class="nv">`++r`</span>, with return type <span class="na">:cpp:expr:</span><span class="nv">`It&amp;`</span>, when <span class="na">:cpp:expr:</span><span class="nv">`r`</span> is incrementable.
+
+<span class="p">..</span> <span class="ow">cpp:concept</span><span class="p">::</span> template&lt;typename Cont&gt; std::Container()
+
+   Holder of elements, to which it can provide access via
+   <span class="na">:cpp:concept:</span><span class="nv">`Iterator`</span> s.
+</pre></div>
+</div>
+<p>They will render as follows:</p>
+<dl class="concept">
+<dt id="_CPPv2I0ENSt8IteratorE">
+template&lt;typename <code class="descname">It</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">std::</code><code class="descname">Iterator</code><a class="headerlink" href="#_CPPv2I0ENSt8IteratorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Proxy to an element of a notional sequence that can be compared,
+indirected, or incremented.</p>
+<p><strong>Notation</strong></p>
+<dl class="var">
+<dt id="_CPPv2NSt8Iterator1rE">
+<span id="std::Iterator::r__It"></span><a class="reference internal" href="#_CPPv2I0ENSt8IteratorE" title="std::Iterator::It">It</a> <code class="descclassname"></code><code class="descname">r</code><a class="headerlink" href="#_CPPv2NSt8Iterator1rE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An lvalue.</p>
+</dd></dl>
+
+<p><strong>Valid Expressions</strong></p>
+<ul class="simple">
+<li><a href="#id11"><span class="problematic" id="id12">:cpp:expr:`*r`</span></a>, when <a href="#id13"><span class="problematic" id="id14">:cpp:expr:`r`</span></a> is dereferenceable.</li>
+<li><a href="#id15"><span class="problematic" id="id16">:cpp:expr:`++r`</span></a>, with return type <a href="#id17"><span class="problematic" id="id18">:cpp:expr:`It&amp;`</span></a>, when <a href="#id19"><span class="problematic" id="id20">:cpp:expr:`r`</span></a> is incrementable.</li>
+</ul>
+</dd></dl>
+
+<dl class="concept">
+<dt id="_CPPv2I0ENSt9ContainerE">
+template&lt;typename <code class="descname">Cont</code>&gt;<br /><em class="property">concept </em>bool <code class="descclassname">std::</code><code class="descname">Container</code>()<a class="headerlink" href="#_CPPv2I0ENSt9ContainerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Holder of elements, to which it can provide access via
+<a class="reference internal" href="#_CPPv2I0ENSt8IteratorE" title="std::Iterator"><code class="xref cpp cpp-concept docutils literal"><span class="pre">Iterator</span></code></a> s.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="options">
+<h4>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h4>
+<p>Some directives support options:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">:noindex:</span></code>, see <a class="reference internal" href="#basic-domain-markup"><span class="std std-ref">Basic Markup</span></a>.</li>
+<li><code class="docutils literal"><span class="pre">:tparam-line-spec:</span></code>, for templated declarations.
+If specified, each template parameter will be rendered on a separate line.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="constrained-templates">
+<h3>Constrained Templates<a class="headerlink" href="#constrained-templates" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The support for constrained templates is experimental. It is based on the
+Concepts Technical Specification, and the features may change as the TS evolves.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Sphinx does not currently support <code class="docutils literal"><span class="pre">requires</span></code> clauses.</p>
+</div>
+<div class="section" id="placeholders">
+<h4>Placeholders<a class="headerlink" href="#placeholders" title="Permalink to this headline">¶</a></h4>
+<p>Declarations may use the name of a concept to introduce constrained template
+parameters, or the keyword <code class="docutils literal"><span class="pre">auto</span></code> to introduce unconstrained template parameters:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> void f(auto &amp;&amp;arg)
+
+   A function template with a single unconstrained template parameter.
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> void f(std::Iterator it)
+
+   A function template with a single template parameter, constrained by the
+   Iterator concept.
+</pre></div>
+</div>
+</div>
+<div class="section" id="template-introductions">
+<h4>Template Introductions<a class="headerlink" href="#template-introductions" title="Permalink to this headline">¶</a></h4>
+<p>Simple constrained function or class templates can be declared with a
+<cite>template introduction</cite> instead of a template parameter list:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> std::Iterator{It} void advance(It &amp;it)
+
+    A function template with a template parameter constrained to be an Iterator.
+
+<span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> std::LessThanComparable{T} MySortedContainer
+
+    A class template with a template parameter constrained to be LessThanComparable.
+</pre></div>
+</div>
+<p>They are rendered as follows.</p>
+<dl class="function">
+<dt id="_CPPv2I0EXNSt8IteratorEI2ItEE7advanceR2It">
+std::<a class="reference internal" href="#_CPPv2I0ENSt8IteratorE" title="std::Iterator">Iterator</a>{<code class="descname">It</code>}<br />void <code class="descclassname"></code><code class="descname">advance</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv2I0EXNSt8IteratorEI2ItEE7advanceR2It" title="advance::It">It</a> &amp;<em>it</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2I0EXNSt8IteratorEI2ItEE7advanceR2It" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A function template with a template parameter constrained to be an Iterator.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv2I0EXNSt18LessThanComparableEI1TEE17MySortedContainer">
+std::LessThanComparable{<code class="descname">T</code>}<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">MySortedContainer</code><a class="headerlink" href="#_CPPv2I0EXNSt18LessThanComparableEI1TEE17MySortedContainer" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A class template with a template parameter constrained to be LessThanComparable.</p>
+</dd></dl>
+
+<p>Note however that no checking is performed with respect to parameter
+compatibility. E.g., <code class="docutils literal"><span class="pre">Iterator{A,</span> <span class="pre">B,</span> <span class="pre">C}</span></code> will be accepted as an introduction
+even though it would not be valid C++.</p>
+</div>
+</div>
+<div class="section" id="inline-expressions-and-tpes">
+<h3>Inline Expressions and Tpes<a class="headerlink" href="#inline-expressions-and-tpes" title="Permalink to this headline">¶</a></h3>
+<dl class="role">
+<dt id="role-cpp:expr">
+<code class="descname">:cpp:expr:</code><a class="headerlink" href="#role-cpp:expr" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>A role for inserting a C++ expression or type as inline text.
+For example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:var</span><span class="p">::</span> int a = 42
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> int f(int i)
+
+An expression: <span class="na">:cpp:expr:</span><span class="nv">`a * f(a)`</span>.
+A type: <span class="na">:cpp:expr:</span><span class="nv">`const MySortedContainer&lt;int&gt;&amp;`</span>.
+</pre></div>
+</div>
+<p>will be rendered as follows:</p>
+</div></blockquote>
+<dl class="var">
+<dt id="_CPPv21a">
+<span id="a__i"></span>int <code class="descclassname"></code><code class="descname">a</code> = 42<a class="headerlink" href="#_CPPv21a" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv21fi">
+<span id="f__i"></span>int <code class="descclassname"></code><code class="descname">f</code><span class="sig-paren">(</span>int <em>i</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv21fi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<p>An expression: <a href="#id21"><span class="problematic" id="id22">:cpp:expr:`a * f(a)`</span></a>.
+A type: <a href="#id23"><span class="problematic" id="id24">:cpp:expr:`const MySortedContainer&lt;int&gt;&amp;`</span></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="namespacing">
+<h3>Namespacing<a class="headerlink" href="#namespacing" title="Permalink to this headline">¶</a></h3>
+<p>Declarations in the C++ domain are as default placed in global scope.
+The current scope can be changed using three namespace directives.
+They manage a stack declarations where <code class="docutils literal"><span class="pre">cpp:namespace</span></code> resets the stack and
+changes a given scope.
+The <code class="docutils literal"><span class="pre">cpp:namespace-push</span></code> directive changes the scope to a given inner scope
+of the current one.
+The <code class="docutils literal"><span class="pre">cpp:namespace-pop</span></code> directive undos the most recent <code class="docutils literal"><span class="pre">cpp:namespace-push</span></code>
+directive.</p>
+<dl class="directive">
+<dt id="directive-cpp:namespace">
+<code class="descname">.. cpp:namespace::</code><code class="descclassname"> scope specification</code><a class="headerlink" href="#directive-cpp:namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the current scope for the subsequent objects to the given scope,
+and resets the namespace directive stack.
+Note that the namespace does not need to correspond to C++ namespaces,
+but can end in names of classes, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:namespace</span><span class="p">::</span> Namespace1::Namespace2::SomeClass::AnInnerClass
+</pre></div>
+</div>
+<p>All subsequent objects will be defined as if their name were declared with the scope
+prepended. The subsequent cross-references will be searched for starting in the current scope.</p>
+<p>Using <code class="docutils literal"><span class="pre">NULL</span></code>, <code class="docutils literal"><span class="pre">0</span></code>, or <code class="docutils literal"><span class="pre">nullptr</span></code> as the scope will change to global scope.</p>
+<p>A namespace declaration can also be templated, e.g.,:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;typename T&gt; \
+               std::vector
+
+<span class="p">..</span> <span class="ow">cpp:namespace</span><span class="p">::</span> template&lt;typename T&gt; std::vector
+
+<span class="p">..</span> <span class="ow">cpp:function</span><span class="p">::</span> std::size_t size() const
+</pre></div>
+</div>
+<p>declares <code class="docutils literal"><span class="pre">size</span></code> as a member function of the class template <code class="docutils literal"><span class="pre">std::vector</span></code>.
+Equivalently this could have been declared using:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;typename T&gt; \
+               std::vector
+
+<span class="p">   ..</span> <span class="ow">cpp:function</span><span class="p">::</span> std::size_t size() const
+</pre></div>
+</div>
+<p>or::</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:class</span><span class="p">::</span> template&lt;typename T&gt; \
+               std::vector
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:namespace-push">
+<code class="descname">.. cpp:namespace-push::</code><code class="descclassname"> scope specification</code><a class="headerlink" href="#directive-cpp:namespace-push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the scope relatively to the current scope. For example, after:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:namespace</span><span class="p">::</span> A::B
+
+<span class="p">..</span> <span class="ow">cpp:namespace-push</span><span class="p">::</span> C::D
+</pre></div>
+</div>
+<p>the current scope will be <code class="docutils literal"><span class="pre">A::B::C::D</span></code>.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-cpp:namespace-pop">
+<code class="descname">.. cpp:namespace-pop::</code><code class="descclassname"> </code><a class="headerlink" href="#directive-cpp:namespace-pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undo the previous <code class="docutils literal"><span class="pre">cpp:namespace-push</span></code> directive (<em>not</em> just pop a scope).
+For example, after:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:namespace</span><span class="p">::</span> A::B
+
+<span class="p">..</span> <span class="ow">cpp:namespace-push</span><span class="p">::</span> C::D
+
+<span class="p">..</span> <span class="ow">cpp:namespace-pop</span><span class="p">::</span>
+</pre></div>
+</div>
+<p>the current scope will be <code class="docutils literal"><span class="pre">A::B</span></code> (<em>not</em> <code class="docutils literal"><span class="pre">A::B::C</span></code>).</p>
+<p>If no previous <code class="docutils literal"><span class="pre">cpp:namespace-push</span></code> directive has been used, but only a <code class="docutils literal"><span class="pre">cpp:namespace</span></code>
+directive, then the current scope will be reset to global scope.
+That is, <code class="docutils literal"><span class="pre">..</span> <span class="pre">cpp:namespace::</span> <span class="pre">A::B</span></code> is equivalent to:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">cpp:namespace</span><span class="p">::</span> nullptr
+
+<span class="p">..</span> <span class="ow">cpp:namespace-push</span><span class="p">::</span> A::B
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="id25">
+<h3>Info field lists<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<p>The C++ directives support the following info fields (see also <a class="reference internal" href="#info-field-lists"><span class="std std-ref">Info field lists</span></a>):</p>
+<ul class="simple">
+<li><cite>param</cite>, <cite>parameter</cite>, <cite>arg</cite>, <cite>argument</cite>: Description of a parameter.</li>
+<li><cite>tparam</cite>: Description of a template parameter.</li>
+<li><cite>returns</cite>, <cite>return</cite>: Description of a return value.</li>
+<li><cite>throws</cite>, <cite>throw</cite>, <cite>exception</cite>: Description of a possibly thrown exception.</li>
+</ul>
+</div>
+<div class="section" id="cross-referencing">
+<span id="cpp-roles"></span><h3>Cross-referencing<a class="headerlink" href="#cross-referencing" title="Permalink to this headline">¶</a></h3>
+<p>These roles link to the given declaration types:</p>
+<dl class="role">
+<dt id="role-cpp:any">
+<code class="descname">:cpp:any:</code><a class="headerlink" href="#role-cpp:any" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:class">
+<code class="descname">:cpp:class:</code><a class="headerlink" href="#role-cpp:class" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:func">
+<code class="descname">:cpp:func:</code><a class="headerlink" href="#role-cpp:func" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:member">
+<code class="descname">:cpp:member:</code><a class="headerlink" href="#role-cpp:member" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:var">
+<code class="descname">:cpp:var:</code><a class="headerlink" href="#role-cpp:var" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:type">
+<code class="descname">:cpp:type:</code><a class="headerlink" href="#role-cpp:type" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:concept">
+<code class="descname">:cpp:concept:</code><a class="headerlink" href="#role-cpp:concept" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:enum">
+<code class="descname">:cpp:enum:</code><a class="headerlink" href="#role-cpp:enum" title="Permalink to this definition">¶</a></dt>
+<dt id="role-cpp:enumerator">
+<code class="descname">:cpp:enumerator:</code><a class="headerlink" href="#role-cpp:enumerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference a C++ declaration by name (see below for details).
+The name must be properly qualified relative to the position of the link.</p>
+</dd></dl>
+
+<div class="admonition-note-on-references-with-templates-parameters-arguments admonition">
+<p class="first admonition-title">Note on References with Templates Parameters/Arguments</p>
+<p class="last">Sphinx’s syntax to give references a custom title can interfere with
+linking to class templates, if nothing follows the closing angle
+bracket, i.e. if the link looks like this: <code class="docutils literal"><span class="pre">:cpp:class:`MyClass&lt;int&gt;`</span></code>.
+This is interpreted as a link to <code class="docutils literal"><span class="pre">int</span></code> with a title of <code class="docutils literal"><span class="pre">MyClass</span></code>.
+In this case, please escape the opening angle bracket with a backslash,
+like this: <code class="docutils literal"><span class="pre">:cpp:class:`MyClass\&lt;int&gt;`</span></code>.</p>
+</div>
+<div class="admonition-note-on-references-to-overloaded-functions admonition">
+<p class="first admonition-title">Note on References to Overloaded Functions</p>
+<p class="last">It is currently impossible to link to a specific version of an
+overloaded method.  Currently the C++ domain is the first domain
+that has basic support for overloaded methods and until there is more
+data for comparison we don’t want to select a bad syntax to reference a
+specific overload.  Currently Sphinx will link to the first overloaded
+version of the method / function.</p>
+</div>
+<div class="section" id="declarations-without-template-parameters-and-template-arguments">
+<h4>Declarations without template parameters and template arguments<a class="headerlink" href="#declarations-without-template-parameters-and-template-arguments" title="Permalink to this headline">¶</a></h4>
+<p>For linking to non-templated declarations the name must be a nested name,
+e.g., <code class="docutils literal"><span class="pre">f</span></code> or <code class="docutils literal"><span class="pre">MyClass::f</span></code>.</p>
+</div>
+<div class="section" id="templated-declarations">
+<h4>Templated declarations<a class="headerlink" href="#templated-declarations" title="Permalink to this headline">¶</a></h4>
+<p>Assume the following declarations.</p>
+<dl class="class">
+<dt id="_CPPv27Wrapper">
+<span id="Wrapper"></span><em class="property">class </em><code class="descclassname"></code><code class="descname">Wrapper</code><a class="headerlink" href="#_CPPv27Wrapper" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv2I0EN7Wrapper5OuterE">
+template&lt;typename <code class="descname">TOuter</code>&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Outer</code><a class="headerlink" href="#_CPPv2I0EN7Wrapper5OuterE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv2I0EN7Wrapper5Outer5InnerE">
+template&lt;typename <code class="descname">TInner</code>&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Inner</code><a class="headerlink" href="#_CPPv2I0EN7Wrapper5Outer5InnerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<p>In general the reference must include the template paraemter declarations, e.g.,
+<code class="docutils literal"><span class="pre">template\&lt;typename</span> <span class="pre">TOuter&gt;</span> <span class="pre">Wrapper::Outer</span></code> (<a class="reference internal" href="#_CPPv2I0EN7Wrapper5OuterE" title="Wrapper::Outer"><code class="xref cpp cpp-class docutils literal"><span class="pre">template&lt;typename</span> <span class="pre">TOuter&gt;</span> <span class="pre">Wrapper::Outer</span></code></a>).
+Currently the lookup only succeed if the template parameter identifiers are equal strings. That is,
+<code class="docutils literal"><span class="pre">template\&lt;typename</span> <span class="pre">UOuter&gt;</span> <span class="pre">Wrapper::Outer</span></code> will not work.</p>
+<p>The inner class template can not be directly referenced, unless the current namespace
+is changed or the following shorthand is used.
+If a template parameter list is omitted, then the lookup will assume either a template or a non-template,
+but not a partial template specialisation.
+This means the following references work.</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">Wrapper::Outer</span></code> (<a class="reference internal" href="#_CPPv2I0EN7Wrapper5OuterE" title="Wrapper::Outer"><code class="xref cpp cpp-class docutils literal"><span class="pre">Wrapper::Outer</span></code></a>)</li>
+<li><code class="docutils literal"><span class="pre">Wrapper::Outer::Inner</span></code> (<a class="reference internal" href="#_CPPv2I0EN7Wrapper5Outer5InnerE" title="Wrapper::Outer::Inner"><code class="xref cpp cpp-class docutils literal"><span class="pre">Wrapper::Outer::Inner</span></code></a>)</li>
+<li><code class="docutils literal"><span class="pre">template\&lt;typename</span> <span class="pre">TInner&gt;</span> <span class="pre">Wrapper::Outer::Inner</span></code> (<a class="reference internal" href="#_CPPv2I0EN7Wrapper5Outer5InnerE" title="Wrapper::Outer::Inner"><code class="xref cpp cpp-class docutils literal"><span class="pre">template&lt;typename</span> <span class="pre">TInner&gt;</span> <span class="pre">Wrapper::Outer::Inner</span></code></a>)</li>
+</ul>
+</div>
+<div class="section" id="full-template-specialisations">
+<h4>(Full) Template Specialisations<a class="headerlink" href="#full-template-specialisations" title="Permalink to this headline">¶</a></h4>
+<p>Assume the following declarations.</p>
+<dl class="class">
+<dt id="_CPPv2I0E5Outer">
+template&lt;typename <code class="descname">TOuter</code>&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Outer</code><a class="headerlink" href="#_CPPv2I0E5Outer" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv2I0EN5Outer5InnerE">
+template&lt;typename <code class="descname">TInner</code>&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Inner</code><a class="headerlink" href="#_CPPv2I0EN5Outer5InnerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv2IE5OuterIiE">
+template&lt;&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Outer</code>&lt;int&gt;<a class="headerlink" href="#_CPPv2IE5OuterIiE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="class">
+<dt id="_CPPv2I0EN5OuterIiE5InnerE">
+template&lt;typename <code class="descname">TInner</code>&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Inner</code><a class="headerlink" href="#_CPPv2I0EN5OuterIiE5InnerE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="_CPPv2IEN5OuterIiE5InnerIbEE">
+template&lt;&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Inner</code>&lt;bool&gt;<a class="headerlink" href="#_CPPv2IEN5OuterIiE5InnerIbEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<p>In general the reference must include a template parameter list for each template argument list.
+The full specialisation above can therefore be referenced with <code class="docutils literal"><span class="pre">template\&lt;&gt;</span> <span class="pre">Outer\&lt;int&gt;</span></code> (<a class="reference internal" href="#_CPPv2IE5OuterIiE" title="Outer&lt;int&gt;"><code class="xref cpp cpp-class docutils literal"><span class="pre">template&lt;&gt;</span> <span class="pre">Outer&lt;int&gt;</span></code></a>)
+and <code class="docutils literal"><span class="pre">template\&lt;&gt;</span> <span class="pre">template\&lt;&gt;</span> <span class="pre">Outer\&lt;int&gt;::Inner\&lt;bool&gt;</span></code> (<a class="reference internal" href="#_CPPv2IEN5OuterIiE5InnerIbEE" title="Outer&lt;int&gt;::Inner&lt;bool&gt;"><code class="xref cpp cpp-class docutils literal"><span class="pre">template&lt;&gt;</span> <span class="pre">template&lt;&gt;</span> <span class="pre">Outer&lt;int&gt;::Inner&lt;bool&gt;</span></code></a>).
+As a shorthand the empty template parameter list can be omitted, e.g., <code class="docutils literal"><span class="pre">Outer\&lt;int&gt;</span></code> (<a class="reference internal" href="#_CPPv2IE5OuterIiE" title="Outer&lt;int&gt;"><code class="xref cpp cpp-class docutils literal"><span class="pre">Outer&lt;int&gt;</span></code></a>)
+and <code class="docutils literal"><span class="pre">Outer\&lt;int&gt;::Inner\&lt;bool&gt;</span></code> (<a class="reference internal" href="#_CPPv2IEN5OuterIiE5InnerIbEE" title="Outer&lt;int&gt;::Inner&lt;bool&gt;"><code class="xref cpp cpp-class docutils literal"><span class="pre">Outer&lt;int&gt;::Inner&lt;bool&gt;</span></code></a>).</p>
+</div>
+<div class="section" id="partial-template-specialisations">
+<h4>Partial Template Specialisations<a class="headerlink" href="#partial-template-specialisations" title="Permalink to this headline">¶</a></h4>
+<p>Assume the following declaration.</p>
+<dl class="class">
+<dt id="_CPPv2I0E5OuterIP1TE">
+template&lt;typename <code class="descname">T</code>&gt;<br /><em class="property">class </em><code class="descclassname"></code><code class="descname">Outer</code>&lt;<a class="reference internal" href="#_CPPv2I0E5OuterIP1TE" title="Outer&lt;T *&gt;::T">T</a> *&gt;<a class="headerlink" href="#_CPPv2I0E5OuterIP1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<p>References to partial specialisations must always include the template parameter lists, e.g.,
+<code class="docutils literal"><span class="pre">template\&lt;typename</span> <span class="pre">T&gt;</span> <span class="pre">Outer\&lt;T*&gt;</span></code> (<a class="reference internal" href="#_CPPv2I0E5OuterIP1TE" title="Outer&lt;T *&gt;"><code class="xref cpp cpp-class docutils literal"><span class="pre">template&lt;typename</span> <span class="pre">T&gt;</span> <span class="pre">Outer&lt;T*&gt;</span></code></a>).
+Currently the lookup only succeed if the template parameter identifiers are equal strings.</p>
+</div>
+</div>
+<div class="section" id="configuration-variables">
+<h3>Configuration Variables<a class="headerlink" href="#configuration-variables" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference internal" href="config.html#cpp-config"><span class="std std-ref">Options for the C++ domain</span></a>.</p>
+</div>
+</div>
+<div class="section" id="the-standard-domain">
+<h2>The Standard Domain<a class="headerlink" href="#the-standard-domain" title="Permalink to this headline">¶</a></h2>
+<p>The so-called “standard” domain collects all markup that doesn’t warrant a
+domain of its own.  Its directives and roles are not prefixed with a domain
+name.</p>
+<p>The standard domain is also where custom object descriptions, added using the
+<a class="reference internal" href="extdev/appapi.html#sphinx.application.Sphinx.add_object_type" title="sphinx.application.Sphinx.add_object_type"><code class="xref py py-func docutils literal"><span class="pre">add_object_type()</span></code></a> API, are placed.</p>
+<p>There is a set of directives allowing documenting command-line programs:</p>
+<dl class="directive">
+<dt id="directive-option">
+<code class="descname">.. option::</code><code class="descclassname"> name args, name args, …</code><a class="headerlink" href="#directive-option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a command line argument or switch.  Option argument names should be
+enclosed in angle brackets.  Examples:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">option</span><span class="p">::</span> dest_dir
+
+   Destination directory.
+
+<span class="p">..</span> <span class="ow">option</span><span class="p">::</span> -m &lt;module&gt;, --module &lt;module&gt;
+
+   Run a module as a script.
+</pre></div>
+</div>
+<p>The directive will create cross-reference targets for the given options,
+referencable by <a class="reference internal" href="markup/inline.html#role-option" title="option role"><code class="xref rst rst-role docutils literal"><span class="pre">option</span></code></a> (in the example case, you’d use something
+like <code class="docutils literal"><span class="pre">:option:`dest_dir`</span></code>, <code class="docutils literal"><span class="pre">:option:`-m`</span></code>, or <code class="docutils literal"><span class="pre">:option:`--module`</span></code>).</p>
+<p><code class="docutils literal"><span class="pre">cmdoption</span></code> directive is a deprecated alias for the <code class="docutils literal"><span class="pre">option</span></code> directive.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-envvar">
+<code class="descname">.. envvar::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-envvar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes an environment variable that the documented code or program uses or
+defines.  Referencable by <a class="reference internal" href="markup/inline.html#role-envvar" title="envvar role"><code class="xref rst rst-role docutils literal"><span class="pre">envvar</span></code></a>.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-program">
+<code class="descname">.. program::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-program" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#directive-py:currentmodule" title="py:currentmodule directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:currentmodule</span></code></a>, this directive produces no output.
+Instead, it serves to notify Sphinx that all following <a class="reference internal" href="#directive-option" title="option directive"><code class="xref rst rst-dir docutils literal"><span class="pre">option</span></code></a>
+directives document options for the program called <em>name</em>.</p>
+<p>If you use <a class="reference internal" href="#directive-program" title="program directive"><code class="xref rst rst-dir docutils literal"><span class="pre">program</span></code></a>, you have to qualify the references in your
+<a class="reference internal" href="markup/inline.html#role-option" title="option role"><code class="xref rst rst-role docutils literal"><span class="pre">option</span></code></a> roles by the program name, so if you have the following
+situation</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">program</span><span class="p">::</span> rm
+
+<span class="p">..</span> <span class="ow">option</span><span class="p">::</span> -r
+
+   Work recursively.
+
+<span class="p">..</span> <span class="ow">program</span><span class="p">::</span> svn
+
+<span class="p">..</span> <span class="ow">option</span><span class="p">::</span> -r revision
+
+   Specify the revision to work upon.
+</pre></div>
+</div>
+<p>then <code class="docutils literal"><span class="pre">:option:`rm</span> <span class="pre">-r`</span></code> would refer to the first option, while
+<code class="docutils literal"><span class="pre">:option:`svn</span> <span class="pre">-r`</span></code> would refer to the second one.</p>
+<p>The program name may contain spaces (in case you want to document subcommands
+like <code class="docutils literal"><span class="pre">svn</span> <span class="pre">add</span></code> and <code class="docutils literal"><span class="pre">svn</span> <span class="pre">commit</span></code> separately).</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.5.</span></p>
+</div>
+</dd></dl>
+
+<p>There is also a very generic object description directive, which is not tied to
+any domain:</p>
+<dl class="directive">
+<dt id="directive-describe">
+<code class="descname">.. describe::</code><code class="descclassname"> text</code><a class="headerlink" href="#directive-describe" title="Permalink to this definition">¶</a></dt>
+<dt id="directive-object">
+<code class="descname">.. object::</code><code class="descclassname"> text</code><a class="headerlink" href="#directive-object" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive produces the same formatting as the specific ones provided by
+domains, but does not create index entries or cross-referencing targets.
+Example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">describe</span><span class="p">::</span> PAPER
+
+   You can set this variable to select a paper size.
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="the-javascript-domain">
+<h2>The JavaScript Domain<a class="headerlink" href="#the-javascript-domain" title="Permalink to this headline">¶</a></h2>
+<p>The JavaScript domain (name <strong>js</strong>) provides the following directives:</p>
+<dl class="directive">
+<dt id="directive-js:module">
+<code class="descname">.. js:module::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-js:module" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive sets the module name for object declarations that follow
+after. The module name is used in the global module index and in cross
+references. This directive does not create an object heading like
+<a class="reference internal" href="#directive-py:class" title="py:class directive"><code class="xref rst rst-dir docutils literal"><span class="pre">py:class</span></code></a> would, for example.</p>
+<p>By default, this directive will create a linkable entity and will cause an
+entry in the global module index, unless the <code class="docutils literal"><span class="pre">noindex</span></code> option is specified.
+If this option is specified, the directive will only update the current
+module name.</p>
+<p>To clear the current module, set the module name to <code class="docutils literal"><span class="pre">null</span></code> or <code class="docutils literal"><span class="pre">None</span></code></p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-js:function">
+<code class="descname">.. js:function::</code><code class="descclassname"> name(signature)</code><a class="headerlink" href="#directive-js:function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a JavaScript function or method.  If you want to describe
+arguments as optional use square brackets as <a class="reference internal" href="#signatures"><span class="std std-ref">documented</span></a> for Python signatures.</p>
+<p>You can use fields to give more details about arguments and their expected
+types, errors which may be thrown by the function, and the value being
+returned:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">js:function</span><span class="p">::</span> $.getJSON(href, callback[, errback])
+
+   <span class="nc">:param string href:</span> <span class="nf">An URI to the location of the resource.</span>
+   <span class="nc">:param callback:</span> <span class="nf">Gets called with the object.</span>
+   :param errback:
+       Gets called in case the request fails. And a lot of other
+       text so we need multiple lines.
+   <span class="nc">:throws SomeError:</span> <span class="nf">For whatever reason in that case.</span>
+   <span class="nc">:returns:</span> <span class="nf">Something.</span>
+</pre></div>
+</div>
+<p>This is rendered as:</p>
+<blockquote>
+<div><dl class="function">
+<dt id="_S_.getJSON">
+<code class="descclassname">$.</code><code class="descname">getJSON</code><span class="sig-paren">(</span><em>href</em>, <em>callback</em><span class="optional">[</span>, <em>errback</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#_S_.getJSON" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>href</strong> (<em>string</em>) – An URI to the location of the resource.</li>
+<li><strong>callback</strong> – Gets called with the object.</li>
+<li><strong>errback</strong> – Gets called in case the request fails. And a lot of other
+text so we need multiple lines.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Throws:</th><td class="field-body"><p class="first"><strong>SomeError</strong> – For whatever reason in that case.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Something.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-js:method">
+<code class="descname">.. js:method::</code><code class="descclassname"> name(signature)</code><a class="headerlink" href="#directive-js:method" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive is an alias for <a class="reference internal" href="#directive-js:function" title="js:function directive"><code class="xref rst rst-dir docutils literal"><span class="pre">js:function</span></code></a>, however it describes a
+function that is implemented as a method on a class object.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-js:class">
+<code class="descname">.. js:class::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-js:class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a constructor that creates an object.  This is basically like
+a function but will show up with a <cite>class</cite> prefix:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">js:class</span><span class="p">::</span> MyAnimal(name[, age])
+
+   <span class="nc">:param string name:</span> <span class="nf">The name of the animal</span>
+   <span class="nc">:param number age:</span> <span class="nf">an optional age for the animal</span>
+</pre></div>
+</div>
+<p>This is rendered as:</p>
+<blockquote>
+<div><dl class="class">
+<dt id="MyAnimal">
+<em class="property">class </em><code class="descname">MyAnimal</code><span class="sig-paren">(</span><em>name</em><span class="optional">[</span>, <em>age</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#MyAnimal" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) – The name of the animal</li>
+<li><strong>age</strong> (<em>number</em>) – an optional age for the animal</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-js:data">
+<code class="descname">.. js:data::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-js:data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a global variable or constant.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-js:attribute">
+<code class="descname">.. js:attribute::</code><code class="descclassname"> object.name</code><a class="headerlink" href="#directive-js:attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes the attribute <em>name</em> of <em>object</em>.</p>
+</dd></dl>
+
+<p id="js-roles">These roles are provided to refer to the described objects:</p>
+<dl class="role">
+<dt id="role-js:mod">
+<code class="descname">:js:mod:</code><a class="headerlink" href="#role-js:mod" title="Permalink to this definition">¶</a></dt>
+<dt id="role-js:func">
+<code class="descname">:js:func:</code><a class="headerlink" href="#role-js:func" title="Permalink to this definition">¶</a></dt>
+<dt id="role-js:meth">
+<code class="descname">:js:meth:</code><a class="headerlink" href="#role-js:meth" title="Permalink to this definition">¶</a></dt>
+<dt id="role-js:class">
+<code class="descname">:js:class:</code><a class="headerlink" href="#role-js:class" title="Permalink to this definition">¶</a></dt>
+<dt id="role-js:data">
+<code class="descname">:js:data:</code><a class="headerlink" href="#role-js:data" title="Permalink to this definition">¶</a></dt>
+<dt id="role-js:attr">
+<code class="descname">:js:attr:</code><a class="headerlink" href="#role-js:attr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="the-restructuredtext-domain">
+<h2>The reStructuredText domain<a class="headerlink" href="#the-restructuredtext-domain" title="Permalink to this headline">¶</a></h2>
+<p>The reStructuredText domain (name <strong>rst</strong>) provides the following directives:</p>
+<dl class="directive">
+<dt id="directive-rst:directive">
+<code class="descname">.. rst:directive::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-rst:directive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a reST directive.  The <em>name</em> can be a single directive name or
+actual directive syntax (<cite>..</cite> prefix and <cite>::</cite> suffix) with arguments that
+will be rendered differently.  For example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rst:directive</span><span class="p">::</span> foo
+
+   Foo description.
+
+<span class="p">..</span> <span class="ow">rst:directive</span><span class="p">::</span> .. bar:: baz
+
+   Bar description.
+</pre></div>
+</div>
+<p>will be rendered as:</p>
+<blockquote>
+<div><dl class="directive">
+<dt id="directive-foo">
+<code class="descname">.. foo::</code><a class="headerlink" href="#directive-foo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Foo description.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-bar">
+<code class="descname">.. bar::</code><code class="descclassname"> baz</code><a class="headerlink" href="#directive-bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bar description.</p>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-rst:role">
+<code class="descname">.. rst:role::</code><code class="descclassname"> name</code><a class="headerlink" href="#directive-rst:role" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes a reST role.  For example:</p>
+<div class="highlight-rst"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">rst:role</span><span class="p">::</span> foo
+
+   Foo description.
+</pre></div>
+</div>
+<p>will be rendered as:</p>
+<blockquote>
+<div><dl class="role">
+<dt id="role-foo">
+<code class="descname">:foo:</code><a class="headerlink" href="#role-foo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Foo description.</p>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<p id="rst-roles">These roles are provided to refer to the described objects:</p>
+<dl class="role">
+<dt id="role-rst:dir">
+<code class="descname">:rst:dir:</code><a class="headerlink" href="#role-rst:dir" title="Permalink to this definition">¶</a></dt>
+<dt id="role-rst:role">
+<code class="descname">:rst:role:</code><a class="headerlink" href="#role-rst:role" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="more-domains">
+<h2>More domains<a class="headerlink" href="#more-domains" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://bitbucket.org/birkenfeld/sphinx-contrib/">sphinx-contrib</a> repository contains more domains available as extensions;
+currently <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-adadomain">Ada</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-coffee">CoffeeScript</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-erlangdomain">Erlang</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-httpdomain">HTTP</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-lassodomain">Lasso</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-matlabdomain">MATLAB</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-phpdomain">PHP</a>, and <a class="reference external" href="https://bitbucket.org/birkenfeld/sphinx-contrib/src/default/rubydomain">Ruby</a>
+domains. Also available are domains for <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-chapeldomain">Chapel</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-cldomain">Common Lisp</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-dqndomain">dqn</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-golangdomain">Go</a>,
+<a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-jinjadomain">Jinja</a>, <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-operationdomain">Operation</a>, and <a class="reference external" href="https://pypi.python.org/pypi/sphinxcontrib-scaladomain">Scala</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Sphinx Domains</a><ul>
+<li><a class="reference internal" href="#what-is-a-domain">What is a Domain?</a></li>
+<li><a class="reference internal" href="#basic-markup">Basic Markup</a><ul>
+<li><a class="reference internal" href="#cross-referencing-syntax">Cross-referencing syntax</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-python-domain">The Python Domain</a><ul>
+<li><a class="reference internal" href="#python-signatures">Python Signatures</a></li>
+<li><a class="reference internal" href="#info-field-lists">Info field lists</a></li>
+<li><a class="reference internal" href="#cross-referencing-python-objects">Cross-referencing Python objects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-c-domain">The C Domain</a><ul>
+<li><a class="reference internal" href="#cross-referencing-c-constructs">Cross-referencing C constructs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">The C++ Domain</a><ul>
+<li><a class="reference internal" href="#directives">Directives</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#constrained-templates">Constrained Templates</a><ul>
+<li><a class="reference internal" href="#placeholders">Placeholders</a></li>
+<li><a class="reference internal" href="#template-introductions">Template Introductions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inline-expressions-and-tpes">Inline Expressions and Tpes</a></li>
+<li><a class="reference internal" href="#namespacing">Namespacing</a></li>
+<li><a class="reference internal" href="#id25">Info field lists</a></li>
+<li><a class="reference internal" href="#cross-referencing">Cross-referencing</a><ul>
+<li><a class="reference internal" href="#declarations-without-template-parameters-and-template-arguments">Declarations without template parameters and template arguments</a></li>
+<li><a class="reference internal" href="#templated-declarations">Templated declarations</a></li>
+<li><a class="reference internal" href="#full-template-specialisations">(Full) Template Specialisations</a></li>
+<li><a class="reference internal" href="#partial-template-specialisations">Partial Template Specialisations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-variables">Configuration Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-standard-domain">The Standard Domain</a></li>
+<li><a class="reference internal" href="#the-javascript-domain">The JavaScript Domain</a></li>
+<li><a class="reference internal" href="#the-restructuredtext-domain">The reStructuredText domain</a></li>
+<li><a class="reference internal" href="#more-domains">More domains</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sphinx/doc/domains.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/sphinx/doc/domains.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

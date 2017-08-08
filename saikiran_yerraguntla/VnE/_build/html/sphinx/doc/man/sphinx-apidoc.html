@@ -1,0 +1,208 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx-apidoc manual page &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sphinx-apidoc-manual-page">
+<h1>sphinx-apidoc manual page<a class="headerlink" href="#sphinx-apidoc-manual-page" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong>sphinx-apidoc</strong> [<em>options</em>] -o &lt;<em>outputdir</em>&gt; &lt;<em>sourcedir</em>&gt; [<em>pathnames</em> …]</p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">sphinx-apidoc</strong> is a tool for automatic generation of Sphinx sources
+that, using the autodoc extension, document a whole package in the style of
+other automatic API documentation tools.</p>
+<p><em>sourcedir</em> must point to a Python package.  Any <em>pathnames</em> given are paths to
+be excluded from the generation.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><code class="docutils literal"><span class="pre">sphinx-apidoc</span></code> generates source files that use <a class="reference internal" href="../ext/autodoc.html#module-sphinx.ext.autodoc" title="sphinx.ext.autodoc: Include documentation from docstrings."><code class="xref py py-mod docutils literal"><span class="pre">sphinx.ext.autodoc</span></code></a>
+to document all found modules.  If any modules have side effects on import,
+these will be executed by <code class="docutils literal"><span class="pre">autodoc</span></code> when <code class="docutils literal"><span class="pre">sphinx-build</span></code> is run.</p>
+<p class="last">If you document scripts (as opposed to library modules), make sure their main
+routine is protected by a <code class="docutils literal"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">'__main__'</span></code> condition.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>&lt;outputdir&gt;</var></span></kbd></td>
+<td>Directory to place the output files.  If it does not exist,
+it is created.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></td>
+<td>Usually, apidoc does not overwrite files, unless this option
+is given.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-l</span>, <span class="option">--follow-links</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Follow symbolic links.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span>, <span class="option">--dry-run</span></kbd></td>
+<td>If given, apidoc does not create any files.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-s <var>&lt;suffix&gt;</var></span></kbd></td>
+<td>Suffix for the source files generated, default is <code class="docutils literal"><span class="pre">rst</span></code>.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d <var>&lt;maxdepth&gt;</var></span></kbd></td>
+<td>Maximum depth for the generated table of contents file.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-T</span>, <span class="option">--no-toc</span></kbd></td>
+<td>Do not create a table of contents file.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-F</span>, <span class="option">--full</span></kbd></td>
+<td>If given, a full Sphinx project is generated (<code class="docutils literal"><span class="pre">conf.py</span></code>,
+<code class="docutils literal"><span class="pre">Makefile</span></code> etc.) using sphinx-quickstart.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-e</span>, <span class="option">--separate</span></kbd></td>
+<td>Put each module file in its own page.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-E</span>, <span class="option">--no-headings</span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Don’t create headings for the modules/packages</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-P</span>, <span class="option">--private</span></kbd></td>
+<td>Include “_private” modules</td></tr>
+</tbody>
+</table>
+<p>These options are used with <code class="docutils literal"><span class="pre">-F</span></code>:</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-a</span></kbd></td>
+<td>Append module_path to sys.path.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-H <var>&lt;project&gt;</var></span></kbd></td>
+<td>Project name to put into the configuration.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-A <var>&lt;author&gt;</var></span></kbd></td>
+<td>Author name(s) to put into the configuration.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-V <var>&lt;version&gt;</var></span></kbd></td>
+<td>Project version.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-R <var>&lt;release&gt;</var></span></kbd></td>
+<td>Project release.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">sphinx-build(1)</em></p>
+</div>
+<div class="section" id="author">
+<h2>Author<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h2>
+<p>Etienne Desautels, &lt;<a class="reference external" href="mailto:etienne&#46;desautels&#37;&#52;&#48;gmail&#46;com">etienne<span>&#46;</span>desautels<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;, Georg Brandl
+&lt;<a class="reference external" href="mailto:georg&#37;&#52;&#48;python&#46;org">georg<span>&#64;</span>python<span>&#46;</span>org</a>&gt; et al.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">sphinx-apidoc manual page</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+<li><a class="reference internal" href="#author">Author</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/man/sphinx-apidoc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/man/sphinx-apidoc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,543 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LaTeX customization &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-latex">
+<span id="latex-customization"></span><span id="latex"></span><h1>LaTeX customization<a class="headerlink" href="#module-latex" title="Permalink to this headline">¶</a></h1>
+<p>The <em>latex</em> target does not benefit from pre-prepared themes like the
+<em>html</em> target does (see <a class="reference internal" href="theming.html"><span class="doc">HTML theming support</span></a>).</p>
+<div class="section" id="basic-customization">
+<h2>Basic customization<a class="headerlink" href="#basic-customization" title="Permalink to this headline">¶</a></h2>
+<p>It is achieved via usage of the
+<a class="reference internal" href="config.html#latex-options"><span class="std std-ref">Options for LaTeX output</span></a> as described in <a class="reference internal" href="config.html"><span class="doc">The build configuration file</span></a>. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># inside conf.py</span>
+<span class="n">latex_engine</span> <span class="o">=</span> <span class="s1">&#39;xelatex&#39;</span>
+<span class="n">latex_elements</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;fontpkg&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">\setmainfont{DejaVu Serif}</span>
+<span class="s1">\setsansfont{DejaVu Sans}</span>
+<span class="s1">\setmonofont{DejaVu Sans Mono}</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;preamble&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">\usepackage[titles]{tocloft}</span>
+<span class="s1">\cftsetpnumwidth {1.25cm}\cftsetrmarg{1.5cm}</span>
+<span class="s1">\setlength{\cftchapnumwidth}{0.75cm}</span>
+<span class="s1">\setlength{\cftsecindent}{\cftchapnumwidth}</span>
+<span class="s1">\setlength{\cftsecnumwidth}{1.25cm}</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fncychap&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;\usepackage[Bjornstrup]{fncychap}&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;printindex&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;\footnotesize\raggedright\printindex&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">latex_show_urls</span> <span class="o">=</span> <span class="s1">&#39;footnote&#39;</span>
+</pre></div>
+</div>
+<p>If the size of the <code class="docutils literal"><span class="pre">'preamble'</span></code> contents becomes inconvenient, one may move
+all needed macros into some file <code class="file docutils literal"><span class="pre">mystyle.tex</span></code> of the project source
+repertory, and get LaTeX to import it at run time:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span>&#39;preamble&#39;: r&#39;<span class="k">\input</span><span class="nb">{</span>mystyle.tex<span class="nb">}</span>&#39;,
+# or, if the <span class="k">\ProvidesPackage</span> LaTeX macro is used in a file mystyle.sty
+&#39;preamble&#39;: r&#39;<span class="k">\usepackage</span><span class="nb">{</span>mystyle<span class="nb">}</span>&#39;,
+</pre></div>
+</div>
+<p>It is needed to set appropriately <a href="#id1"><span class="problematic" id="id2">:confval:`latex_additional_files`</span></a>, for
+example:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span>latex<span class="nb">_</span>additional<span class="nb">_</span>files = [&quot;mystyle.tex&quot;]
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-latex-style-file-options">
+<span id="latexsphinxsetup"></span><h2>The LaTeX style file options<a class="headerlink" href="#the-latex-style-file-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-sphinxsetup-interface">
+<h3>The sphinxsetup interface<a class="headerlink" href="#the-sphinxsetup-interface" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">'sphinxsetup'</span></code> key of <a href="#id3"><span class="problematic" id="id4">:confval:`latex_elements`</span></a> provides a convenient
+interface to the package options of the Sphinx style file:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span>latex<span class="nb">_</span>elements = <span class="nb">{</span>
+    &#39;sphinxsetup&#39;: &#39;key1=value1, key2=value2, ...&#39;,
+<span class="nb">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>some values may be LaTeX macros, then the backslashes must be
+Python-escaped, or the whole must be a Python raw string,</li>
+<li>LaTeX boolean keys require <em>lowercase</em> <code class="docutils literal"><span class="pre">true</span></code> or <code class="docutils literal"><span class="pre">false</span></code> values,</li>
+<li>spaces around the commas and equal signs are ignored, spaces inside LaTeX
+macros may be significant.</li>
+</ul>
+<p>If non-empty, it will be passed as argument to the <code class="docutils literal"><span class="pre">\sphinxsetup</span></code> macro
+inside the document preamble, like this:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span><span class="k">\usepackage</span><span class="nb">{</span>sphinx<span class="nb">}</span>
+<span class="k">\sphinxsetup</span><span class="nb">{</span>key1=value1, key2=value2,...<span class="nb">}</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5.</span></p>
+</div>
+<p>It is possible to insert further uses of the <code class="docutils literal"><span class="pre">\sphinxsetup</span></code> LaTeX macro
+directly into the body of the document, via the help of the <code class="xref rst rst-dir docutils literal"><span class="pre">raw</span></code>
+directive. This is what is done for this documentation, for local styling
+of this chapter in the PDF output:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span>.. raw:: latex
+
+   <span class="k">\begingroup</span>
+   <span class="k">\sphinxsetup</span><span class="nb">{</span><span class="c">%</span>
+         verbatimwithframe=false,
+         VerbatimColor=<span class="nb">{</span>named<span class="nb">}{</span>OldLace<span class="nb">}</span>,
+         TitleColor=<span class="nb">{</span>named<span class="nb">}{</span>DarkGoldenrod<span class="nb">}</span>,
+         hintBorderColor=<span class="nb">{</span>named<span class="nb">}{</span>LightCoral<span class="nb">}</span>,
+         attentionborder=3pt,
+         attentionBorderColor=<span class="nb">{</span>named<span class="nb">}{</span>Crimson<span class="nb">}</span>,
+         attentionBgColor=<span class="nb">{</span>named<span class="nb">}{</span>FloralWhite<span class="nb">}</span>,
+         noteborder=2pt,
+         noteBorderColor=<span class="nb">{</span>named<span class="nb">}{</span>Olive<span class="nb">}</span>,
+         cautionborder=3pt,
+         cautionBorderColor=<span class="nb">{</span>named<span class="nb">}{</span>Cyan<span class="nb">}</span>,
+         cautionBgColor=<span class="nb">{</span>named<span class="nb">}{</span>LightCyan<span class="nb">}}</span>
+</pre></div>
+</div>
+<p>at the start of the chapter and:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span>.. raw:: latex
+
+   <span class="k">\endgroup</span>
+</pre></div>
+</div>
+<p>at its end.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The colors above are made available via the <code class="docutils literal"><span class="pre">svgnames</span></code> option of
+the “xcolor” package:</p>
+<div class="last highlight-latex"><div class="highlight"><pre><span></span>latex<span class="nb">_</span>elements = <span class="nb">{</span>
+    &#39;passoptionstopackages&#39;: r&#39;<span class="k">\PassOptionsToPackage</span><span class="nb">{</span>svgnames<span class="nb">}{</span>xcolor<span class="nb">}</span>&#39;,
+<span class="nb">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-available-styling-options">
+<h3>The available styling options<a class="headerlink" href="#the-available-styling-options" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils" id="latexsphinxsetuphmargin">
+<dt><code class="docutils literal"><span class="pre">hmargin,</span> <span class="pre">vmargin</span></code></dt>
+<dd><p class="first">The dimensions of the horizontal (resp. vertical) margins, passed as
+<code class="docutils literal"><span class="pre">hmargin</span></code> (resp. <code class="docutils literal"><span class="pre">vmargin</span></code>) option to
+the <code class="docutils literal"><span class="pre">geometry</span></code> package. The default is <code class="docutils literal"><span class="pre">1in</span></code>, which is equivalent to
+<code class="docutils literal"><span class="pre">{1in,1in}</span></code>. Example:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span>&#39;sphinxsetup&#39;: &#39;hmargin=<span class="nb">{</span>2in,1.5in<span class="nb">}</span>, vmargin=<span class="nb">{</span>1.5in,2in<span class="nb">}</span>, marginpar=1in&#39;,
+</pre></div>
+</div>
+<p>Japanese documents currently accept only the one-dimension format for
+these parameters. The <code class="docutils literal"><span class="pre">geometry</span></code> package is then passed suitable options
+to get the text width set to an exact multiple of the <em>zenkaku</em> width, and
+the text height set to an integer multiple of the baselineskip, with the
+closest fit for the margins.</p>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p>For Japanese <code class="docutils literal"><span class="pre">'manual'</span></code> docclass with pointsize <code class="docutils literal"><span class="pre">11pt</span></code> or <code class="docutils literal"><span class="pre">12pt</span></code>,
+use the <code class="docutils literal"><span class="pre">nomag</span></code> extra document class option (cf.
+<code class="docutils literal"><span class="pre">'extraclassoptions'</span></code> key of <a href="#id5"><span class="problematic" id="id6">:confval:`latex_elements`</span></a>) or so-called
+TeX “true” units:</p>
+<div class="last highlight-latex"><div class="highlight"><pre><span></span>&#39;sphinxsetup&#39;: &#39;hmargin=1.5truein, vmargin=1.5truein, marginpar=5zw&#39;,
+</pre></div>
+</div>
+</div>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.5.3.</span></p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">marginpar</span></code></dt>
+<dd><p class="first">The <code class="docutils literal"><span class="pre">\marginparwidth</span></code> LaTeX dimension, defaults to <code class="docutils literal"><span class="pre">0.5in</span></code>. For Japanese
+documents, the value is modified to be the closest integer multiple of the
+<em>zenkaku</em> width.</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.5.3.</span></p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimwithframe</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">true</span></code>. Boolean to specify if <a class="reference internal" href="markup/code.html#directive-code-block" title="code-block directive"><code class="xref rst rst-dir docutils literal"><span class="pre">code-block</span></code></a>s and literal
+includes are framed. Setting it to <code class="docutils literal"><span class="pre">false</span></code> does not deactivate use of
+package “framed”, because it is still in use for the optional background
+colour.</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimwrapslines</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">true</span></code>. Tells whether long lines in <a class="reference internal" href="markup/code.html#directive-code-block" title="code-block directive"><code class="xref rst rst-dir docutils literal"><span class="pre">code-block</span></code></a>’s
+contents should wrap.</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimhintsturnover</span></code></dt>
+<dd><p class="first">default <code class="docutils literal"><span class="pre">false</span></code>. If <code class="docutils literal"><span class="pre">true</span></code>, code-blocks display “continued on next
+page”, “continued from previous page” hints in case of pagebreaks.</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.6.3: </span>the default will change to <code class="docutils literal"><span class="pre">true</span></code> at 1.7 and horizontal positioning
+of continuation hints (currently right aligned only) will be
+customizable.</p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">parsedliteralwraps</span></code></dt>
+<dd><p class="first">default <code class="docutils literal"><span class="pre">true</span></code>. Tells whether long lines in <a href="#id7"><span class="problematic" id="id8">:dudir:`parsed-literal`</span></a>’s
+contents should wrap.</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.5.2: </span>set this option value to <code class="docutils literal"><span class="pre">false</span></code> to recover former behaviour.</p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">inlineliteralwraps</span></code></dt>
+<dd><p class="first">default <code class="docutils literal"><span class="pre">true</span></code>. Allows linebreaks inside inline literals: but extra
+potential break-points (additionally to those allowed by LaTeX at spaces
+or for hyphenation) are currently inserted only after the characters
+<code class="docutils literal"><span class="pre">.</span> <span class="pre">,</span> <span class="pre">;</span> <span class="pre">?</span> <span class="pre">!</span> <span class="pre">/</span></code>. Due to TeX internals, white space in the line will be
+stretched (or shrunk) in order to accomodate the linebreak.</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.5: </span>set this option value to <code class="docutils literal"><span class="pre">false</span></code> to recover former behaviour.</p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimvisiblespace</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">\textcolor{red}{\textvisiblespace}</span></code>. When a long code line is
+split, the last space character from the source code line right before the
+linebreak location is typeset using this.</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimcontinued</span></code></dt>
+<dd><p class="first">A LaTeX macro inserted at start of continuation code lines. Its
+(complicated…) default typesets a small red hook pointing to the right:</p>
+<div class="highlight-latex"><div class="highlight"><pre><span></span><span class="k">\makebox</span><span class="na">[2\fontcharwd\font`\x][r]</span><span class="nb">{</span><span class="k">\textcolor</span><span class="nb">{</span>red<span class="nb">}{</span><span class="k">\tiny</span><span class="s">$</span><span class="nv">\hookrightarrow</span><span class="s">$</span><span class="nb">}}</span>
+</pre></div>
+</div>
+<div class="last versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>The breaking of long code lines was added at 1.4.2. The default
+definition of the continuation symbol was changed at 1.5 to accomodate
+various font sizes (e.g. code-blocks can be in footnotes).</p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">TitleColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{0.126,0.263,0.361}</span></code>. The colour for titles (as configured
+via use of package “titlesec”.)</dd>
+</dl>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Colours set via <code class="docutils literal"><span class="pre">'sphinxsetup'</span></code>  must obey the syntax of the
+argument of the <code class="docutils literal"><span class="pre">color/xcolor</span></code> packages <code class="docutils literal"><span class="pre">\definecolor</span></code> command.</p>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">InnerLinkColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{0.208,0.374,0.486}</span></code>. A colour passed to <code class="docutils literal"><span class="pre">hyperref</span></code> as
+value of <code class="docutils literal"><span class="pre">linkcolor</span></code>  and <code class="docutils literal"><span class="pre">citecolor</span></code>.</dd>
+<dt><code class="docutils literal"><span class="pre">OuterLinkColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{0.216,0.439,0.388}</span></code>. A colour passed to <code class="docutils literal"><span class="pre">hyperref</span></code> as
+value of <code class="docutils literal"><span class="pre">filecolor</span></code>, <code class="docutils literal"><span class="pre">menucolor</span></code>, and <code class="docutils literal"><span class="pre">urlcolor</span></code>.</dd>
+<dt><code class="docutils literal"><span class="pre">VerbatimColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{1,1,1}</span></code>. The background colour for
+<a class="reference internal" href="markup/code.html#directive-code-block" title="code-block directive"><code class="xref rst rst-dir docutils literal"><span class="pre">code-block</span></code></a>s. The default is white.</dd>
+<dt><code class="docutils literal"><span class="pre">VerbatimBorderColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{0,0,0}</span></code>. The frame color, defaults to black.</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimsep</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">\fboxsep</span></code>. The separation between code lines and the frame.</dd>
+<dt><code class="docutils literal"><span class="pre">verbatimborder</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">\fboxrule</span></code>. The width of the frame around
+<a class="reference internal" href="markup/code.html#directive-code-block" title="code-block directive"><code class="xref rst rst-dir docutils literal"><span class="pre">code-block</span></code></a>s.</dd>
+<dt><code class="docutils literal"><span class="pre">shadowsep</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">5pt</span></code>. The separation between contents and frame for
+<a href="#id9"><span class="problematic" id="id10">:dudir:`contents`</span></a> and <a href="#id11"><span class="problematic" id="id12">:dudir:`topic`</span></a> boxes.</dd>
+<dt><code class="docutils literal"><span class="pre">shadowsize</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">4pt</span></code>. The width of the lateral “shadow” to the right.</dd>
+<dt><code class="docutils literal"><span class="pre">shadowrule</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">\fboxrule</span></code>. The width of the frame around <a href="#id13"><span class="problematic" id="id14">:dudir:`topic`</span></a> boxes.</dd>
+<dt><code class="docutils literal"><span class="pre">noteBorderColor</span></code>, <code class="docutils literal"><span class="pre">hintBorderColor</span></code>,
+<code class="docutils literal"><span class="pre">importantBorderColor</span></code>, <code class="docutils literal"><span class="pre">tipBorderColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{0,0,0}</span></code> (black). The colour for the two horizontal rules
+used by Sphinx in LaTeX for styling a <a href="#id15"><span class="problematic" id="id16">:dudir:`note`</span></a> type admonition.</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The actual colour names declared to “color” or “xcolor” are prefixed with
+“sphinx”.</p>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">noteborder</span></code>, <code class="docutils literal"><span class="pre">hintborder</span></code>, <code class="docutils literal"><span class="pre">importantborder</span></code>, <code class="docutils literal"><span class="pre">tipborder</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">0.5pt</span></code>. The width of the two horizontal rules.</dd>
+</dl>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">warningBorderColor</span></code>, <code class="docutils literal"><span class="pre">cautionBorderColor</span></code>,
+<code class="docutils literal"><span class="pre">attentionBorderColor</span></code>, <code class="docutils literal"><span class="pre">dangerBorderColor</span></code>,
+<code class="docutils literal"><span class="pre">errorBorderColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{0,0,0}</span></code> (black). The colour for the admonition frame.</dd>
+</dl>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">warningBgColor</span></code>, <code class="docutils literal"><span class="pre">cautionBgColor</span></code>,
+<code class="docutils literal"><span class="pre">attentionBgColor</span></code>, <code class="docutils literal"><span class="pre">dangerBgColor</span></code>,
+<code class="docutils literal"><span class="pre">errorBgColor</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">{rgb}{1,1,1}</span></code> (white). The background colours for the respective
+admonitions.</dd>
+<dt><code class="docutils literal"><span class="pre">warningBorder</span></code>, <code class="docutils literal"><span class="pre">cautionBorder</span></code>,
+<code class="docutils literal"><span class="pre">attentionBorder</span></code>, <code class="docutils literal"><span class="pre">dangerBorder</span></code>,
+<code class="docutils literal"><span class="pre">errorBorder</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">1pt</span></code>. The width of the frame.</dd>
+<dt><code class="docutils literal"><span class="pre">AtStartFootnote</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">\mbox{</span> <span class="pre">}</span></code>. LaTeX macros inserted at the start of the footnote
+text at bottom of page, after the footnote number.</dd>
+<dt><code class="docutils literal"><span class="pre">BeforeFootnote</span></code></dt>
+<dd><p class="first">default <code class="docutils literal"><span class="pre">\leavevmode\unskip</span></code>. LaTeX macros inserted before the footnote
+mark. The default removes possible space before it (else, TeX could insert
+a linebreak there).</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.5.</span></p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">HeaderFamily</span></code></dt>
+<dd>default <code class="docutils literal"><span class="pre">\sffamily\bfseries</span></code>. Sets the font used by headings.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="latex-macros-and-environments">
+<h2>LaTeX macros and environments<a class="headerlink" href="#latex-macros-and-environments" title="Permalink to this headline">¶</a></h2>
+<p>Here are some macros from the package file <code class="file docutils literal"><span class="pre">sphinx.sty</span></code> and class files
+<code class="file docutils literal"><span class="pre">sphinxhowto.cls</span></code>, <code class="file docutils literal"><span class="pre">sphinxmanual.cls</span></code>, which have public names
+thus allowing redefinitions. Check the respective files for the defaults.</p>
+<div class="section" id="macros">
+<h3>Macros<a class="headerlink" href="#macros" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">text styling commands <code class="docutils literal"><span class="pre">\sphinx&lt;foo&gt;</span></code> with <code class="docutils literal"><span class="pre">&lt;foo&gt;</span></code> being one of
+<code class="docutils literal"><span class="pre">strong</span></code>, <code class="docutils literal"><span class="pre">bfcode</span></code>, <code class="docutils literal"><span class="pre">email</span></code>, <code class="docutils literal"><span class="pre">tablecontinued</span></code>, <code class="docutils literal"><span class="pre">titleref</span></code>,
+<code class="docutils literal"><span class="pre">menuselection</span></code>, <code class="docutils literal"><span class="pre">accelerator</span></code>, <code class="docutils literal"><span class="pre">crossref</span></code>, <code class="docutils literal"><span class="pre">termref</span></code>, <code class="docutils literal"><span class="pre">optional</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.4.5: </span>Use of <code class="docutils literal"><span class="pre">\sphinx</span></code> prefixed macro names to limit possibilities of conflict
+with LaTeX packages.</p>
+</div>
+</li>
+<li><p class="first">more text styling: <code class="docutils literal"><span class="pre">\sphinxstyle&lt;bar&gt;</span></code> with <code class="docutils literal"><span class="pre">&lt;bar&gt;</span></code> one of
+<code class="docutils literal"><span class="pre">indexentry</span></code>, <code class="docutils literal"><span class="pre">indexextra</span></code>, <code class="docutils literal"><span class="pre">indexpageref</span></code>, <code class="docutils literal"><span class="pre">topictitle</span></code>,
+<code class="docutils literal"><span class="pre">sidebartitle</span></code>, <code class="docutils literal"><span class="pre">othertitle</span></code>, <code class="docutils literal"><span class="pre">sidebarsubtitle</span></code>,
+<code class="docutils literal"><span class="pre">theadfamily</span></code>, <code class="docutils literal"><span class="pre">emphasis</span></code>, <code class="docutils literal"><span class="pre">literalemphasis</span></code>, <code class="docutils literal"><span class="pre">strong</span></code>,
+<code class="docutils literal"><span class="pre">literalstrong</span></code>, <code class="docutils literal"><span class="pre">abbreviation</span></code>, <code class="docutils literal"><span class="pre">literalintitle</span></code>, <code class="docutils literal"><span class="pre">codecontinued</span></code>,
+<code class="docutils literal"><span class="pre">codecontinues</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5: </span>these macros were formerly hard-coded as non customizable <code class="docutils literal"><span class="pre">\texttt</span></code>,
+<code class="docutils literal"><span class="pre">\emph</span></code>, etc…</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.6: </span><code class="docutils literal"><span class="pre">\sphinxstyletheadfamily</span></code> which defaults to <code class="docutils literal"><span class="pre">\sffamily</span></code> and allows
+multiple paragraphs in header cells of tables.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.6.3: </span><code class="docutils literal"><span class="pre">\sphinxstylecodecontinued</span></code> and <code class="docutils literal"><span class="pre">\sphinxstylecodecontinues</span></code>.</p>
+</div>
+</li>
+<li><p class="first">by default the Sphinx style file <code class="docutils literal"><span class="pre">sphinx.sty</span></code> executes the command
+<code class="docutils literal"><span class="pre">\fvset{fontsize=\small}</span></code> as part of its configuration of
+<code class="docutils literal"><span class="pre">fancyvrb.sty</span></code>. This may be overriden for example via
+<code class="docutils literal"><span class="pre">\fvset{fontsize=auto}</span></code> which will let code listings use the ambient font
+size. Refer to <code class="docutils literal"><span class="pre">fancyvrb.sty</span></code>’s documentation for further keys.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5.</span></p>
+</div>
+</li>
+<li><p class="first">the table of contents is typeset via <code class="docutils literal"><span class="pre">\sphinxtableofcontents</span></code> which is a
+wrapper (whose definition can be found in <code class="file docutils literal"><span class="pre">sphinxhowto.cls</span></code> or in
+<code class="file docutils literal"><span class="pre">sphinxmanual.cls</span></code>) of standard <code class="docutils literal"><span class="pre">\tableofcontents</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>formerly, the meaning of <code class="docutils literal"><span class="pre">\tableofcontents</span></code> was modified by Sphinx.</p>
+</div>
+</li>
+<li><p class="first">the <code class="docutils literal"><span class="pre">\maketitle</span></code> command is redefined by the class files
+<code class="file docutils literal"><span class="pre">sphinxmanual.cls</span></code> and <code class="file docutils literal"><span class="pre">sphinxhowto.cls</span></code>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="environments">
+<h3>Environments<a class="headerlink" href="#environments" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">a <a href="#id17"><span class="problematic" id="id18">:dudir:`figure`</span></a> may have an optional legend with arbitrary body
+elements: they are rendered in a <code class="docutils literal"><span class="pre">sphinxlegend</span></code> environment. The default
+definition issues <code class="docutils literal"><span class="pre">\small</span></code>, and ends with <code class="docutils literal"><span class="pre">\par</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5.6: </span>formerly, the <code class="docutils literal"><span class="pre">\small</span></code> was hardcoded in LaTeX writer and the ending
+<code class="docutils literal"><span class="pre">\par</span></code> was lacking.</p>
+</div>
+</li>
+<li><p class="first">for each admonition type <code class="docutils literal"><span class="pre">&lt;foo&gt;</span></code>, the
+used environment is named <code class="docutils literal"><span class="pre">sphinx&lt;foo&gt;</span></code>. They may be <code class="docutils literal"><span class="pre">\renewenvironment</span></code>
+‘d individually, and must then be defined with one argument (it is the heading
+of the notice, for example <code class="docutils literal"><span class="pre">Warning:</span></code> for <a href="#id19"><span class="problematic" id="id20">:dudir:`warning`</span></a> directive, if
+English is the document language). Their default definitions use either the
+<em>sphinxheavybox</em> (for the first listed directives) or the <em>sphinxlightbox</em>
+environments, configured to use the parameters (colours, border thickness)
+specific to each type, which can be set via <code class="docutils literal"><span class="pre">'sphinxsetup'</span></code> string.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>use of public environment names, separate customizability of the
+parameters, such as <code class="docutils literal"><span class="pre">noteBorderColor</span></code>, <code class="docutils literal"><span class="pre">noteborder</span></code>,
+<code class="docutils literal"><span class="pre">warningBgColor</span></code>, <code class="docutils literal"><span class="pre">warningBorderColor</span></code>, <code class="docutils literal"><span class="pre">warningborder</span></code>, …</p>
+</div>
+</li>
+<li><p class="first">the <a href="#id21"><span class="problematic" id="id22">:dudir:`contents`</span></a> directive (with <code class="docutils literal"><span class="pre">:local:</span></code> option) and the
+<a href="#id23"><span class="problematic" id="id24">:dudir:`topic`</span></a> directive are implemented by environment <code class="docutils literal"><span class="pre">sphinxShadowBox</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.4.2: </span>former code refactored into an environment allowing page breaks.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>options <code class="docutils literal"><span class="pre">shadowsep</span></code>, <code class="docutils literal"><span class="pre">shadowsize</span></code>,  <code class="docutils literal"><span class="pre">shadowrule</span></code>.</p>
+</div>
+</li>
+<li><p class="first">the literal blocks (via <code class="docutils literal"><span class="pre">::</span></code> or <a class="reference internal" href="markup/code.html#directive-code-block" title="code-block directive"><code class="xref rst rst-dir docutils literal"><span class="pre">code-block</span></code></a>), are
+implemented using <code class="docutils literal"><span class="pre">sphinxVerbatim</span></code> environment which is a wrapper of
+<code class="docutils literal"><span class="pre">Verbatim</span></code> environment from package <code class="docutils literal"><span class="pre">fancyvrb.sty</span></code>. It adds the handling
+of the top caption and the wrapping of long lines, and a frame which allows
+pagebreaks. Inside tables the used
+environment is <code class="docutils literal"><span class="pre">sphinxVerbatimintable</span></code> (it does not draw a frame, but
+allows a caption).</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span><code class="docutils literal"><span class="pre">Verbatim</span></code> keeps exact same meaning as in <code class="docutils literal"><span class="pre">fancyvrb.sty</span></code> (also
+under the name <code class="docutils literal"><span class="pre">OriginalVerbatim</span></code>); <code class="docutils literal"><span class="pre">sphinxVerbatimintable</span></code> is used
+inside tables.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5: </span>options <code class="docutils literal"><span class="pre">verbatimwithframe</span></code>, <code class="docutils literal"><span class="pre">verbatimwrapslines</span></code>,
+<code class="docutils literal"><span class="pre">verbatimsep</span></code>, <code class="docutils literal"><span class="pre">verbatimborder</span></code>.</p>
+</div>
+</li>
+<li><p class="first">the bibliography uses <code class="docutils literal"><span class="pre">sphinxthebibliography</span></code> and the Python Module index
+as well as the general index both use <code class="docutils literal"><span class="pre">sphinxtheindex</span></code>; these environments
+are wrappers of the <code class="docutils literal"><span class="pre">thebibliography</span></code> and respectively <code class="docutils literal"><span class="pre">theindex</span></code>
+environments as provided by the document class (or packages).</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>formerly, the original environments were modified by Sphinx.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="miscellany">
+<h3>Miscellany<a class="headerlink" href="#miscellany" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">the section, subsection, …  headings are set using  <em>titlesec</em>’s
+<code class="docutils literal"><span class="pre">\titleformat</span></code> command.</p>
+</li>
+<li><p class="first">for the <code class="docutils literal"><span class="pre">'manual'</span></code> docclass, the chapter headings can be customized using
+<em>fncychap</em>’s commands <code class="docutils literal"><span class="pre">\ChNameVar</span></code>, <code class="docutils literal"><span class="pre">\ChNumVar</span></code>, <code class="docutils literal"><span class="pre">\ChTitleVar</span></code>. File
+<code class="file docutils literal"><span class="pre">sphinx.sty</span></code> has custom re-definitions in case of <em>fncychap</em>
+option <code class="docutils literal"><span class="pre">Bjarne</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>formerly, use of <em>fncychap</em> with other styles than <code class="docutils literal"><span class="pre">Bjarne</span></code> was
+dysfunctional.</p>
+</div>
+</li>
+<li><p class="first">check file <code class="file docutils literal"><span class="pre">sphinx.sty</span></code> for more…</p>
+</li>
+</ul>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p>As an experimental feature, Sphinx can use user-defined template file for
+LaTeX source if you have a file named <code class="docutils literal"><span class="pre">_templates/latex.tex_t</span></code> in your
+project.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5: </span>currently all template variables are unstable and undocumented.</p>
+</div>
+<p>Additional files <code class="docutils literal"><span class="pre">longtable.tex_t</span></code>, <code class="docutils literal"><span class="pre">tabulary.tex_t</span></code> and
+<code class="docutils literal"><span class="pre">tabular.tex_t</span></code> can be added to <code class="docutils literal"><span class="pre">_templates/</span></code> to configure some aspects
+of table rendering (such as the caption position).</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.6: </span>currently all template variables are unstable and undocumented.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">LaTeX customization</a><ul>
+<li><a class="reference internal" href="#basic-customization">Basic customization</a></li>
+<li><a class="reference internal" href="#the-latex-style-file-options">The LaTeX style file options</a><ul>
+<li><a class="reference internal" href="#the-sphinxsetup-interface">The sphinxsetup interface</a></li>
+<li><a class="reference internal" href="#the-available-styling-options">The available styling options</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#latex-macros-and-environments">LaTeX macros and environments</a><ul>
+<li><a class="reference internal" href="#macros">Macros</a></li>
+<li><a class="reference internal" href="#environments">Environments</a></li>
+<li><a class="reference internal" href="#miscellany">Miscellany</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sphinx/doc/latex.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/sphinx/doc/latex.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

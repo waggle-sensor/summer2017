@@ -1,0 +1,356 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>longtables &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="longtables">
+<h1>longtables<a class="headerlink" href="#longtables" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="longtable">
+<h2>longtable<a class="headerlink" href="#longtable" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cell1-1</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-widths-option">
+<h2>longtable having :widths: option<a class="headerlink" href="#longtable-having-widths-option" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable colwidths-given docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cell1-1</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-align-option">
+<h2>longtable having :align: option<a class="headerlink" href="#longtable-having-align-option" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils align-right">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cell1-1</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-with-tabularcolumn">
+<h2>longtable with tabularcolumn<a class="headerlink" href="#longtable-with-tabularcolumn" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cell1-1</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-caption">
+<h2>longtable having caption<a class="headerlink" href="#longtable-having-caption" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils" id="id1">
+<caption><span class="caption-text">caption for longtable</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cell1-1</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-verbatim">
+<h2>longtable having verbatim<a class="headerlink" href="#longtable-having-verbatim" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="n">hello</span> <span class="n">world</span>
+</pre></div>
+</div>
+</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-both-widths-and-problematic-cell">
+<h2>longtable having both :widths: and problematic cell<a class="headerlink" href="#longtable-having-both-widths-and-problematic-cell" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="colwidths-given longtable docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><ul class="first last simple">
+<li>item1</li>
+<li>item2</li>
+</ul>
+</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-problematic-cell">
+<h2>longtable having problematic cell<a class="headerlink" href="#longtable-having-problematic-cell" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><ul class="first last simple">
+<li>item1</li>
+<li>item2</li>
+</ul>
+</td>
+<td>cell1-2</td>
+</tr>
+<tr class="row-odd"><td>cell2-1</td>
+<td>cell2-2</td>
+</tr>
+<tr class="row-even"><td>cell3-1</td>
+<td>cell3-2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="longtable-having-both-stub-columns-and-problematic-cell">
+<h2>longtable having both stub columns and problematic cell<a class="headerlink" href="#longtable-having-both-stub-columns-and-problematic-cell" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head stub">header1</th>
+<th class="head stub">header2</th>
+<th class="head">header3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><th class="stub"><ul class="first last simple">
+<li>instub1-1a</li>
+<li>instub1-1b</li>
+</ul>
+</th>
+<th class="stub">instub1-2</th>
+<td>notinstub1-3</td>
+</tr>
+<tr class="row-odd"><th class="stub">cell2-1</th>
+<th class="stub">cell2-2</th>
+<td>cell2-3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">longtables</a><ul>
+<li><a class="reference internal" href="#longtable">longtable</a></li>
+<li><a class="reference internal" href="#longtable-having-widths-option">longtable having :widths: option</a></li>
+<li><a class="reference internal" href="#longtable-having-align-option">longtable having :align: option</a></li>
+<li><a class="reference internal" href="#longtable-with-tabularcolumn">longtable with tabularcolumn</a></li>
+<li><a class="reference internal" href="#longtable-having-caption">longtable having caption</a></li>
+<li><a class="reference internal" href="#longtable-having-verbatim">longtable having verbatim</a></li>
+<li><a class="reference internal" href="#longtable-having-both-widths-and-problematic-cell">longtable having both :widths: and problematic cell</a></li>
+<li><a class="reference internal" href="#longtable-having-problematic-cell">longtable having problematic cell</a></li>
+<li><a class="reference internal" href="#longtable-having-both-stub-columns-and-problematic-cell">longtable having both stub columns and problematic cell</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/sphinx/tests/roots/test-latex-table/longtable.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../../_sources/sphinx/tests/roots/test-latex-table/longtable.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,186 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.ext.graphviz – Add Graphviz graphs &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.ext.graphviz">
+<span id="sphinx-ext-graphviz-add-graphviz-graphs"></span><h1><a class="reference internal" href="#module-sphinx.ext.graphviz" title="sphinx.ext.graphviz: Support for Graphviz graphs."><code class="xref py py-mod docutils literal"><span class="pre">sphinx.ext.graphviz</span></code></a> – Add Graphviz graphs<a class="headerlink" href="#module-sphinx.ext.graphviz" title="Permalink to this headline">¶</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+<p>This extension allows you to embed <a class="reference external" href="http://graphviz.org/">Graphviz</a> graphs in
+your documents.</p>
+<p>It adds these directives:</p>
+<dl class="directive">
+<dt id="directive-graphviz">
+<code class="descname">.. graphviz::</code><a class="headerlink" href="#directive-graphviz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directive to embed graphviz code.  The input code for <code class="docutils literal"><span class="pre">dot</span></code> is given as the
+content.  For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">graphviz</span><span class="p">::</span>
+
+   digraph foo {
+      &quot;bar&quot; -&gt; &quot;baz&quot;;
+   }
+</pre></div>
+</div>
+<p>In HTML output, the code will be rendered to a PNG or SVG image (see
+<a href="#id1"><span class="problematic" id="id2">:confval:`graphviz_output_format`</span></a>).  In LaTeX output, the code will be
+rendered to an embeddable PDF file.</p>
+<p>You can also embed external dot files, by giving the file name as an
+argument to <a class="reference internal" href="#directive-graphviz" title="graphviz directive"><code class="xref rst rst-dir docutils literal"><span class="pre">graphviz</span></code></a> and no additional content:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">graphviz</span><span class="p">::</span> external.dot
+</pre></div>
+</div>
+<p>As for all file references in Sphinx, if the filename is absolute, it is
+taken as relative to the source directory.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.1: </span>Added support for external files.</p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-graph">
+<code class="descname">.. graph::</code><a class="headerlink" href="#directive-graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directive for embedding a single undirected graph.  The name is given as a
+directive argument, the contents of the graph are the directive content.
+This is a convenience directive to generate <code class="docutils literal"><span class="pre">graph</span> <span class="pre">&lt;name&gt;</span> <span class="pre">{</span> <span class="pre">&lt;content&gt;</span> <span class="pre">}</span></code>.</p>
+<p>For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">graph</span><span class="p">::</span> foo
+
+   &quot;bar&quot; -- &quot;baz&quot;;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The graph name is passed unchanged to Graphviz.  If it contains
+non-alphanumeric characters (e.g. a dash), you will have to double-quote
+it.</p>
+</div>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-digraph">
+<code class="descname">.. digraph::</code><a class="headerlink" href="#directive-digraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directive for embedding a single directed graph.  The name is given as a
+directive argument, the contents of the graph are the directive content.
+This is a convenience directive to generate <code class="docutils literal"><span class="pre">digraph</span> <span class="pre">&lt;name&gt;</span> <span class="pre">{</span> <span class="pre">&lt;content&gt;</span> <span class="pre">}</span></code>.</p>
+<p>For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">digraph</span><span class="p">::</span> foo
+
+   &quot;bar&quot; -&gt; &quot;baz&quot; -&gt; &quot;quux&quot;;
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.0: </span>All three directives support an <code class="docutils literal"><span class="pre">alt</span></code> option that determines the image’s
+alternate text for HTML output.  If not given, the alternate text defaults to
+the graphviz code.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.1: </span>All three directives support a <code class="docutils literal"><span class="pre">caption</span></code> option that can be used to give a
+caption to the diagram.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.4: </span>All three directives support a <code class="docutils literal"><span class="pre">graphviz_dot</span></code> option that can be switch the
+<code class="docutils literal"><span class="pre">dot</span></code> command within the directive.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.5: </span>All three directives support a <code class="docutils literal"><span class="pre">align</span></code> option to align the graph horizontal.
+The values “left”, “center”, “right” are allowed.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.6: </span>All three directives support a <code class="docutils literal"><span class="pre">name</span></code> option to set the label to graph.</p>
+</div>
+<p>There are also these new config values:</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/ext/graphviz.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/ext/graphviz.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

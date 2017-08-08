@@ -1,0 +1,427 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Miscellaneous markup &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="miscellaneous-markup">
+<h1>Miscellaneous markup<a class="headerlink" href="#miscellaneous-markup" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="file-wide-metadata">
+<span id="metadata"></span><h2>File-wide metadata<a class="headerlink" href="#file-wide-metadata" title="Permalink to this headline">¶</a></h2>
+<p>reST has the concept of “field lists”; these are a sequence of fields marked up
+like this:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="nc">:fieldname:</span> <span class="nf">Field content</span>
+</pre></div>
+</div>
+<p>A field list near the top of a file is parsed by docutils as the “docinfo”
+which is normally used to record the author, date of publication and other
+metadata.  <em>In Sphinx</em>, a field list preceding any other markup is moved from
+the docinfo to the Sphinx environment as document metadata and is not displayed
+in the output; a field list appearing after the document title will be part of
+the docinfo as normal and will be displayed in the output.</p>
+<p>At the moment, these metadata fields are recognized:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">tocdepth</span></code></dt>
+<dd><p class="first">The maximum depth for a table of contents of this file.</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 0.4.</span></p>
+</div>
+</dd>
+<dt><code class="docutils literal"><span class="pre">nocomments</span></code></dt>
+<dd>If set, the web application won’t display a comment form for a page generated
+from this source file.</dd>
+<dt><code class="docutils literal"><span class="pre">orphan</span></code></dt>
+<dd><p class="first">If set, warnings about this file not being included in any toctree will be
+suppressed.</p>
+<div class="last versionadded">
+<p><span class="versionmodified">New in version 1.0.</span></p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="meta-information-markup">
+<h2>Meta-information markup<a class="headerlink" href="#meta-information-markup" title="Permalink to this headline">¶</a></h2>
+<dl class="directive">
+<dt id="directive-sectionauthor">
+<code class="descname">.. sectionauthor::</code><code class="descclassname"> name &lt;email&gt;</code><a class="headerlink" href="#directive-sectionauthor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies the author of the current section.  The argument should include
+the author’s name such that it can be used for presentation and email
+address.  The domain name portion of the address should be lower case.
+Example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">sectionauthor</span><span class="p">::</span> Guido van Rossum &lt;guido@python.org&gt;
+</pre></div>
+</div>
+<p>By default, this markup isn’t reflected in the output in any way (it helps
+keep track of contributions), but you can set the configuration value
+<a href="#id1"><span class="problematic" id="id2">:confval:`show_authors`</span></a> to <code class="docutils literal"><span class="pre">True</span></code> to make them produce a paragraph in the
+output.</p>
+</dd></dl>
+
+<dl class="directive">
+<dt id="directive-codeauthor">
+<code class="descname">.. codeauthor::</code><code class="descclassname"> name &lt;email&gt;</code><a class="headerlink" href="#directive-codeauthor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#directive-codeauthor" title="codeauthor directive"><code class="xref rst rst-dir docutils literal"><span class="pre">codeauthor</span></code></a> directive, which can appear multiple times, names
+the authors of the described code, just like <a class="reference internal" href="#directive-sectionauthor" title="sectionauthor directive"><code class="xref rst rst-dir docutils literal"><span class="pre">sectionauthor</span></code></a> names
+the author(s) of a piece of documentation.  It too only produces output if
+the <a href="#id3"><span class="problematic" id="id4">:confval:`show_authors`</span></a> configuration value is <code class="docutils literal"><span class="pre">True</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="index-generating-markup">
+<h2>Index-generating markup<a class="headerlink" href="#index-generating-markup" title="Permalink to this headline">¶</a></h2>
+<p>Sphinx automatically creates index entries from all object descriptions (like
+functions, classes or attributes) like discussed in <a class="reference internal" href="../domains.html#domains"><span class="std std-ref">Sphinx Domains</span></a>.</p>
+<p>However, there is also explicit markup available, to make the index more
+comprehensive and enable index entries in documents where information is not
+mainly contained in information units, such as the language reference.</p>
+<dl class="directive">
+<dt id="directive-index">
+<code class="descname">.. index::</code><code class="descclassname"> &lt;entries&gt;</code><a class="headerlink" href="#directive-index" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive contains one or more index entries.  Each entry consists of a
+type and a value, separated by a colon.</p>
+<p>For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">index</span><span class="p">::</span>
+   single: execution; context
+   module: __main__
+   module: sys
+   triple: module; search; path
+
+<span class="gh">The execution context</span>
+<span class="gh">---------------------</span>
+
+<span class="cp">...</span>
+</pre></div>
+</div>
+<p>This directive contains five entries, which will be converted to entries in
+the generated index which link to the exact location of the index statement
+(or, in case of offline media, the corresponding page number).</p>
+<p>Since index directives generate cross-reference targets at their location in
+the source, it makes sense to put them <em>before</em> the thing they refer to –
+e.g. a heading, as in the example above.</p>
+<p>The possible entry types are:</p>
+<dl class="docutils">
+<dt>single</dt>
+<dd>Creates a single index entry.  Can be made a subentry by separating the
+subentry text with a semicolon (this notation is also used below to
+describe what entries are created).</dd>
+<dt>pair</dt>
+<dd><code class="docutils literal"><span class="pre">pair:</span> <span class="pre">loop;</span> <span class="pre">statement</span></code> is a shortcut that creates two index entries,
+namely <code class="docutils literal"><span class="pre">loop;</span> <span class="pre">statement</span></code> and <code class="docutils literal"><span class="pre">statement;</span> <span class="pre">loop</span></code>.</dd>
+<dt>triple</dt>
+<dd>Likewise, <code class="docutils literal"><span class="pre">triple:</span> <span class="pre">module;</span> <span class="pre">search;</span> <span class="pre">path</span></code> is a shortcut that creates
+three index entries, which are <code class="docutils literal"><span class="pre">module;</span> <span class="pre">search</span> <span class="pre">path</span></code>, <code class="docutils literal"><span class="pre">search;</span> <span class="pre">path,</span>
+<span class="pre">module</span></code> and <code class="docutils literal"><span class="pre">path;</span> <span class="pre">module</span> <span class="pre">search</span></code>.</dd>
+<dt>see</dt>
+<dd><code class="docutils literal"><span class="pre">see:</span> <span class="pre">entry;</span> <span class="pre">other</span></code> creates an index entry that refers from <code class="docutils literal"><span class="pre">entry</span></code> to
+<code class="docutils literal"><span class="pre">other</span></code>.</dd>
+<dt>seealso</dt>
+<dd>Like <code class="docutils literal"><span class="pre">see</span></code>, but inserts “see also” instead of “see”.</dd>
+<dt>module, keyword, operator, object, exception, statement, builtin</dt>
+<dd>These all create two index entries.  For example, <code class="docutils literal"><span class="pre">module:</span> <span class="pre">hashlib</span></code>
+creates the entries <code class="docutils literal"><span class="pre">module;</span> <span class="pre">hashlib</span></code> and <code class="docutils literal"><span class="pre">hashlib;</span> <span class="pre">module</span></code>.  (These
+are Python-specific and therefore deprecated.)</dd>
+</dl>
+<p>You can mark up “main” index entries by prefixing them with an exclamation
+mark.  The references to “main” entries are emphasized in the generated
+index.  For example, if two pages contain</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">index</span><span class="p">::</span> Python
+</pre></div>
+</div>
+<p>and one page contains</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">index</span><span class="p">::</span> ! Python
+</pre></div>
+</div>
+<p>then the backlink to the latter page is emphasized among the three backlinks.</p>
+<p>For index directives containing only “single” entries, there is a shorthand
+notation:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">index</span><span class="p">::</span> BNF, grammar, syntax, notation
+</pre></div>
+</div>
+<p>This creates four index entries.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.1: </span>Added <code class="docutils literal"><span class="pre">see</span></code> and <code class="docutils literal"><span class="pre">seealso</span></code> types, as well as marking main entries.</p>
+</div>
+</dd></dl>
+
+<dl class="role">
+<dt id="role-index">
+<code class="descname">:index:</code><a class="headerlink" href="#role-index" title="Permalink to this definition">¶</a></dt>
+<dd><p>While the <a class="reference internal" href="#directive-index" title="index directive"><code class="xref rst rst-dir docutils literal"><span class="pre">index</span></code></a> directive is a block-level markup and links to the
+beginning of the next paragraph, there is also a corresponding role that sets
+the link target directly where it is used.</p>
+<p>The content of the role can be a simple phrase, which is then kept in the
+text and used as an index entry.  It can also be a combination of text and
+index entry, styled like with explicit targets of cross-references.  In that
+case, the “target” part can be a full entry as described for the directive
+above.  For example:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span>This is a normal reST <span class="na">:index:</span><span class="nv">`paragraph`</span> that contains several
+<span class="nc">:index:`index entries &lt;pair:</span> <span class="nf">index; entry&gt;`.</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.1.</span></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="including-content-based-on-tags">
+<span id="tags"></span><h2>Including content based on tags<a class="headerlink" href="#including-content-based-on-tags" title="Permalink to this headline">¶</a></h2>
+<dl class="directive">
+<dt id="directive-only">
+<code class="descname">.. only::</code><code class="descclassname"> &lt;expression&gt;</code><a class="headerlink" href="#directive-only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Include the content of the directive only if the <em>expression</em> is true.  The
+expression should consist of tags, like this:</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">only</span><span class="p">::</span> html and draft
+</pre></div>
+</div>
+<p>Undefined tags are false, defined tags (via the <code class="docutils literal"><span class="pre">-t</span></code> command-line option or
+within <code class="file docutils literal"><span class="pre">conf.py</span></code>, see <a class="reference internal" href="../config.html#conf-tags"><span class="std std-ref">here</span></a>) are true.  Boolean
+expressions, also using parentheses (like <code class="docutils literal"><span class="pre">html</span> <span class="pre">and</span> <span class="pre">(latex</span> <span class="pre">or</span> <span class="pre">draft)</span></code>) are
+supported.</p>
+<p>The <em>format</em> and the <em>name</em> of the current builder (<code class="docutils literal"><span class="pre">html</span></code>, <code class="docutils literal"><span class="pre">latex</span></code> or
+<code class="docutils literal"><span class="pre">text</span></code>) are always set as a tag <a class="footnote-reference" href="#id10" id="id5">[1]</a>.  To make the distinction between
+format and name explicit, they are also added with the prefix <code class="docutils literal"><span class="pre">format_</span></code> and
+<code class="docutils literal"><span class="pre">builder_</span></code>, e.g. the epub builder defines the tags  <code class="docutils literal"><span class="pre">html</span></code>, <code class="docutils literal"><span class="pre">epub</span></code>,
+<code class="docutils literal"><span class="pre">format_html</span></code> and <code class="docutils literal"><span class="pre">builder_epub</span></code>.</p>
+<p>These standard tags are set <em>after</em> the configuration file is read, so they
+are not available there.</p>
+<p>All tags must follow the standard Python identifier syntax as set out in
+the <a class="reference external" href="https://docs.python.org/2/reference/lexical_analysis.html#identifiers">Identifiers and keywords</a>
+documentation.  That is, a tag expression may only consist of tags that
+conform to the syntax of Python variables.  In ASCII, this consists of the
+uppercase and lowercase letters <code class="docutils literal"><span class="pre">A</span></code> through <code class="docutils literal"><span class="pre">Z</span></code>, the underscore <code class="docutils literal"><span class="pre">_</span></code>
+and, except for the first character, the digits <code class="docutils literal"><span class="pre">0</span></code> through <code class="docutils literal"><span class="pre">9</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.2: </span>Added the name of the builder and the prefixes.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This directive is designed to control only content of document.  It could
+not control sections, labels and so on.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="tables">
+<h2>Tables<a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h2>
+<p>Use <a class="reference internal" href="../rest.html#rst-tables"><span class="std std-ref">standard reStructuredText tables</span></a>.  They work fine in
+HTML output, however there are some gotchas when using tables in LaTeX: the
+column width is hard to determine correctly automatically.  For this reason, the
+following directive exists:</p>
+<dl class="directive">
+<dt id="directive-tabularcolumns">
+<code class="descname">.. tabularcolumns::</code><code class="descclassname"> column spec</code><a class="headerlink" href="#directive-tabularcolumns" title="Permalink to this definition">¶</a></dt>
+<dd><p>This directive gives a “column spec” for the next table occurring in the
+source file.  The spec is the second argument to the LaTeX <code class="docutils literal"><span class="pre">tabulary</span></code>
+package’s environment (which Sphinx uses to translate tables).  It can have
+values like</p>
+<div class="highlight-rest"><div class="highlight"><pre><span></span>|l|l|l|
+</pre></div>
+</div>
+<p>which means three left-adjusted, nonbreaking columns.  For columns with
+longer text that should automatically be broken, use either the standard
+<code class="docutils literal"><span class="pre">p{width}</span></code> construct, or tabulary’s automatic specifiers:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">L</span></code></td>
+<td>flush left column with automatic width</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">R</span></code></td>
+<td>flush right column with automatic width</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">C</span></code></td>
+<td>centered column with automatic width</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">J</span></code></td>
+<td>justified column with automatic width</td>
+</tr>
+</tbody>
+</table>
+<p>The automatic widths of the <code class="docutils literal"><span class="pre">LRCJ</span></code> columns are attributed by <code class="docutils literal"><span class="pre">tabulary</span></code>
+in proportion to the observed shares in a first pass where the table cells
+are rendered at their natural “horizontal” widths.</p>
+<p>By default, Sphinx uses a table layout with <code class="docutils literal"><span class="pre">J</span></code> for every column.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.3.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.6: </span>Merged cells may now contain multiple paragraphs and are much better
+handled, thanks to custom Sphinx LaTeX macros. This novel situation
+motivated the switch to <code class="docutils literal"><span class="pre">J</span></code> specifier and not <code class="docutils literal"><span class="pre">L</span></code> by default.</p>
+</div>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p>Sphinx actually uses <code class="docutils literal"><span class="pre">T</span></code> specifier having done <code class="docutils literal"><span class="pre">\newcolumntype{T}{J}</span></code>.
+To revert to previous default, insert <code class="docutils literal"><span class="pre">\newcolumntype{T}{L}</span></code> in the
+LaTeX preamble (see <a href="#id6"><span class="problematic" id="id7">:confval:`latex_elements`</span></a>).</p>
+<p>A frequent issue with tabulary is that columns with little contents are
+“squeezed”. The minimal column width is a tabulary parameter called
+<code class="docutils literal"><span class="pre">\tymin</span></code>. You may set it globally in the LaTeX preamble via
+<code class="docutils literal"><span class="pre">\setlength{\tymin}{40pt}</span></code> for example.</p>
+<p class="last">Else, use the <a class="reference internal" href="#directive-tabularcolumns" title="tabularcolumns directive"><code class="xref rst rst-dir docutils literal"><span class="pre">tabularcolumns</span></code></a> directive with an explicit
+<code class="docutils literal"><span class="pre">p{40pt}</span></code> (for example) for that column. You may use also <code class="docutils literal"><span class="pre">l</span></code>
+specifier but this makes the task of setting column widths more difficult
+if some merged cell intersects that column.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Tables with more than 30 rows are rendered using <code class="docutils literal"><span class="pre">longtable</span></code>, not
+<code class="docutils literal"><span class="pre">tabulary</span></code>, in order to allow pagebreaks. The <code class="docutils literal"><span class="pre">L</span></code>, <code class="docutils literal"><span class="pre">R</span></code>, … specifiers
+do not work for these tables.</p>
+<p>Tables that contain list-like elements such as object descriptions,
+blockquotes or any kind of lists cannot be set out of the box with
+<code class="docutils literal"><span class="pre">tabulary</span></code>. They are therefore set with the standard LaTeX <code class="docutils literal"><span class="pre">tabular</span></code> (or
+<code class="docutils literal"><span class="pre">longtable</span></code>) environment if you don’t give a <code class="docutils literal"><span class="pre">tabularcolumns</span></code> directive.
+If you do, the table will be set with <code class="docutils literal"><span class="pre">tabulary</span></code> but you must use the
+<code class="docutils literal"><span class="pre">p{width}</span></code> construct (or Sphinx’s <code class="docutils literal"><span class="pre">\X</span></code> and <code class="docutils literal"><span class="pre">\Y</span></code> specifiers described
+below) for the columns containing these elements.</p>
+<p class="last">Literal blocks do not work with <code class="docutils literal"><span class="pre">tabulary</span></code> at all, so tables containing
+a literal block are always set with <code class="docutils literal"><span class="pre">tabular</span></code>. The verbatim environment
+used for literal blocks only works in <code class="docutils literal"><span class="pre">p{width}</span></code> (and <code class="docutils literal"><span class="pre">\X</span></code> or <code class="docutils literal"><span class="pre">\Y</span></code>)
+columns, hence Sphinx generates such column specs for tables containing
+literal blocks.</p>
+</div>
+<p>Since Sphinx 1.5, the <code class="docutils literal"><span class="pre">\X{a}{b}</span></code> specifier is used (there <em>is</em> a backslash
+in the specifier letter). It is like <code class="docutils literal"><span class="pre">p{width}</span></code> with the width set to a
+fraction <code class="docutils literal"><span class="pre">a/b</span></code> of the current line width. You can use it in the
+<a class="reference internal" href="#directive-tabularcolumns" title="tabularcolumns directive"><code class="xref rst rst-dir docutils literal"><span class="pre">tabularcolumns</span></code></a> (it is not a problem if some LaTeX macro is also
+called <code class="docutils literal"><span class="pre">\X</span></code>.)</p>
+<p>It is <em>not</em> needed for <code class="docutils literal"><span class="pre">b</span></code> to be the total number of columns, nor for the
+sum of the fractions of the <code class="docutils literal"><span class="pre">\X</span></code> specifiers to add  up to one. For example
+<code class="docutils literal"><span class="pre">|\X{2}{5}|\X{1}{5}|\X{1}{5}|</span></code> is legitimate and the table will occupy
+80% of the line width, the first of its three columns having the same width
+as the sum  of the next two.</p>
+<p>This is used by the <code class="docutils literal"><span class="pre">:widths:</span></code> option of the <a href="#id8"><span class="problematic" id="id9">:dudir:`table`</span></a> directive.</p>
+<p>Since Sphinx 1.6, there is also the <code class="docutils literal"><span class="pre">\Y{f}</span></code> specifier which admits a
+decimal argument, such has <code class="docutils literal"><span class="pre">\Y{0.15}</span></code>: this would have the same effect as
+<code class="docutils literal"><span class="pre">\X{3}{20}</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.6: </span>Merged cells from complex grid tables (either multi-row, multi-column, or
+both) now allow blockquotes, lists, literal blocks, … as do regular cells.</p>
+<p>Sphinx’s merged cells interact well with <code class="docutils literal"><span class="pre">p{width}</span></code>, <code class="docutils literal"><span class="pre">\X{a}{b}</span></code>, <code class="docutils literal"><span class="pre">Y{f}</span></code>
+and tabulary’s columns.</p>
+</div>
+</dd></dl>
+
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[1]</a></td><td><p class="first">For most builders name and format are the same. At the moment only
+builders derived from the html builder distinguish between the builder
+format and the builder name.</p>
+<p class="last">Note that the current builder tag is not available in <code class="docutils literal"><span class="pre">conf.py</span></code>, it is
+only available after the builder is initialized.</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Miscellaneous markup</a><ul>
+<li><a class="reference internal" href="#file-wide-metadata">File-wide metadata</a></li>
+<li><a class="reference internal" href="#meta-information-markup">Meta-information markup</a></li>
+<li><a class="reference internal" href="#index-generating-markup">Index-generating markup</a></li>
+<li><a class="reference internal" href="#including-content-based-on-tags">Including content based on tags</a></li>
+<li><a class="reference internal" href="#tables">Tables</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/markup/misc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/markup/misc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

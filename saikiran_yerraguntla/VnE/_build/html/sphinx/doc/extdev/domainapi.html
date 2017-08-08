@@ -1,0 +1,350 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Domain API &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.domains">
+<span id="id1"></span><span id="domain-api"></span><h1>Domain API<a class="headerlink" href="#module-sphinx.domains" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sphinx.domains.Domain">
+<em class="property">class </em><code class="descclassname">sphinx.domains.</code><code class="descname">Domain</code><span class="sig-paren">(</span><em>env</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Domain is meant to be a group of “object” description directives for
+objects of a similar nature, and corresponding roles to create references to
+them.  Examples would be Python modules, classes, functions etc., elements
+of a templating language, Sphinx roles and directives, etc.</p>
+<p>Each domain has a separate storage for information about existing objects
+and how to reference them in <cite>self.data</cite>, which must be a dictionary.  It
+also must implement several functions that expose the object information in
+a uniform way to parts of Sphinx that allow the user to reference or search
+for objects in a domain-agnostic way.</p>
+<p>About <cite>self.data</cite>: since all object and cross-referencing information is
+stored on a BuildEnvironment instance, the <cite>domain.data</cite> object is also
+stored in the <cite>env.domaindata</cite> dict under the key <cite>domain.name</cite>.  Before the
+build process starts, every active domain is instantiated and given the
+environment object; the <cite>domaindata</cite> dict must then either be nonexistent or
+a dictionary whose ‘version’ key is equal to the domain class’
+<a class="reference internal" href="#sphinx.domains.Domain.data_version" title="sphinx.domains.Domain.data_version"><code class="xref py py-attr docutils literal"><span class="pre">data_version</span></code></a> attribute.  Otherwise, <cite>IOError</cite> is raised and the
+pickled environment is discarded.</p>
+<dl class="method">
+<dt id="sphinx.domains.Domain.check_consistency">
+<code class="descname">check_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.check_consistency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.check_consistency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do consistency checks (<strong>experimental</strong>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.clear_doc">
+<code class="descname">clear_doc</code><span class="sig-paren">(</span><em>docname</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.clear_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.clear_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove traces of a document in the domain-specific inventories.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.dangling_warnings">
+<code class="descname">dangling_warnings</code><em class="property"> = {}</em><a class="headerlink" href="#sphinx.domains.Domain.dangling_warnings" title="Permalink to this definition">¶</a></dt>
+<dd><p>role name -&gt; a warning message if reference is missing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.data">
+<code class="descname">data</code><em class="property"> = None</em><a class="headerlink" href="#sphinx.domains.Domain.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>data value</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.data_version">
+<code class="descname">data_version</code><em class="property"> = 0</em><a class="headerlink" href="#sphinx.domains.Domain.data_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>data version, bump this when the format of <cite>self.data</cite> changes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.directive">
+<code class="descname">directive</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.directive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.directive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a directive adapter class that always gives the registered
+directive its full name (‘domain:name’) as <code class="docutils literal"><span class="pre">self.name</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.directives">
+<code class="descname">directives</code><em class="property"> = {}</em><a class="headerlink" href="#sphinx.domains.Domain.directives" title="Permalink to this definition">¶</a></dt>
+<dd><p>directive name -&gt; directive class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.get_full_qualified_name">
+<code class="descname">get_full_qualified_name</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.get_full_qualified_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.get_full_qualified_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return full qualified name for given node.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.get_objects">
+<code class="descname">get_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.get_objects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.get_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterable of “object descriptions”, which are tuples with
+five items:</p>
+<ul class="simple">
+<li><cite>name</cite>     – fully qualified name</li>
+<li><cite>dispname</cite> – name to display when searching/linking</li>
+<li><cite>type</cite>     – object type, a key in <code class="docutils literal"><span class="pre">self.object_types</span></code></li>
+<li><cite>docname</cite>  – the document where it is to be found</li>
+<li><cite>anchor</cite>   – the anchor name for the object</li>
+<li><cite>priority</cite> – how “important” the object is (determines placement
+in search results)<ul>
+<li>1: default priority (placed before full-text matches)</li>
+<li>0: object is important (placed before default-priority objects)</li>
+<li>2: object is unimportant (placed after full-text matches)</li>
+<li>-1: object should not show up in search at all</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.get_type_name">
+<code class="descname">get_type_name</code><span class="sig-paren">(</span><em>type</em>, <em>primary=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.get_type_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.get_type_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return full name for given ObjType.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.indices">
+<code class="descname">indices</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.domains.Domain.indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>a list of Index subclasses</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.initial_data">
+<code class="descname">initial_data</code><em class="property"> = {}</em><a class="headerlink" href="#sphinx.domains.Domain.initial_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>data value for a fresh environment</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.label">
+<code class="descname">label</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.domains.Domain.label" title="Permalink to this definition">¶</a></dt>
+<dd><p>domain label: longer, more descriptive (used in messages)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.merge_domaindata">
+<code class="descname">merge_domaindata</code><span class="sig-paren">(</span><em>docnames</em>, <em>otherdata</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.merge_domaindata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.merge_domaindata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge in data regarding <em>docnames</em> from a different domaindata
+inventory (coming from a subprocess in parallel builds).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.name">
+<code class="descname">name</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.domains.Domain.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>domain name: should be short, but unique</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.object_types">
+<code class="descname">object_types</code><em class="property"> = {}</em><a class="headerlink" href="#sphinx.domains.Domain.object_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>type (usually directive) name -&gt; ObjType instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.process_doc">
+<code class="descname">process_doc</code><span class="sig-paren">(</span><em>env</em>, <em>docname</em>, <em>document</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.process_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.process_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a document after it is read by the environment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.process_field_xref">
+<code class="descname">process_field_xref</code><span class="sig-paren">(</span><em>pnode</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.process_field_xref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.process_field_xref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a pending xref created in a doc field.
+For example, attach information about the current scope.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.resolve_any_xref">
+<code class="descname">resolve_any_xref</code><span class="sig-paren">(</span><em>env</em>, <em>fromdocname</em>, <em>builder</em>, <em>target</em>, <em>node</em>, <em>contnode</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.resolve_any_xref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.resolve_any_xref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve the pending_xref <em>node</em> with the given <em>target</em>.</p>
+<p>The reference comes from an “any” or similar role, which means that we
+don’t know the type.  Otherwise, the arguments are the same as for
+<a class="reference internal" href="#sphinx.domains.Domain.resolve_xref" title="sphinx.domains.Domain.resolve_xref"><code class="xref py py-meth docutils literal"><span class="pre">resolve_xref()</span></code></a>.</p>
+<p>The method must return a list (potentially empty) of tuples
+<code class="docutils literal"><span class="pre">('domain:role',</span> <span class="pre">newnode)</span></code>, where <code class="docutils literal"><span class="pre">'domain:role'</span></code> is the name of a
+role that could have created the same reference, e.g. <code class="docutils literal"><span class="pre">'py:func'</span></code>.
+<code class="docutils literal"><span class="pre">newnode</span></code> is what <a class="reference internal" href="#sphinx.domains.Domain.resolve_xref" title="sphinx.domains.Domain.resolve_xref"><code class="xref py py-meth docutils literal"><span class="pre">resolve_xref()</span></code></a> would return.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.3.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.resolve_xref">
+<code class="descname">resolve_xref</code><span class="sig-paren">(</span><em>env</em>, <em>fromdocname</em>, <em>builder</em>, <em>typ</em>, <em>target</em>, <em>node</em>, <em>contnode</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.resolve_xref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.resolve_xref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve the pending_xref <em>node</em> with the given <em>typ</em> and <em>target</em>.</p>
+<p>This method should return a new node, to replace the xref node,
+containing the <em>contnode</em> which is the markup content of the
+cross-reference.</p>
+<p>If no resolution can be found, None can be returned; the xref node will
+then given to the ‘missing-reference’ event, and if that yields no
+resolution, replaced by <em>contnode</em>.</p>
+<p>The method can also raise <code class="xref py py-exc docutils literal"><span class="pre">sphinx.environment.NoUri</span></code> to suppress
+the ‘missing-reference’ event being emitted.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.domains.Domain.role">
+<code class="descname">role</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Domain.role"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Domain.role" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a role adapter function that always gives the registered
+role its full name (‘domain:name’) as the first argument.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.domains.Domain.roles">
+<code class="descname">roles</code><em class="property"> = {}</em><a class="headerlink" href="#sphinx.domains.Domain.roles" title="Permalink to this definition">¶</a></dt>
+<dd><p>role name -&gt; role callable</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.domains.ObjType">
+<em class="property">class </em><code class="descclassname">sphinx.domains.</code><code class="descname">ObjType</code><span class="sig-paren">(</span><em>lname</em>, <em>*roles</em>, <em>**attrs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#ObjType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.ObjType" title="Permalink to this definition">¶</a></dt>
+<dd><p>An ObjType is the description for a type of object that a domain can
+document.  In the object_types attribute of Domain subclasses, object type
+names are mapped to instances of this class.</p>
+<p>Constructor arguments:</p>
+<ul class="simple">
+<li><em>lname</em>: localized name of the type (do not include domain name)</li>
+<li><em>roles</em>: all the roles that can refer to an object of this type</li>
+<li><em>attrs</em>: object attributes – currently only “searchprio” is known,
+which defines the object’s priority in the full-text search index,
+see <a class="reference internal" href="#sphinx.domains.Domain.get_objects" title="sphinx.domains.Domain.get_objects"><code class="xref py py-meth docutils literal"><span class="pre">Domain.get_objects()</span></code></a>.</li>
+</ul>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.domains.Index">
+<em class="property">class </em><code class="descclassname">sphinx.domains.</code><code class="descname">Index</code><span class="sig-paren">(</span><em>domain</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Index" title="Permalink to this definition">¶</a></dt>
+<dd><p>An Index is the description for a domain-specific index.  To add an index to
+a domain, subclass Index, overriding the three name attributes:</p>
+<ul class="simple">
+<li><cite>name</cite> is an identifier used for generating file names.</li>
+<li><cite>localname</cite> is the section title for the index.</li>
+<li><cite>shortname</cite> is a short name for the index, for use in the relation bar in
+HTML output.  Can be empty to disable entries in the relation bar.</li>
+</ul>
+<p>and providing a <a class="reference internal" href="#sphinx.domains.Index.generate" title="sphinx.domains.Index.generate"><code class="xref py py-meth docutils literal"><span class="pre">generate()</span></code></a> method.  Then, add the index class to
+your domain’s <cite>indices</cite> list.  Extensions can add indices to existing
+domains using <a class="reference internal" href="appapi.html#sphinx.application.Sphinx.add_index_to_domain" title="sphinx.application.Sphinx.add_index_to_domain"><code class="xref py py-meth docutils literal"><span class="pre">add_index_to_domain()</span></code></a>.</p>
+<dl class="method">
+<dt id="sphinx.domains.Index.generate">
+<code class="descname">generate</code><span class="sig-paren">(</span><em>docnames=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/domains.html#Index.generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.domains.Index.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return entries for the index given by <em>name</em>.  If <em>docnames</em> is
+given, restrict to entries referring to these docnames.</p>
+<p>The return value is a tuple of <code class="docutils literal"><span class="pre">(content,</span> <span class="pre">collapse)</span></code>, where <em>collapse</em>
+is a boolean that determines if sub-entries should start collapsed (for
+output formats that support collapsing sub-entries).</p>
+<p><em>content</em> is a sequence of <code class="docutils literal"><span class="pre">(letter,</span> <span class="pre">entries)</span></code> tuples, where <em>letter</em>
+is the “heading” for the given <em>entries</em>, usually the starting letter.</p>
+<p><em>entries</em> is a sequence of single entries, where a single entry is a
+sequence <code class="docutils literal"><span class="pre">[name,</span> <span class="pre">subtype,</span> <span class="pre">docname,</span> <span class="pre">anchor,</span> <span class="pre">extra,</span> <span class="pre">qualifier,</span> <span class="pre">descr]</span></code>.
+The items in this sequence have the following meaning:</p>
+<ul class="simple">
+<li><cite>name</cite> – the name of the index entry to be displayed</li>
+<li><cite>subtype</cite> – sub-entry related type:
+0 – normal entry
+1 – entry with sub-entries
+2 – sub-entry</li>
+<li><cite>docname</cite> – docname where the entry is located</li>
+<li><cite>anchor</cite> – anchor for the entry within <cite>docname</cite></li>
+<li><cite>extra</cite> – extra info for the entry</li>
+<li><cite>qualifier</cite> – qualifier for the description</li>
+<li><cite>descr</cite> – description for the entry</li>
+</ul>
+<p>Qualifier and description are not rendered e.g. in LaTeX output.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/domainapi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/domainapi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

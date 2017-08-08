@@ -1,0 +1,587 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Templating &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="templating">
+<span id="id1"></span><h1>Templating<a class="headerlink" href="#templating" title="Permalink to this headline">¶</a></h1>
+<p>Sphinx uses the <a class="reference external" href="http://jinja.pocoo.org">Jinja</a> templating engine for its HTML
+templates.  Jinja is a text-based engine, and inspired by Django templates, so
+anyone having used Django will already be familiar with it.  It also has
+excellent documentation for those who need to make themselves familiar with it.</p>
+<div class="section" id="do-i-need-to-use-sphinx-s-templates-to-produce-html">
+<h2>Do I need to use Sphinx’s templates to produce HTML?<a class="headerlink" href="#do-i-need-to-use-sphinx-s-templates-to-produce-html" title="Permalink to this headline">¶</a></h2>
+<p>No.  You have several other options:</p>
+<ul class="simple">
+<li>You can write a <a class="reference internal" href="../tests/roots/test-autosummary/sphinx.html#sphinx.application.TemplateBridge" title="sphinx.application.TemplateBridge"><code class="xref py py-class docutils literal"><span class="pre">TemplateBridge</span></code></a> subclass that
+calls your template engine of choice, and set the <a href="#id2"><span class="problematic" id="id3">:confval:`template_bridge`</span></a>
+configuration value accordingly.</li>
+<li>You can <a class="reference internal" href="extdev/builderapi.html#writing-builders"><span class="std std-ref">write a custom builder</span></a> that derives from
+<a class="reference internal" href="builders.html#sphinx.builders.html.StandaloneHTMLBuilder" title="sphinx.builders.html.StandaloneHTMLBuilder"><code class="xref py py-class docutils literal"><span class="pre">StandaloneHTMLBuilder</span></code></a> and calls your template
+engine of choice.</li>
+<li>You can use the <a class="reference internal" href="builders.html#sphinx.builders.html.PickleHTMLBuilder" title="sphinx.builders.html.PickleHTMLBuilder"><code class="xref py py-class docutils literal"><span class="pre">PickleHTMLBuilder</span></code></a> that produces
+pickle files with the page contents, and postprocess them using a custom tool,
+or use them in your Web application.</li>
+</ul>
+</div>
+<div class="section" id="jinja-sphinx-templating-primer">
+<h2>Jinja/Sphinx Templating Primer<a class="headerlink" href="#jinja-sphinx-templating-primer" title="Permalink to this headline">¶</a></h2>
+<p>The default templating language in Sphinx is Jinja.  It’s Django/Smarty inspired
+and easy to understand.  The most important concept in Jinja is <em class="dfn">template
+inheritance</em>, which means that you can overwrite only specific blocks within a
+template, customizing it while also keeping the changes at a minimum.</p>
+<p>To customize the output of your documentation you can override all the templates
+(both the layout templates and the child templates) by adding files with the
+same name as the original filename into the template directory of the structure
+the Sphinx quickstart generated for you.</p>
+<p>Sphinx will look for templates in the folders of <a href="#id4"><span class="problematic" id="id5">:confval:`templates_path`</span></a>
+first, and if it can’t find the template it’s looking for there, it falls back
+to the selected theme’s templates.</p>
+<p>A template contains <strong>variables</strong>, which are replaced with values when the
+template is evaluated, <strong>tags</strong>, which control the logic of the template and
+<strong>blocks</strong> which are used for template inheritance.</p>
+<p>Sphinx’s <em>basic</em> theme provides base templates with a couple of blocks it will
+fill with data.  These are located in the <code class="file docutils literal"><span class="pre">themes/basic</span></code> subdirectory of
+the Sphinx installation directory, and used by all builtin Sphinx themes.
+Templates with the same name in the <a href="#id6"><span class="problematic" id="id7">:confval:`templates_path`</span></a> override templates
+supplied by the selected theme.</p>
+<p>For example, to add a new link to the template area containing related links all
+you have to do is to add a new template called <code class="docutils literal"><span class="pre">layout.html</span></code> with the
+following contents:</p>
+<div class="highlight-html+jinja"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;!layout.html&quot;</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">rootrellink</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;http://project.invalid/&quot;</span><span class="p">&gt;</span>Project Homepage<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span> <span class="ni">&amp;raquo;</span><span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nb">super</span><span class="o">()</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>By prefixing the name of the overridden template with an exclamation mark,
+Sphinx will load the layout template from the underlying HTML theme.</p>
+<p><strong>Important</strong>: If you override a block, call <code class="docutils literal"><span class="pre">{{</span> <span class="pre">super()</span> <span class="pre">}}</span></code> somewhere to
+render the block’s content in the extended template – unless you don’t want
+that content to show up.</p>
+</div>
+<div class="section" id="working-with-the-builtin-templates">
+<h2>Working with the builtin templates<a class="headerlink" href="#working-with-the-builtin-templates" title="Permalink to this headline">¶</a></h2>
+<p>The builtin <strong>basic</strong> theme supplies the templates that all builtin Sphinx
+themes are based on.  It has the following elements you can override or use:</p>
+<div class="section" id="blocks">
+<h3>Blocks<a class="headerlink" href="#blocks" title="Permalink to this headline">¶</a></h3>
+<p>The following blocks exist in the <code class="docutils literal"><span class="pre">layout.html</span></code> template:</p>
+<dl class="docutils">
+<dt><cite>doctype</cite></dt>
+<dd>The doctype of the output format.  By default this is XHTML 1.0 Transitional
+as this is the closest to what Sphinx and Docutils generate and it’s a good
+idea not to change it unless you want to switch to HTML 5 or a different but
+compatible XHTML doctype.</dd>
+<dt><cite>linktags</cite></dt>
+<dd>This block adds a couple of <code class="docutils literal"><span class="pre">&lt;link&gt;</span></code> tags to the head section of the
+template.</dd>
+<dt><cite>extrahead</cite></dt>
+<dd>This block is empty by default and can be used to add extra contents into
+the <code class="docutils literal"><span class="pre">&lt;head&gt;</span></code> tag of the generated HTML file.  This is the right place to
+add references to JavaScript or extra CSS files.</dd>
+<dt><cite>relbar1</cite> / <cite>relbar2</cite></dt>
+<dd><p class="first">This block contains the <em>relation bar</em>, the list of related links (the
+parent documents on the left, and the links to index, modules etc. on the
+right).  <cite>relbar1</cite> appears before the document, <cite>relbar2</cite> after the
+document.  By default, both blocks are filled; to show the relbar only
+before the document, you would override <cite>relbar2</cite> like this:</p>
+<div class="last highlight-html+jinja"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">relbar2</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</dd>
+<dt><cite>rootrellink</cite> / <cite>relbaritems</cite></dt>
+<dd>Inside the relbar there are three sections: The <cite>rootrellink</cite>, the links
+from the documentation and the custom <cite>relbaritems</cite>.  The <cite>rootrellink</cite> is a
+block that by default contains a list item pointing to the master document
+by default, the <cite>relbaritems</cite> is an empty block.  If you override them to
+add extra links into the bar make sure that they are list items and end with
+the <a class="reference internal" href="#reldelim1" title="reldelim1"><code class="xref py py-data docutils literal"><span class="pre">reldelim1</span></code></a>.</dd>
+<dt><cite>document</cite></dt>
+<dd>The contents of the document itself.  It contains the block “body” where the
+individual content is put by subtemplates like <code class="docutils literal"><span class="pre">page.html</span></code>.</dd>
+<dt><cite>sidebar1</cite> / <cite>sidebar2</cite></dt>
+<dd><p class="first">A possible location for a sidebar.  <cite>sidebar1</cite> appears before the document
+and is empty by default, <cite>sidebar2</cite> after the document and contains the
+default sidebar.  If you want to swap the sidebar location override this and
+call the <cite>sidebar</cite> helper:</p>
+<div class="highlight-html+jinja"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">block</span> <span class="nv">sidebar1</span> <span class="cp">%}{{</span> <span class="nv">sidebar</span><span class="o">()</span> <span class="cp">}}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">sidebar2</span> <span class="cp">%}{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p class="last">(The <cite>sidebar2</cite> location for the sidebar is needed by the <code class="docutils literal"><span class="pre">sphinxdoc.css</span></code>
+stylesheet, for example.)</p>
+</dd>
+<dt><cite>sidebarlogo</cite></dt>
+<dd>The logo location within the sidebar.  Override this if you want to place
+some content at the top of the sidebar.</dd>
+<dt><cite>footer</cite></dt>
+<dd>The block for the footer div.  If you want a custom footer or markup before
+or after it, override this one.</dd>
+</dl>
+<p>The following four blocks are <em>only</em> used for pages that do not have assigned a
+list of custom sidebars in the <a href="#id8"><span class="problematic" id="id9">:confval:`html_sidebars`</span></a> config value.  Their use
+is deprecated in favor of separate sidebar templates, which can be included via
+<a href="#id10"><span class="problematic" id="id11">:confval:`html_sidebars`</span></a>.</p>
+<dl class="docutils">
+<dt><cite>sidebartoc</cite></dt>
+<dd><p class="first">The table of contents within the sidebar.</p>
+<div class="last deprecated">
+<p><span class="versionmodified">Deprecated since version 1.0.</span></p>
+</div>
+</dd>
+<dt><cite>sidebarrel</cite></dt>
+<dd><p class="first">The relation links (previous, next document) within the sidebar.</p>
+<div class="last deprecated">
+<p><span class="versionmodified">Deprecated since version 1.0.</span></p>
+</div>
+</dd>
+<dt><cite>sidebarsourcelink</cite></dt>
+<dd><p class="first">The “Show source” link within the sidebar (normally only shown if this is
+enabled by <a href="#id12"><span class="problematic" id="id13">:confval:`html_show_sourcelink`</span></a>).</p>
+<div class="last deprecated">
+<p><span class="versionmodified">Deprecated since version 1.0.</span></p>
+</div>
+</dd>
+<dt><cite>sidebarsearch</cite></dt>
+<dd><p class="first">The search box within the sidebar.  Override this if you want to place some
+content at the bottom of the sidebar.</p>
+<div class="last deprecated">
+<p><span class="versionmodified">Deprecated since version 1.0.</span></p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="configuration-variables">
+<h3>Configuration Variables<a class="headerlink" href="#configuration-variables" title="Permalink to this headline">¶</a></h3>
+<p>Inside templates you can set a couple of variables used by the layout template
+using the <code class="docutils literal"><span class="pre">{%</span> <span class="pre">set</span> <span class="pre">%}</span></code> tag:</p>
+<dl class="data">
+<dt id="reldelim1">
+<code class="descname">reldelim1</code><a class="headerlink" href="#reldelim1" title="Permalink to this definition">¶</a></dt>
+<dd><p>The delimiter for the items on the left side of the related bar.  This
+defaults to <code class="docutils literal"><span class="pre">'</span> <span class="pre">&amp;raquo;'</span></code> Each item in the related bar ends with the value
+of this variable.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="reldelim2">
+<code class="descname">reldelim2</code><a class="headerlink" href="#reldelim2" title="Permalink to this definition">¶</a></dt>
+<dd><p>The delimiter for the items on the right side of the related bar.  This
+defaults to <code class="docutils literal"><span class="pre">'</span> <span class="pre">|'</span></code>.  Each item except of the last one in the related bar
+ends with the value of this variable.</p>
+</dd></dl>
+
+<p>Overriding works like this:</p>
+<div class="highlight-html+jinja"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;!layout.html&quot;</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">set</span> <span class="nv">reldelim1</span> <span class="o">=</span> <span class="s1">&#39; &amp;gt;&#39;</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<dl class="data">
+<dt id="script_files">
+<code class="descname">script_files</code><a class="headerlink" href="#script_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add additional script files here, like this:</p>
+<div class="highlight-html+jinja"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">set</span> <span class="nv">script_files</span> <span class="o">=</span> <span class="nv">script_files</span> <span class="o">+</span> <span class="o">[</span><span class="s2">&quot;_static/myscript.js&quot;</span><span class="o">]</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="helper-functions">
+<h3>Helper Functions<a class="headerlink" href="#helper-functions" title="Permalink to this headline">¶</a></h3>
+<p>Sphinx provides various Jinja functions as helpers in the template.  You can use
+them to generate links or output multiply used elements.</p>
+<dl class="function">
+<dt id="pathto">
+<code class="descname">pathto</code><span class="sig-paren">(</span><em>document</em><span class="sig-paren">)</span><a class="headerlink" href="#pathto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the path to a Sphinx document as a URL.  Use this to refer to built
+documents.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">pathto</code><span class="sig-paren">(</span><em>file</em>, <em>1</em><span class="sig-paren">)</span></dt>
+<dd><p>Return the path to a <em>file</em> which is a filename relative to the root of the
+generated output.  Use this to refer to static files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hasdoc">
+<code class="descname">hasdoc</code><span class="sig-paren">(</span><em>document</em><span class="sig-paren">)</span><a class="headerlink" href="#hasdoc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a document with the name <em>document</em> exists.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sidebar">
+<code class="descname">sidebar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sidebar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the rendered sidebar.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="relbar">
+<code class="descname">relbar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#relbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the rendered relation bar.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="global-variables">
+<h3>Global Variables<a class="headerlink" href="#global-variables" title="Permalink to this headline">¶</a></h3>
+<p>These global variables are available in every template and are safe to use.
+There are more, but most of them are an implementation detail and might change
+in the future.</p>
+<dl class="data">
+<dt id="builder">
+<code class="descname">builder</code><a class="headerlink" href="#builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the builder (e.g. <code class="docutils literal"><span class="pre">html</span></code> or <code class="docutils literal"><span class="pre">htmlhelp</span></code>).</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="copyright">
+<code class="descname">copyright</code><a class="headerlink" href="#copyright" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id14"><span class="problematic" id="id15">:confval:`copyright`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="docstitle">
+<code class="descname">docstitle</code><a class="headerlink" href="#docstitle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The title of the documentation (the value of <a href="#id16"><span class="problematic" id="id17">:confval:`html_title`</span></a>), except
+when the “single-file” builder is used, when it is set to <code class="docutils literal"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="embedded">
+<code class="descname">embedded</code><a class="headerlink" href="#embedded" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the built HTML is meant to be embedded in some viewing application
+that handles navigation, not the web browser, such as for HTML help or Qt
+help formats.  In this case, the sidebar is not included.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="favicon">
+<code class="descname">favicon</code><a class="headerlink" href="#favicon" title="Permalink to this definition">¶</a></dt>
+<dd><p>The path to the HTML favicon in the static path, or <code class="docutils literal"><span class="pre">''</span></code>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="file_suffix">
+<code class="descname">file_suffix</code><a class="headerlink" href="#file_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the builder’s <a class="reference internal" href="builders.html#sphinx.builders.html.SerializingHTMLBuilder.out_suffix" title="sphinx.builders.html.SerializingHTMLBuilder.out_suffix"><code class="xref py py-attr docutils literal"><span class="pre">out_suffix</span></code></a>
+attribute, i.e. the file name extension that the output files will get.  For
+a standard HTML builder, this is usually <code class="docutils literal"><span class="pre">.html</span></code>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="has_source">
+<code class="descname">has_source</code><a class="headerlink" href="#has_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if the reST document sources are copied (if <a href="#id18"><span class="problematic" id="id19">:confval:`html_copy_source`</span></a>
+is <code class="docutils literal"><span class="pre">True</span></code>).</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="language">
+<code class="descname">language</code><a class="headerlink" href="#language" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id20"><span class="problematic" id="id21">:confval:`language`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="last_updated">
+<code class="descname">last_updated</code><a class="headerlink" href="#last_updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>The build date.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="logo">
+<code class="descname">logo</code><a class="headerlink" href="#logo" title="Permalink to this definition">¶</a></dt>
+<dd><p>The path to the HTML logo image in the static path, or <code class="docutils literal"><span class="pre">''</span></code>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="master_doc">
+<code class="descname">master_doc</code><a class="headerlink" href="#master_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id22"><span class="problematic" id="id23">:confval:`master_doc`</span></a>, for usage with <a class="reference internal" href="#pathto" title="pathto"><code class="xref py py-func docutils literal"><span class="pre">pathto()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="pagename">
+<code class="descname">pagename</code><a class="headerlink" href="#pagename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The “page name” of the current file, i.e. either the document name if the
+file is generated from a reST source, or the equivalent hierarchical name
+relative to the output directory (<code class="docutils literal"><span class="pre">[directory/]filename_without_extension</span></code>).</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="project">
+<code class="descname">project</code><a class="headerlink" href="#project" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id24"><span class="problematic" id="id25">:confval:`project`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="release">
+<code class="descname">release</code><a class="headerlink" href="#release" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id26"><span class="problematic" id="id27">:confval:`release`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="rellinks">
+<code class="descname">rellinks</code><a class="headerlink" href="#rellinks" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of links to put at the left side of the relbar, next to “next” and
+“prev”.  This usually contains links to the general index and other indices,
+such as the Python module index.  If you add something yourself, it must be a
+tuple <code class="docutils literal"><span class="pre">(pagename,</span> <span class="pre">link</span> <span class="pre">title,</span> <span class="pre">accesskey,</span> <span class="pre">link</span> <span class="pre">text)</span></code>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="shorttitle">
+<code class="descname">shorttitle</code><a class="headerlink" href="#shorttitle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id28"><span class="problematic" id="id29">:confval:`html_short_title`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="show_source">
+<code class="descname">show_source</code><a class="headerlink" href="#show_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if <a href="#id30"><span class="problematic" id="id31">:confval:`html_show_sourcelink`</span></a> is <code class="docutils literal"><span class="pre">True</span></code>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="sphinx_version">
+<code class="descname">sphinx_version</code><a class="headerlink" href="#sphinx_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The version of Sphinx used to build.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="style">
+<code class="descname">style</code><a class="headerlink" href="#style" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the main stylesheet, as given by the theme or
+<a href="#id32"><span class="problematic" id="id33">:confval:`html_style`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="title">
+<code class="descname">title</code><a class="headerlink" href="#title" title="Permalink to this definition">¶</a></dt>
+<dd><p>The title of the current document, as used in the <code class="docutils literal"><span class="pre">&lt;title&gt;</span></code> tag.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="use_opensearch">
+<code class="descname">use_opensearch</code><a class="headerlink" href="#use_opensearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id34"><span class="problematic" id="id35">:confval:`html_use_opensearch`</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="version">
+<code class="descname">version</code><a class="headerlink" href="#version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a href="#id36"><span class="problematic" id="id37">:confval:`version`</span></a>.</p>
+</dd></dl>
+
+<p>In addition to these values, there are also all <strong>theme options</strong> available
+(prefixed by <code class="docutils literal"><span class="pre">theme_</span></code>), as well as the values given by the user in
+<a href="#id38"><span class="problematic" id="id39">:confval:`html_context`</span></a>.</p>
+<p>In documents that are created from source files (as opposed to
+automatically-generated files like the module index, or documents that already
+are in HTML form), these variables are also available:</p>
+<dl class="data">
+<dt id="body">
+<code class="descname">body</code><a class="headerlink" href="#body" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string containing the content of the page in HTML form as produced by the HTML builder,
+before the theme is applied.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="display_toc">
+<code class="descname">display_toc</code><a class="headerlink" href="#display_toc" title="Permalink to this definition">¶</a></dt>
+<dd><p>A boolean that is True if the toc contains more than one entry.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="meta">
+<code class="descname">meta</code><a class="headerlink" href="#meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Document metadata (a dictionary), see <a class="reference internal" href="markup/misc.html#metadata"><span class="std std-ref">File-wide metadata</span></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="metatags">
+<code class="descname">metatags</code><a class="headerlink" href="#metatags" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string containing the page’s HTML <a href="#id40"><span class="problematic" id="id41">:dudir:`meta`</span></a> tags.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="next">
+<code class="descname">next</code><a class="headerlink" href="#next" title="Permalink to this definition">¶</a></dt>
+<dd><p>The next document for the navigation.  This variable is either false or has
+two attributes <cite>link</cite> and <cite>title</cite>.  The title contains HTML markup.  For
+example, to generate a link to the next page, you can use this snippet:</p>
+<div class="highlight-html+jinja"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">next</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">next.link</span><span class="o">|</span><span class="nf">e</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">next.title</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="page_source_suffix">
+<code class="descname">page_source_suffix</code><a class="headerlink" href="#page_source_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The suffix of the file that was rendered. Since we support a list of <a href="#id42"><span class="problematic" id="id43">:confval:`source_suffix`</span></a>,
+this will allow you to properly link to the original source file.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="parents">
+<code class="descname">parents</code><a class="headerlink" href="#parents" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of parent documents for navigation, structured like the <a class="reference internal" href="#next" title="next"><code class="xref py py-data docutils literal"><span class="pre">next</span></code></a>
+item.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="prev">
+<code class="descname">prev</code><a class="headerlink" href="#prev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#next" title="next"><code class="xref py py-data docutils literal"><span class="pre">next</span></code></a>, but for the previous page.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="sourcename">
+<code class="descname">sourcename</code><a class="headerlink" href="#sourcename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the copied source file for the current document.  This is only
+nonempty if the <a href="#id44"><span class="problematic" id="id45">:confval:`html_copy_source`</span></a> value is <code class="docutils literal"><span class="pre">True</span></code>.
+This has empty value on creating automatically-generated files.</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<code class="descname">title</code></dt>
+<dd><p>The page title.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="toc">
+<code class="descname">toc</code><a class="headerlink" href="#toc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The local table of contents for the current page, rendered as HTML bullet
+lists.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="toctree">
+<code class="descname">toctree</code><a class="headerlink" href="#toctree" title="Permalink to this definition">¶</a></dt>
+<dd><p>A callable yielding the global TOC tree containing the current page, rendered
+as HTML bullet lists.  Optional keyword arguments:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">collapse</span></code> (<code class="docutils literal"><span class="pre">True</span></code> by default): if true, all TOC entries that are not
+ancestors of the current page are collapsed</li>
+<li><code class="docutils literal"><span class="pre">maxdepth</span></code> (defaults to the max depth selected in the toctree directive):
+the maximum depth of the tree; set it to <code class="docutils literal"><span class="pre">-1</span></code> to allow unlimited depth</li>
+<li><code class="docutils literal"><span class="pre">titles_only</span></code> (<code class="docutils literal"><span class="pre">False</span></code> by default): if true, put only toplevel document
+titles in the tree</li>
+<li><code class="docutils literal"><span class="pre">includehidden</span></code> (<code class="docutils literal"><span class="pre">False</span></code> by default): if true, the TOC tree will also
+contain hidden entries.</li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Templating</a><ul>
+<li><a class="reference internal" href="#do-i-need-to-use-sphinx-s-templates-to-produce-html">Do I need to use Sphinx’s templates to produce HTML?</a></li>
+<li><a class="reference internal" href="#jinja-sphinx-templating-primer">Jinja/Sphinx Templating Primer</a></li>
+<li><a class="reference internal" href="#working-with-the-builtin-templates">Working with the builtin templates</a><ul>
+<li><a class="reference internal" href="#blocks">Blocks</a></li>
+<li><a class="reference internal" href="#configuration-variables">Configuration Variables</a></li>
+<li><a class="reference internal" href="#helper-functions">Helper Functions</a></li>
+<li><a class="reference internal" href="#global-variables">Global Variables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sphinx/doc/templating.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/sphinx/doc/templating.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

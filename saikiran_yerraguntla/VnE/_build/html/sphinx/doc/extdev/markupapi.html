@@ -1,0 +1,285 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Docutils markup API &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="docutils-markup-api">
+<h1>Docutils markup API<a class="headerlink" href="#docutils-markup-api" title="Permalink to this headline">¶</a></h1>
+<p>This section describes the API for adding ReST markup elements (roles and
+directives).</p>
+<div class="section" id="roles">
+<h2>Roles<a class="headerlink" href="#roles" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="directives">
+<h2>Directives<a class="headerlink" href="#directives" title="Permalink to this headline">¶</a></h2>
+<p>Directives are handled by classes derived from
+<code class="docutils literal"><span class="pre">docutils.parsers.rst.Directive</span></code>.  They have to be registered by an extension
+using <a class="reference internal" href="appapi.html#sphinx.application.Sphinx.add_directive" title="sphinx.application.Sphinx.add_directive"><code class="xref py py-meth docutils literal"><span class="pre">Sphinx.add_directive()</span></code></a> or <a class="reference internal" href="appapi.html#sphinx.application.Sphinx.add_directive_to_domain" title="sphinx.application.Sphinx.add_directive_to_domain"><code class="xref py py-meth docutils literal"><span class="pre">Sphinx.add_directive_to_domain()</span></code></a>.</p>
+<span class="target" id="module-docutils.parsers.rst"></span><dl class="class">
+<dt id="docutils.parsers.rst.Directive">
+<em class="property">class </em><code class="descclassname">docutils.parsers.rst.</code><code class="descname">Directive</code><a class="reference internal" href="../../../_modules/docutils/parsers/rst.html#Directive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#docutils.parsers.rst.Directive" title="Permalink to this definition">¶</a></dt>
+<dd><p>The markup syntax of the new directive is determined by the follow five class
+attributes:</p>
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.required_arguments">
+<code class="descname">required_arguments</code><em class="property"> = 0</em><a class="headerlink" href="#docutils.parsers.rst.Directive.required_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of required directive arguments.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.optional_arguments">
+<code class="descname">optional_arguments</code><em class="property"> = 0</em><a class="headerlink" href="#docutils.parsers.rst.Directive.optional_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of optional arguments after the required arguments.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.final_argument_whitespace">
+<code class="descname">final_argument_whitespace</code><em class="property"> = False</em><a class="headerlink" href="#docutils.parsers.rst.Directive.final_argument_whitespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>May the final argument contain whitespace?</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.option_spec">
+<code class="descname">option_spec</code><em class="property"> = None</em><a class="headerlink" href="#docutils.parsers.rst.Directive.option_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping of option names to validator functions.</p>
+<p>Option validator functions take a single parameter, the option argument
+(or <code class="docutils literal"><span class="pre">None</span></code> if not given), and should validate it or convert it to the
+proper form.  They raise <code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> or <code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> to indicate
+failure.</p>
+<p>There are several predefined and possibly useful validators in the
+<code class="xref py py-mod docutils literal"><span class="pre">docutils.parsers.rst.directives</span></code> module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.has_content">
+<code class="descname">has_content</code><em class="property"> = False</em><a class="headerlink" href="#docutils.parsers.rst.Directive.has_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>May the directive have content?</p>
+</dd></dl>
+
+<p>New directives must implement the <a class="reference internal" href="#docutils.parsers.rst.Directive.run" title="docutils.parsers.rst.Directive.run"><code class="xref py py-meth docutils literal"><span class="pre">run()</span></code></a> method:</p>
+<dl class="method">
+<dt id="docutils.parsers.rst.Directive.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/docutils/parsers/rst.html#Directive.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#docutils.parsers.rst.Directive.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method must process the directive arguments, options and content, and
+return a list of Docutils/Sphinx nodes that will be inserted into the
+document tree at the point where the directive was encountered.</p>
+</dd></dl>
+
+<p>Instance attributes that are always set on the directive are:</p>
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.name">
+<code class="descname">name</code><a class="headerlink" href="#docutils.parsers.rst.Directive.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The directive name (useful when registering the same directive class under
+multiple names).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.arguments">
+<code class="descname">arguments</code><a class="headerlink" href="#docutils.parsers.rst.Directive.arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>The arguments given to the directive, as a list.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.options">
+<code class="descname">options</code><a class="headerlink" href="#docutils.parsers.rst.Directive.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>The options given to the directive, as a dictionary mapping option names
+to validated/converted values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.content">
+<code class="descname">content</code><a class="headerlink" href="#docutils.parsers.rst.Directive.content" title="Permalink to this definition">¶</a></dt>
+<dd><p>The directive content, if given, as a <code class="xref py py-class docutils literal"><span class="pre">ViewList</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.lineno">
+<code class="descname">lineno</code><a class="headerlink" href="#docutils.parsers.rst.Directive.lineno" title="Permalink to this definition">¶</a></dt>
+<dd><p>The absolute line number on which the directive appeared.  This is not
+always a useful value; use <a class="reference internal" href="#docutils.parsers.rst.Directive.srcline" title="docutils.parsers.rst.Directive.srcline"><code class="xref py py-attr docutils literal"><span class="pre">srcline</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.src">
+<code class="descname">src</code><a class="headerlink" href="#docutils.parsers.rst.Directive.src" title="Permalink to this definition">¶</a></dt>
+<dd><p>The source file of the directive.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.srcline">
+<code class="descname">srcline</code><a class="headerlink" href="#docutils.parsers.rst.Directive.srcline" title="Permalink to this definition">¶</a></dt>
+<dd><p>The line number in the source file on which the directive appeared.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.content_offset">
+<code class="descname">content_offset</code><a class="headerlink" href="#docutils.parsers.rst.Directive.content_offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal offset of the directive content.  Used when calling
+<code class="docutils literal"><span class="pre">nested_parse</span></code> (see below).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.block_text">
+<code class="descname">block_text</code><a class="headerlink" href="#docutils.parsers.rst.Directive.block_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>The string containing the entire directive.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="docutils.parsers.rst.Directive.state">
+<code class="descname">state</code><a class="headerlink" href="#docutils.parsers.rst.Directive.state" title="Permalink to this definition">¶</a></dt>
+<dt id="docutils.parsers.rst.Directive.state_machine">
+<code class="descname">state_machine</code><a class="headerlink" href="#docutils.parsers.rst.Directive.state_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>The state and state machine which controls the parsing.  Used for
+<code class="docutils literal"><span class="pre">nested_parse</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="viewlists">
+<h3>ViewLists<a class="headerlink" href="#viewlists" title="Permalink to this headline">¶</a></h3>
+<p>Docutils represents document source lines in a class
+<code class="docutils literal"><span class="pre">docutils.statemachine.ViewList</span></code>.  This is a list with extended functionality
+– for one, slicing creates views of the original list, and also the list
+contains information about the source line numbers.</p>
+<p>The <a class="reference internal" href="#docutils.parsers.rst.Directive.content" title="docutils.parsers.rst.Directive.content"><code class="xref py py-attr docutils literal"><span class="pre">Directive.content</span></code></a> attribute is a ViewList.  If you generate content
+to be parsed as ReST, you have to create a ViewList yourself.  Important for
+content generation are the following points:</p>
+<ul class="simple">
+<li>The constructor takes a list of strings (lines) and a source (document) name.</li>
+<li>The <code class="docutils literal"><span class="pre">.append()</span></code> method takes a line and a source name as well.</li>
+</ul>
+</div>
+<div class="section" id="parsing-directive-content-as-rest">
+<h3>Parsing directive content as ReST<a class="headerlink" href="#parsing-directive-content-as-rest" title="Permalink to this headline">¶</a></h3>
+<p>Many directives will contain more markup that must be parsed.  To do this, use
+one of the following APIs from the <a class="reference internal" href="#docutils.parsers.rst.Directive.run" title="docutils.parsers.rst.Directive.run"><code class="xref py py-meth docutils literal"><span class="pre">Directive.run()</span></code></a> method:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">self.state.nested_parse</span></code></li>
+<li><code class="xref py py-func docutils literal"><span class="pre">sphinx.util.nodes.nested_parse_with_titles()</span></code> – this allows titles in
+the parsed content.</li>
+</ul>
+<p>Both APIs parse the content into a given node. They are used like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">node</span> <span class="o">=</span> <span class="n">docutils</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">paragraph</span><span class="p">()</span>
+<span class="c1"># either</span>
+<span class="kn">from</span> <span class="nn">sphinx.ext.autodoc</span> <span class="k">import</span> <span class="n">AutodocReporter</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">memo</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="n">AutodocReporter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">memo</span><span class="o">.</span><span class="n">reporter</span><span class="p">)</span>  <span class="c1"># override reporter to avoid errors from &quot;include&quot; directive</span>
+<span class="n">nested_parse_with_titles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+<span class="c1"># or</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">nested_parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you don’t need the wrapping node, you can use any concrete node type and
+return <code class="docutils literal"><span class="pre">node.children</span></code> from the Directive.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://docutils.sourceforge.net/docs/howto/rst-directives.html">Creating directives</a></dt>
+<dd>HOWTO of the Docutils documentation</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Docutils markup API</a><ul>
+<li><a class="reference internal" href="#roles">Roles</a></li>
+<li><a class="reference internal" href="#directives">Directives</a><ul>
+<li><a class="reference internal" href="#viewlists">ViewLists</a></li>
+<li><a class="reference internal" href="#parsing-directive-content-as-rest">Parsing directive content as ReST</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/markupapi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/markupapi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

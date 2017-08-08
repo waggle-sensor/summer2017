@@ -1,0 +1,204 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinxcontrib.websupport.storage &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinxcontrib.websupport.storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinxcontrib.websupport.storage</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Storage for the websupport package.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="StorageBackend"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend">[docs]</a><span class="k">class</span> <span class="nc">StorageBackend</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StorageBackend.pre_build"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.pre_build">[docs]</a>    <span class="k">def</span> <span class="nf">pre_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called immediately before the build process begins. Use this</span>
+<span class="sd">        to prepare the StorageBackend for the addition of nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">has_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check to see if a node exists.</span>
+
+<span class="sd">        :param id: the id to check for.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+<div class="viewcode-block" id="StorageBackend.add_node"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">document</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a node to the StorageBackend.</span>
+
+<span class="sd">        :param id: a unique id for the comment.</span>
+<span class="sd">        :param document: the name of the document the node belongs to.</span>
+<span class="sd">        :param source: the source files name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StorageBackend.post_build"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.post_build">[docs]</a>    <span class="k">def</span> <span class="nf">post_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called after a build has completed. Use this to finalize the</span>
+<span class="sd">        addition of nodes if needed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="StorageBackend.add_comment"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.add_comment">[docs]</a>    <span class="k">def</span> <span class="nf">add_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">displayed</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span>
+                    <span class="n">proposal</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">moderator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called when a comment is being added.</span>
+
+<span class="sd">        :param text: the text of the comment</span>
+<span class="sd">        :param displayed: whether the comment should be displayed</span>
+<span class="sd">        :param username: the name of the user adding the comment</span>
+<span class="sd">        :param time: a date object with the time the comment was added</span>
+<span class="sd">        :param proposal: the text of the proposal the user made</span>
+<span class="sd">        :param node_id: the id of the node that the comment is being added to</span>
+<span class="sd">        :param parent_id: the id of the comment&#39;s parent comment.</span>
+<span class="sd">        :param moderator: whether the user adding the comment is a moderator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StorageBackend.delete_comment"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.delete_comment">[docs]</a>    <span class="k">def</span> <span class="nf">delete_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">moderator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete a comment.</span>
+
+<span class="sd">        Raises :class:`~sphinxcontrib.websupport.errors.UserNotAuthorizedError`</span>
+<span class="sd">        if moderator is False and `username` doesn&#39;t match the username</span>
+<span class="sd">        on the comment.</span>
+
+<span class="sd">        :param comment_id: The id of the comment being deleted.</span>
+<span class="sd">        :param username: The username of the user requesting the deletion.</span>
+<span class="sd">        :param moderator: Whether the user is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">moderator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata for a document. This is currently just a dict</span>
+<span class="sd">        of node_id&#39;s with associated comment counts.</span>
+
+<span class="sd">        :param docname: the name of the document to get metadata for.</span>
+<span class="sd">        :param moderator: whether the requester is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+<div class="viewcode-block" id="StorageBackend.get_data"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">moderator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called to retrieve all data for a node. This should return a</span>
+<span class="sd">        dict with two keys, *source* and *comments* as described by</span>
+<span class="sd">        :class:`~sphinxcontrib.websupport.WebSupport`&#39;s</span>
+<span class="sd">        :meth:`~sphinxcontrib.websupport.WebSupport.get_data` method.</span>
+
+<span class="sd">        :param node_id: The id of the node to get data for.</span>
+<span class="sd">        :param username: The name of the user requesting the data.</span>
+<span class="sd">        :param moderator: Whether the requestor is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StorageBackend.process_vote"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.process_vote">[docs]</a>    <span class="k">def</span> <span class="nf">process_vote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process a vote that is being cast. `value` will be either -1, 0,</span>
+<span class="sd">        or 1.</span>
+
+<span class="sd">        :param comment_id: The id of the comment being voted on.</span>
+<span class="sd">        :param username: The username of the user casting the vote.</span>
+<span class="sd">        :param value: The value of the vote being cast.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StorageBackend.update_username"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.update_username">[docs]</a>    <span class="k">def</span> <span class="nf">update_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_username</span><span class="p">,</span> <span class="n">new_username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If a user is allowed to change their username this method should</span>
+<span class="sd">        be called so that there is not stagnate data in the storage system.</span>
+
+<span class="sd">        :param old_username: The username being changed.</span>
+<span class="sd">        :param new_username: What the username is being changed to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StorageBackend.accept_comment"><a class="viewcode-back" href="../../../sphinx/doc/web/storagebackends.html#sphinxcontrib.websupport.storage.StorageBackend.accept_comment">[docs]</a>    <span class="k">def</span> <span class="nf">accept_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called when a moderator accepts a comment. After the method is</span>
+<span class="sd">        called the comment should be displayed to all users.</span>
+
+<span class="sd">        :param comment_id: The id of the comment being accepted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

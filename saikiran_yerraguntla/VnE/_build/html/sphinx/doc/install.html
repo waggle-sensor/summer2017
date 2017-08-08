@@ -1,0 +1,240 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing Sphinx &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installing-sphinx">
+<h1>Installing Sphinx<a class="headerlink" href="#installing-sphinx" title="Permalink to this headline">¶</a></h1>
+<p>Since Sphinx is written in the Python language, you need to install Python
+(the required version is at least 2.7) and Sphinx.</p>
+<p>Sphinx packages are available on the <a class="reference external" href="https://pypi.python.org/pypi/Sphinx">Python Package Index</a>.</p>
+<p>You can also download a snapshot from the Git repository:</p>
+<ul class="simple">
+<li>as a <a class="reference external" href="https://github.com/sphinx-doc/sphinx/archive/master.tar.gz">.tar.gz</a>
+file or</li>
+<li>as a <a class="reference external" href="https://github.com/sphinx-doc/sphinx/archive/master.zip">.zip</a> file</li>
+</ul>
+<p>There are introductions for several environments:</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#debian-ubuntu-install-sphinx-using-packaging-system" id="id1">Debian/Ubuntu: Install Sphinx using packaging system</a></li>
+<li><a class="reference internal" href="#other-linux-distributions" id="id2">Other Linux distributions</a></li>
+<li><a class="reference internal" href="#mac-os-x-install-sphinx-using-macports" id="id3">Mac OS X: Install Sphinx using MacPorts</a></li>
+<li><a class="reference internal" href="#windows-install-python-and-sphinx" id="id4">Windows: Install Python and Sphinx</a></li>
+<li><a class="reference internal" href="#installing-sphinx-with-pip" id="id5">Installing Sphinx with pip</a></li>
+</ul>
+</div>
+<div class="section" id="debian-ubuntu-install-sphinx-using-packaging-system">
+<h2>Debian/Ubuntu: Install Sphinx using packaging system<a class="headerlink" href="#debian-ubuntu-install-sphinx-using-packaging-system" title="Permalink to this headline">¶</a></h2>
+<p>You may install using this command if you use Debian/Ubuntu.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install python-sphinx
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-linux-distributions">
+<h2>Other Linux distributions<a class="headerlink" href="#other-linux-distributions" title="Permalink to this headline">¶</a></h2>
+<p>Most Linux distributions have Sphinx in their package repositories.  Usually the
+package is called “python-sphinx”, “python-Sphinx” or “sphinx”.  Be aware that
+there are two other packages with “sphinx” in their name: a speech recognition
+toolkit (CMU Sphinx) and a full-text search database (Sphinx search).</p>
+</div>
+<div class="section" id="mac-os-x-install-sphinx-using-macports">
+<h2>Mac OS X: Install Sphinx using MacPorts<a class="headerlink" href="#mac-os-x-install-sphinx-using-macports" title="Permalink to this headline">¶</a></h2>
+<p>If you use Mac OS X <a class="reference external" href="http://www.macports.org/">MacPorts</a>, use this command to
+install all necessary software.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port install py27-sphinx
+</pre></div>
+</div>
+<p>To set up the executable paths, use the <code class="docutils literal"><span class="pre">port</span> <span class="pre">select</span></code> command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port <span class="k">select</span> --set python python27
+$ sudo port <span class="k">select</span> --set sphinx py27-sphinx
+</pre></div>
+</div>
+<p>Type <strong class="command">which sphinx-quickstart</strong> to check if the installation was
+successful.</p>
+</div>
+<div class="section" id="windows-install-python-and-sphinx">
+<h2>Windows: Install Python and Sphinx<a class="headerlink" href="#windows-install-python-and-sphinx" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="install-python">
+<h3>Install Python<a class="headerlink" href="#install-python" title="Permalink to this headline">¶</a></h3>
+<p>Most Windows users do not have Python, so we begin with the installation of
+Python itself.  If you have already installed Python, please skip this section.</p>
+<p>Go to <a class="reference external" href="https://www.python.org/">https://www.python.org/</a>, the main download site for Python. Look at the left
+sidebar and under “Quick Links”, click “Windows Installer” to download.</p>
+<img alt="../../_images/pythonorg.png" src="../../_images/pythonorg.png" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Currently, Python offers two major versions, 2.x and 3.x. Sphinx 1.5 can run
+under Python 2.7, 3.4, 3.5, 3.6, with the recommended version being 2.7.  This
+chapter assumes you have installed Python 2.7.</p>
+</div>
+<p>Follow the Windows installer for Python.</p>
+<img alt="../../_images/installpython.jpg" src="../../_images/installpython.jpg" />
+<p>After installation, you better add the Python executable directories to the
+environment variable <code class="docutils literal"><span class="pre">PATH</span></code> in order to run Python and package commands such
+as <code class="docutils literal"><span class="pre">sphinx-build</span></code> easily from the Command Prompt.</p>
+<ul>
+<li><p class="first">Right-click the “My Computer” icon and choose “Properties”</p>
+</li>
+<li><p class="first">Click the “Environment Variables” button under the “Advanced” tab</p>
+</li>
+<li><p class="first">If “Path” (or “PATH”) is already an entry in the “System variables” list, edit
+it.  If it is not present, add a new variable called “PATH”.</p>
+</li>
+<li><p class="first">Add these paths, separating entries by “;”:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">C:\Python27</span></code> – this folder contains the main Python executable</li>
+<li><code class="docutils literal"><span class="pre">C:\Python27\Scripts</span></code> – this folder will contain executables added by
+Python packages installed with pip (see below)</li>
+</ul>
+<p>This is for Python 2.7.  If you use another version of
+Python or installed to a non-default location, change the digits “27”
+accordingly.</p>
+</li>
+<li><p class="first">Now run the <strong>Command Prompt</strong>.  After command prompt window appear, type
+<code class="docutils literal"><span class="pre">python</span></code> and Enter.  If the Python installation was successful, the
+installed Python version is printed, and you are greeted by the prompt
+<code class="docutils literal"><span class="pre">&gt;&gt;&gt;</span></code>.  Type <code class="docutils literal"><span class="pre">Ctrl+Z</span></code> and Enter to quit.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="install-the-pip-command">
+<h3>Install the pip command<a class="headerlink" href="#install-the-pip-command" title="Permalink to this headline">¶</a></h3>
+<p>Python has a very useful <strong class="command">pip</strong> command which can download and install
+3rd-party libraries with a single command. This is provided by the
+Python Packaging Authority(PyPA):
+<a class="reference external" href="https://groups.google.com/forum/#!forum/pypa-dev">https://groups.google.com/forum/#!forum/pypa-dev</a></p>
+<p>To install pip, download <a class="reference external" href="https://bootstrap.pypa.io/get-pip.py">https://bootstrap.pypa.io/get-pip.py</a> and
+save it somewhere.  After download, invoke the command prompt, go to the
+directory with <code class="docutils literal"><span class="pre">get-pip.py</span></code> and run this command:</p>
+<div class="highlight-bat"><div class="highlight"><pre><span></span>C<span class="p">:</span><span class="nl">\</span><span class="c1">&gt; python get-pip.py</span>
+</pre></div>
+</div>
+<p>Now <strong class="command">pip</strong> command is installed.  From there we can go to the Sphinx
+install.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">pip</span></code> has been contained in the Python official installation after version
+of Python-3.4.0 or Python-2.7.9.</p>
+</div>
+</div>
+</div>
+<div class="section" id="installing-sphinx-with-pip">
+<h2>Installing Sphinx with pip<a class="headerlink" href="#installing-sphinx-with-pip" title="Permalink to this headline">¶</a></h2>
+<p>If you finished the installation of pip, type this line in the command prompt:</p>
+<div class="highlight-bat"><div class="highlight"><pre><span></span>C<span class="p">:</span><span class="nl">\</span><span class="c1">&gt; pip install sphinx</span>
+</pre></div>
+</div>
+<p>After installation, type <strong class="command">sphinx-build -h</strong> on the command prompt.  If
+everything worked fine, you will get a Sphinx version number and a list of
+options for this command.</p>
+<p>That it.  Installation is over.  Head to <a class="reference internal" href="tutorial.html"><span class="doc">First Steps with Sphinx</span></a> to make a Sphinx
+project.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing Sphinx</a><ul>
+<li><a class="reference internal" href="#debian-ubuntu-install-sphinx-using-packaging-system">Debian/Ubuntu: Install Sphinx using packaging system</a></li>
+<li><a class="reference internal" href="#other-linux-distributions">Other Linux distributions</a></li>
+<li><a class="reference internal" href="#mac-os-x-install-sphinx-using-macports">Mac OS X: Install Sphinx using MacPorts</a></li>
+<li><a class="reference internal" href="#windows-install-python-and-sphinx">Windows: Install Python and Sphinx</a><ul>
+<li><a class="reference internal" href="#install-python">Install Python</a></li>
+<li><a class="reference internal" href="#install-the-pip-command">Install the pip command</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installing-sphinx-with-pip">Installing Sphinx with pip</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sphinx/doc/install.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/sphinx/doc/install.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

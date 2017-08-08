@@ -1,0 +1,410 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.builders.gettext &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.builders.gettext</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.builders.gettext</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    The MessageCatalogBuilder class.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">walk</span><span class="p">,</span> <span class="n">getenv</span>
+<span class="kn">from</span> <span class="nn">codecs</span> <span class="k">import</span> <span class="nb">open</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">tzinfo</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="k">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">StringIO</span>
+
+<span class="kn">from</span> <span class="nn">sphinx.builders</span> <span class="k">import</span> <span class="n">Builder</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">split_index_msg</span><span class="p">,</span> <span class="n">logging</span><span class="p">,</span> <span class="n">status_iterator</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.tags</span> <span class="k">import</span> <span class="n">Tags</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.nodes</span> <span class="k">import</span> <span class="n">extract_messages</span><span class="p">,</span> <span class="n">traverse_translatable_index</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">safe_relpath</span><span class="p">,</span> <span class="n">ensuredir</span><span class="p">,</span> <span class="n">canon_path</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.i18n</span> <span class="k">import</span> <span class="n">find_catalog</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.console</span> <span class="k">import</span> <span class="n">bold</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">sphinx.locale</span> <span class="k">import</span> <span class="n">pairindextypes</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">DefaultDict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.util.i18n</span> <span class="k">import</span> <span class="n">CatalogInfo</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>  <span class="c1"># NOQA</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">POHEADER</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2"># SOME DESCRIPTIVE TITLE.</span>
+<span class="s2"># Copyright (C) </span><span class="si">%(copyright)s</span><span class="s2"></span>
+<span class="s2"># This file is distributed under the same license as the </span><span class="si">%(project)s</span><span class="s2"> package.</span>
+<span class="s2"># FIRST AUTHOR &lt;EMAIL@ADDRESS&gt;, YEAR.</span>
+<span class="s2">#</span>
+<span class="s2">#, fuzzy</span>
+<span class="s2">msgid &quot;&quot;</span>
+<span class="s2">msgstr &quot;&quot;</span>
+<span class="s2">&quot;Project-Id-Version: </span><span class="si">%(project)s</span><span class="s2"> </span><span class="si">%(version)s</span><span class="s2">\n&quot;</span>
+<span class="s2">&quot;Report-Msgid-Bugs-To: \n&quot;</span>
+<span class="s2">&quot;POT-Creation-Date: </span><span class="si">%(ctime)s</span><span class="s2">\n&quot;</span>
+<span class="s2">&quot;PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n&quot;</span>
+<span class="s2">&quot;Last-Translator: FULL NAME &lt;EMAIL@ADDRESS&gt;\n&quot;</span>
+<span class="s2">&quot;Language-Team: LANGUAGE &lt;LL@li.org&gt;\n&quot;</span>
+<span class="s2">&quot;MIME-Version: 1.0\n&quot;</span>
+<span class="s2">&quot;Content-Type: text/plain; charset=UTF-8\n&quot;</span>
+<span class="s2">&quot;Content-Transfer-Encoding: 8bit\n&quot;</span>
+
+<span class="s2">&quot;&quot;&quot;</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+
+<span class="k">class</span> <span class="nc">Catalog</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Catalog of translatable messages.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[unicode]</span>
+                            <span class="c1"># retain insertion order, a la OrderedDict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, List[Tuple[unicode, int, unicode]]]</span>
+                            <span class="c1"># msgid -&gt; file, line, uid</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, MsgOrigin) -&gt; None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;uid&#39;</span><span class="p">):</span>
+            <span class="c1"># Nodes that are replicated like todo don&#39;t have a uid,</span>
+            <span class="c1"># however i18n is also unnecessary.</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>  <span class="c1"># faster lookup in hash</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">msg</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">msg</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">origin</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">line</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">uid</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">MsgOrigin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Origin holder for Catalog message origin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, int) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line</span> <span class="o">=</span> <span class="n">line</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+
+
+<span class="k">class</span> <span class="nc">I18nTags</span><span class="p">(</span><span class="n">Tags</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dummy tags module for I18nBuilder.</span>
+
+<span class="sd">    To translate all text inside of only nodes, this class</span>
+<span class="sd">    always returns True value even if no tags are defined.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">eval_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">):</span>
+        <span class="c1"># type: (Any) -&gt; bool</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">class</span> <span class="nc">I18nBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    General i18n builder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;i18n&#39;</span>
+    <span class="n">versioning_method</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span>
+    <span class="n">versioning_compare</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># type: bool</span>
+                                <span class="c1"># be set by `gettext_uuid`</span>
+    <span class="n">use_message_catalog</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">Builder</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">set_versioning_method</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versioning_method</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_uuid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">I18nTags</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">catalogs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">Catalog</span><span class="p">)</span>  <span class="c1"># type: DefaultDict[unicode, Catalog]</span>
+
+    <span class="k">def</span> <span class="nf">get_target_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; unicode</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_outdated_docs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Set[unicode]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">found_docs</span>
+
+    <span class="k">def</span> <span class="nf">prepare_writing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">):</span>
+        <span class="c1"># type: (Set[unicode]) -&gt; None</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">compile_catalogs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c1"># type: (Set[CatalogInfo], unicode) -&gt; None</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">write_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">doctree</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, nodes.Node) -&gt; None</span>
+        <span class="n">catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalogs</span><span class="p">[</span><span class="n">find_catalog</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_compact</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">extract_messages</span><span class="p">(</span><span class="n">doctree</span><span class="p">):</span>
+            <span class="n">catalog</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;index&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_additional_targets</span><span class="p">:</span>
+            <span class="c1"># Extract translatable messages from index entries.</span>
+            <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">entries</span> <span class="ow">in</span> <span class="n">traverse_translatable_index</span><span class="p">(</span><span class="n">doctree</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">typ</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">tid</span><span class="p">,</span> <span class="n">main</span><span class="p">,</span> <span class="n">key_</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">split_index_msg</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">typ</span> <span class="o">==</span> <span class="s1">&#39;pair&#39;</span> <span class="ow">and</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">pairindextypes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                            <span class="c1"># avoid built-in translated message was incorporated</span>
+                            <span class="c1"># in &#39;sphinx.util.nodes.process_index_entry&#39;</span>
+                            <span class="k">continue</span>
+                        <span class="n">catalog</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+
+
+<span class="c1"># determine tzoffset once to remain unaffected by DST change during build</span>
+<span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+<span class="n">tzdelta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span> <span class="o">-</span> \
+    <span class="n">datetime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+<span class="c1"># set timestamp from SOURCE_DATE_EPOCH if set</span>
+<span class="c1"># see https://reproducible-builds.org/specs/source-date-epoch/</span>
+<span class="n">source_date_epoch</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SOURCE_DATE_EPOCH&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">source_date_epoch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">source_date_epoch</span><span class="p">)</span>
+    <span class="n">tzdelta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">LocalTimeZone</span><span class="p">(</span><span class="n">tzinfo</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="c1"># type: (Any, Any) -&gt; None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LocalTimeZone</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tzdelta</span> <span class="o">=</span> <span class="n">tzdelta</span>
+
+    <span class="k">def</span> <span class="nf">utcoffset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="c1"># type: (datetime) -&gt; timedelta</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tzdelta</span>
+
+    <span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="c1"># type: (datetime) -&gt; timedelta</span>
+        <span class="k">return</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="n">ltz</span> <span class="o">=</span> <span class="n">LocalTimeZone</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">should_write</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">new_content</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">oldpot</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+            <span class="n">old_content</span> <span class="o">=</span> <span class="n">oldpot</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">old_header_index</span> <span class="o">=</span> <span class="n">old_content</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&quot;POT-Creation-Date:&#39;</span><span class="p">)</span>
+            <span class="n">new_header_index</span> <span class="o">=</span> <span class="n">new_content</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&quot;POT-Creation-Date:&#39;</span><span class="p">)</span>
+            <span class="n">old_body_index</span> <span class="o">=</span> <span class="n">old_content</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&quot;PO-Revision-Date:&#39;</span><span class="p">)</span>
+            <span class="n">new_body_index</span> <span class="o">=</span> <span class="n">new_content</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&quot;PO-Revision-Date:&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">((</span><span class="n">old_content</span><span class="p">[:</span><span class="n">old_header_index</span><span class="p">]</span> <span class="o">!=</span> <span class="n">new_content</span><span class="p">[:</span><span class="n">new_header_index</span><span class="p">])</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="n">new_content</span><span class="p">[</span><span class="n">new_body_index</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">old_content</span><span class="p">[</span><span class="n">old_body_index</span><span class="p">:]))</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="MessageCatalogBuilder"><a class="viewcode-back" href="../../../sphinx/doc/builders.html#sphinx.builders.gettext.MessageCatalogBuilder">[docs]</a><span class="k">class</span> <span class="nc">MessageCatalogBuilder</span><span class="p">(</span><span class="n">I18nBuilder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds gettext-style message catalogs (.pot files).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;gettext&#39;</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">I18nBuilder</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_template_bridge</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_collect_templates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Set[unicode]</span>
+        <span class="n">template_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">template_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates_path</span><span class="p">:</span>
+            <span class="n">tmpl_abs_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">template_path</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">tmpl_abs_path</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.html&#39;</span><span class="p">):</span>
+                        <span class="n">filename</span> <span class="o">=</span> <span class="n">canon_path</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span>
+                        <span class="n">template_files</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">template_files</span>
+
+    <span class="k">def</span> <span class="nf">_extract_from_template</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_templates</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;building [</span><span class="si">%s</span><span class="s1">]: &#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;targets for </span><span class="si">%d</span><span class="s1"> template files&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
+
+        <span class="n">extract_translations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">extract_translations</span>
+
+        <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="s1">&#39;reading templates... &#39;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span>  <span class="c1"># type: ignore  # NOQA</span>
+                                        <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+                <span class="n">context</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">meth</span><span class="p">,</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">extract_translations</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+                <span class="n">origin</span> <span class="o">=</span> <span class="n">MsgOrigin</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">catalogs</span><span class="p">[</span><span class="s1">&#39;sphinx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">):</span>
+        <span class="c1"># type: (Iterable[unicode], unicode, unicode) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_from_template</span><span class="p">()</span>
+        <span class="n">I18nBuilder</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docnames</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">I18nBuilder</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+            <span class="n">copyright</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">copyright</span><span class="p">,</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
+            <span class="n">ctime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                <span class="n">timestamp</span><span class="p">,</span> <span class="n">ltz</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M%z&#39;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">textdomain</span><span class="p">,</span> <span class="n">catalog</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">catalogs</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
+                                                   <span class="s2">&quot;writing message catalogs... &quot;</span><span class="p">,</span>
+                                                   <span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">catalogs</span><span class="p">),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">,</span>
+                                                   <span class="k">lambda</span> <span class="n">textdomain__</span><span class="p">:</span> <span class="n">textdomain__</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c1"># noop if config.gettext_compact is set</span>
+            <span class="n">ensuredir</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">textdomain</span><span class="p">)))</span>
+
+            <span class="n">pofn</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="n">textdomain</span> <span class="o">+</span> <span class="s1">&#39;.pot&#39;</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">POHEADER</span> <span class="o">%</span> <span class="n">data</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+            <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+                <span class="n">positions</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">message</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_location</span><span class="p">:</span>
+                    <span class="c1"># generate &quot;#: file1:line1\n#: file2:line2 ...&quot;</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">#: &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+                        <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">canon_path</span><span class="p">(</span>
+                            <span class="n">safe_relpath</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">)),</span> <span class="n">line</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gettext_uuid</span><span class="p">:</span>
+                    <span class="c1"># generate &quot;# uuid1\n# uuid2\n ...&quot;</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">uid</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">uid</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">))</span>
+
+                <span class="c1"># message contains *one* line of text ready for translation</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span> \
+                    <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\&quot;&#39;</span><span class="p">)</span><span class="o">.</span> \
+                    <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&quot;</span><span class="se">\n</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;msgid &quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">msgstr &quot;&quot;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+            <span class="n">content</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">should_write</span><span class="p">(</span><span class="n">pofn</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pofn</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pofile</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+                    <span class="n">pofile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="c1"># type: (Sphinx) -&gt; Dict[unicode, Any]</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">MessageCatalogBuilder</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;gettext_compact&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;gettext&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;gettext_location&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;gettext&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;gettext_uuid&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;gettext&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;gettext_auto_build&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;gettext_additional_targets&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="s1">&#39;env&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;builtin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_read_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_write_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../builders.html">sphinx.builders</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

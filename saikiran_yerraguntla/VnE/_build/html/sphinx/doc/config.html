@@ -1,0 +1,582 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The build configuration file &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-conf">
+<span id="the-build-configuration-file"></span><span id="build-config"></span><h1>The build configuration file<a class="headerlink" href="#module-conf" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="glossary.html#term-configuration-directory"><span class="xref std std-term">configuration directory</span></a> must contain a file named <code class="file docutils literal"><span class="pre">conf.py</span></code>.
+This file (containing Python code) is called the “build configuration file” and
+contains all configuration needed to customize Sphinx input and output behavior.</p>
+<p>The configuration file is executed as Python code at build time (using
+<a class="reference external" href="https://docs.python.org/2/library/functions.html#execfile" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">execfile()</span></code></a>, and with the current directory set to its containing
+directory), and therefore can execute arbitrarily complex code.  Sphinx then
+reads simple names from the file’s namespace as its configuration.</p>
+<p>Important points to note:</p>
+<ul class="simple">
+<li>If not otherwise documented, values must be strings, and their default is the
+empty string.</li>
+<li>The term “fully-qualified name” refers to a string that names an importable
+Python object inside a module; for example, the FQN
+<code class="docutils literal"><span class="pre">&quot;sphinx.builders.Builder&quot;</span></code> means the <code class="docutils literal"><span class="pre">Builder</span></code> class in the
+<code class="docutils literal"><span class="pre">sphinx.builders</span></code> module.</li>
+<li>Remember that document names use <code class="docutils literal"><span class="pre">/</span></code> as the path separator and don’t contain
+the file name extension.</li>
+<li>Since <code class="file docutils literal"><span class="pre">conf.py</span></code> is read as a Python file, the usual rules apply for
+encodings and Unicode support: declare the encoding using an encoding cookie
+(a comment like <code class="docutils literal"><span class="pre">#</span> <span class="pre">-*-</span> <span class="pre">coding:</span> <span class="pre">utf-8</span> <span class="pre">-*-</span></code>) and use Unicode string literals
+when you include non-ASCII characters in configuration values.</li>
+<li>The contents of the config namespace are pickled (so that Sphinx can find out
+when configuration changes), so it may not contain unpickleable values –
+delete them from the namespace with <code class="docutils literal"><span class="pre">del</span></code> if appropriate.  Modules are
+removed automatically, so you don’t need to <code class="docutils literal"><span class="pre">del</span></code> your imports after use.</li>
+<li id="conf-tags">There is a special object named <code class="docutils literal"><span class="pre">tags</span></code> available in the config file.
+It can be used to query and change the tags (see <a class="reference internal" href="markup/misc.html#tags"><span class="std std-ref">Including content based on tags</span></a>).  Use
+<code class="docutils literal"><span class="pre">tags.has('tag')</span></code> to query, <code class="docutils literal"><span class="pre">tags.add('tag')</span></code> and <code class="docutils literal"><span class="pre">tags.remove('tag')</span></code>
+to change. Only tags set via the <code class="docutils literal"><span class="pre">-t</span></code> command-line option or via
+<code class="docutils literal"><span class="pre">tags.add('tag')</span></code> can be queried using <code class="docutils literal"><span class="pre">tags.has('tag')</span></code>.
+Note that the current builder tag is not available in <code class="docutils literal"><span class="pre">conf.py</span></code>, as it is
+created <em>after</em> the builder is initialized.</li>
+</ul>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Additional configurations, such as adding stylesheets,
+javascripts, builders, etc. can be made through the <span class="xref std std-doc">/extdev/appapi</span>.</p>
+</div>
+<div class="section" id="general-configuration">
+<h2>General configuration<a class="headerlink" href="#general-configuration" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="project-information">
+<h2>Project information<a class="headerlink" href="#project-information" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="options-for-internationalization">
+<span id="intl-options"></span><h2>Options for internationalization<a class="headerlink" href="#options-for-internationalization" title="Permalink to this headline">¶</a></h2>
+<p>These options influence Sphinx’s <em>Native Language Support</em>.  See the
+documentation on <a class="reference internal" href="intl.html#intl"><span class="std std-ref">Internationalization</span></a> for details.</p>
+</div>
+<div class="section" id="options-for-html-output">
+<span id="html-options"></span><h2>Options for HTML output<a class="headerlink" href="#options-for-html-output" title="Permalink to this headline">¶</a></h2>
+<p>These options influence HTML as well as HTML Help output, and other builders
+that use Sphinx’s HTMLWriter class.</p>
+</div>
+<div class="section" id="options-for-apple-help-output">
+<span id="applehelp-options"></span><h2>Options for Apple Help output<a class="headerlink" href="#options-for-apple-help-output" title="Permalink to this headline">¶</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.3.</span></p>
+</div>
+<p>These options influence the Apple Help output.  This builder derives from the
+HTML builder, so the HTML options also apply where appropriate.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Apple Help output will only work on Mac OS X 10.6 and higher, as it
+requires the <strong class="program">hiutil</strong> and <strong class="program">codesign</strong> command line tools,
+neither of which are Open Source.</p>
+<p class="last">You can disable the use of these tools using
+<a href="#id1"><span class="problematic" id="id2">:confval:`applehelp_disable_external_tools`</span></a>, but the result will not be a
+valid help book until the indexer is run over the <code class="docutils literal"><span class="pre">.lproj</span></code> folders within
+the bundle.</p>
+</div>
+</div>
+<div class="section" id="options-for-epub-output">
+<span id="epub-options"></span><h2>Options for epub output<a class="headerlink" href="#options-for-epub-output" title="Permalink to this headline">¶</a></h2>
+<p>These options influence the epub output.  As this builder derives from the HTML
+builder, the HTML options also apply where appropriate.  The actual values for
+some of the options is not really important, they just have to be entered into
+the <a class="reference external" href="http://dublincore.org/">Dublin Core metadata</a>.</p>
+</div>
+<div class="section" id="options-for-latex-output">
+<span id="latex-options"></span><h2>Options for LaTeX output<a class="headerlink" href="#options-for-latex-output" title="Permalink to this headline">¶</a></h2>
+<p>These options influence LaTeX output. See further <a class="reference internal" href="latex.html"><span class="doc">LaTeX customization</span></a>.</p>
+</div>
+<div class="section" id="options-for-text-output">
+<span id="text-options"></span><h2>Options for text output<a class="headerlink" href="#options-for-text-output" title="Permalink to this headline">¶</a></h2>
+<p>These options influence text output.</p>
+</div>
+<div class="section" id="options-for-manual-page-output">
+<span id="man-options"></span><h2>Options for manual page output<a class="headerlink" href="#options-for-manual-page-output" title="Permalink to this headline">¶</a></h2>
+<p>These options influence manual page output.</p>
+</div>
+<div class="section" id="options-for-texinfo-output">
+<span id="texinfo-options"></span><h2>Options for Texinfo output<a class="headerlink" href="#options-for-texinfo-output" title="Permalink to this headline">¶</a></h2>
+<p>These options influence Texinfo output.</p>
+</div>
+<div class="section" id="options-for-the-linkcheck-builder">
+<h2>Options for the linkcheck builder<a class="headerlink" href="#options-for-the-linkcheck-builder" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="options-for-the-xml-builder">
+<h2>Options for the XML builder<a class="headerlink" href="#options-for-the-xml-builder" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>A note on available globbing syntax: you can use the standard shell
+constructs <code class="docutils literal"><span class="pre">*</span></code>, <code class="docutils literal"><span class="pre">?</span></code>, <code class="docutils literal"><span class="pre">[...]</span></code> and <code class="docutils literal"><span class="pre">[!...]</span></code> with the feature that
+these all don’t match slashes.  A double star <code class="docutils literal"><span class="pre">**</span></code> can be used to match
+any sequence of characters <em>including</em> slashes.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="options-for-the-c-domain">
+<span id="cpp-config"></span><h2>Options for the C++ domain<a class="headerlink" href="#options-for-the-c-domain" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+<div class="section" id="example-of-configuration-file">
+<h1>Example of configuration file<a class="headerlink" href="#example-of-configuration-file" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1"># test documentation build configuration file, created by</span>
+<span class="c1"># sphinx-quickstart on Sun Jun 26 00:00:43 2016.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is execfile()d with the current directory set to its</span>
+<span class="c1"># containing dir.</span>
+<span class="c1">#</span>
+<span class="c1"># Note that not all possible configuration values are present in this</span>
+<span class="c1"># autogenerated file.</span>
+<span class="c1">#</span>
+<span class="c1"># All configuration values have a default; values that are commented out</span>
+<span class="c1"># serve to show the default.</span>
+
+<span class="c1"># If extensions (or modules to document with autodoc) are in another directory,</span>
+<span class="c1"># add these directories to sys.path here. If the directory is relative to the</span>
+<span class="c1"># documentation root, use os.path.abspath to make it absolute, like shown here.</span>
+<span class="c1">#</span>
+<span class="c1"># import os</span>
+<span class="c1"># import sys</span>
+<span class="c1"># sys.path.insert(0, os.path.abspath(&#39;.&#39;))</span>
+
+<span class="c1"># -- General configuration ------------------------------------------------</span>
+
+<span class="c1"># If your documentation needs a minimal Sphinx version, state it here.</span>
+<span class="c1">#</span>
+<span class="c1"># needs_sphinx = &#39;1.0&#39;</span>
+
+<span class="c1"># Add any Sphinx extension module names here, as strings. They can be</span>
+<span class="c1"># extensions coming with Sphinx (named &#39;sphinx.ext.*&#39;) or your custom</span>
+<span class="c1"># ones.</span>
+<span class="n">extensions</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Add any paths that contain templates here, relative to this directory.</span>
+<span class="n">templates_path</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_templates&#39;</span><span class="p">]</span>
+
+<span class="c1"># The suffix(es) of source filenames.</span>
+<span class="c1"># You can specify multiple suffix as a list of string:</span>
+<span class="c1">#</span>
+<span class="c1"># source_suffix = [&#39;.rst&#39;, &#39;.md&#39;]</span>
+<span class="n">source_suffix</span> <span class="o">=</span> <span class="s1">&#39;.rst&#39;</span>
+
+<span class="c1"># The encoding of source files.</span>
+<span class="c1">#</span>
+<span class="c1"># source_encoding = &#39;utf-8-sig&#39;</span>
+
+<span class="c1"># The master toctree document.</span>
+<span class="n">master_doc</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span>
+
+<span class="c1"># General information about the project.</span>
+<span class="n">project</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;test&#39;</span>
+<span class="n">copyright</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;2016, test&#39;</span>
+<span class="n">author</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;test&#39;</span>
+
+<span class="c1"># The version info for the project you&#39;re documenting, acts as replacement for</span>
+<span class="c1"># |version| and |release|, also used in various other places throughout the</span>
+<span class="c1"># built documents.</span>
+<span class="c1">#</span>
+<span class="c1"># The short X.Y version.</span>
+<span class="n">version</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;test&#39;</span>
+<span class="c1"># The full version, including alpha/beta/rc tags.</span>
+<span class="n">release</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;test&#39;</span>
+
+<span class="c1"># The language for content autogenerated by Sphinx. Refer to documentation</span>
+<span class="c1"># for a list of supported languages.</span>
+<span class="c1">#</span>
+<span class="c1"># This is also used if you do content translation via gettext catalogs.</span>
+<span class="c1"># Usually you set &quot;language&quot; from the command line for these cases.</span>
+<span class="n">language</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="c1"># There are two options for replacing |today|: either, you set today to some</span>
+<span class="c1"># non-false value, then it is used:</span>
+<span class="c1">#</span>
+<span class="c1"># today = &#39;&#39;</span>
+<span class="c1">#</span>
+<span class="c1"># Else, today_fmt is used as the format for a strftime call.</span>
+<span class="c1">#</span>
+<span class="c1"># today_fmt = &#39;%B %d, %Y&#39;</span>
+
+<span class="c1"># List of patterns, relative to source directory, that match files and</span>
+<span class="c1"># directories to ignore when looking for source files.</span>
+<span class="c1"># These patterns also affect html_static_path and html_extra_path</span>
+<span class="n">exclude_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_build&#39;</span><span class="p">,</span> <span class="s1">&#39;Thumbs.db&#39;</span><span class="p">,</span> <span class="s1">&#39;.DS_Store&#39;</span><span class="p">]</span>
+
+<span class="c1"># The reST default role (used for this markup: `text`) to use for all</span>
+<span class="c1"># documents.</span>
+<span class="c1">#</span>
+<span class="c1"># default_role = None</span>
+
+<span class="c1"># If true, &#39;()&#39; will be appended to :func: etc. cross-reference text.</span>
+<span class="c1">#</span>
+<span class="c1"># add_function_parentheses = True</span>
+
+<span class="c1"># If true, the current module name will be prepended to all description</span>
+<span class="c1"># unit titles (such as .. function::).</span>
+<span class="c1">#</span>
+<span class="c1"># add_module_names = True</span>
+
+<span class="c1"># If true, sectionauthor and moduleauthor directives will be shown in the</span>
+<span class="c1"># output. They are ignored by default.</span>
+<span class="c1">#</span>
+<span class="c1"># show_authors = False</span>
+
+<span class="c1"># The name of the Pygments (syntax highlighting) style to use.</span>
+<span class="n">pygments_style</span> <span class="o">=</span> <span class="s1">&#39;sphinx&#39;</span>
+
+<span class="c1"># A list of ignored prefixes for module index sorting.</span>
+<span class="c1"># modindex_common_prefix = []</span>
+
+<span class="c1"># If true, keep warnings as &quot;system message&quot; paragraphs in the built documents.</span>
+<span class="c1"># keep_warnings = False</span>
+
+<span class="c1"># If true, `todo` and `todoList` produce output, else they produce nothing.</span>
+<span class="n">todo_include_todos</span> <span class="o">=</span> <span class="bp">False</span>
+
+
+<span class="c1"># -- Options for HTML output ----------------------------------------------</span>
+
+<span class="c1"># The theme to use for HTML and HTML Help pages.  See the documentation for</span>
+<span class="c1"># a list of builtin themes.</span>
+<span class="c1">#</span>
+<span class="n">html_theme</span> <span class="o">=</span> <span class="s1">&#39;alabaster&#39;</span>
+
+<span class="c1"># Theme options are theme-specific and customize the look and feel of a theme</span>
+<span class="c1"># further.  For a list of options available for each theme, see the</span>
+<span class="c1"># documentation.</span>
+<span class="c1">#</span>
+<span class="c1"># html_theme_options = {}</span>
+
+<span class="c1"># Add any paths that contain custom themes here, relative to this directory.</span>
+<span class="c1"># html_theme_path = []</span>
+
+<span class="c1"># The name for this set of Sphinx documents.</span>
+<span class="c1"># &quot;&lt;project&gt; v&lt;release&gt; documentation&quot; by default.</span>
+<span class="c1">#</span>
+<span class="c1"># html_title = u&#39;test vtest&#39;</span>
+
+<span class="c1"># A shorter title for the navigation bar.  Default is the same as html_title.</span>
+<span class="c1">#</span>
+<span class="c1"># html_short_title = None</span>
+
+<span class="c1"># The name of an image file (relative to this directory) to place at the top</span>
+<span class="c1"># of the sidebar.</span>
+<span class="c1">#</span>
+<span class="c1"># html_logo = None</span>
+
+<span class="c1"># The name of an image file (relative to this directory) to use as a favicon of</span>
+<span class="c1"># the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32</span>
+<span class="c1"># pixels large.</span>
+<span class="c1">#</span>
+<span class="c1"># html_favicon = None</span>
+
+<span class="c1"># Add any paths that contain custom static files (such as style sheets) here,</span>
+<span class="c1"># relative to this directory. They are copied after the builtin static files,</span>
+<span class="c1"># so a file named &quot;default.css&quot; will overwrite the builtin &quot;default.css&quot;.</span>
+<span class="n">html_static_path</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_static&#39;</span><span class="p">]</span>
+
+<span class="c1"># Add any extra paths that contain custom files (such as robots.txt or</span>
+<span class="c1"># .htaccess) here, relative to this directory. These files are copied</span>
+<span class="c1"># directly to the root of the documentation.</span>
+<span class="c1">#</span>
+<span class="c1"># html_extra_path = []</span>
+
+<span class="c1"># If not None, a &#39;Last updated on:&#39; timestamp is inserted at every page</span>
+<span class="c1"># bottom, using the given strftime format.</span>
+<span class="c1"># The empty string is equivalent to &#39;%b %d, %Y&#39;.</span>
+<span class="c1">#</span>
+<span class="c1"># html_last_updated_fmt = None</span>
+
+<span class="c1"># Custom sidebar templates, maps document names to template names.</span>
+<span class="c1">#</span>
+<span class="c1"># html_sidebars = {}</span>
+
+<span class="c1"># Additional templates that should be rendered to pages, maps page names to</span>
+<span class="c1"># template names.</span>
+<span class="c1">#</span>
+<span class="c1"># html_additional_pages = {}</span>
+
+<span class="c1"># If false, no module index is generated.</span>
+<span class="c1">#</span>
+<span class="c1"># html_domain_indices = True</span>
+
+<span class="c1"># If false, no index is generated.</span>
+<span class="c1">#</span>
+<span class="c1"># html_use_index = True</span>
+
+<span class="c1"># If true, the index is split into individual pages for each letter.</span>
+<span class="c1">#</span>
+<span class="c1"># html_split_index = False</span>
+
+<span class="c1"># If true, links to the reST sources are added to the pages.</span>
+<span class="c1">#</span>
+<span class="c1"># html_show_sourcelink = True</span>
+
+<span class="c1"># If true, &quot;Created using Sphinx&quot; is shown in the HTML footer. Default is True.</span>
+<span class="c1">#</span>
+<span class="c1"># html_show_sphinx = True</span>
+
+<span class="c1"># If true, &quot;(C) Copyright ...&quot; is shown in the HTML footer. Default is True.</span>
+<span class="c1">#</span>
+<span class="c1"># html_show_copyright = True</span>
+
+<span class="c1"># If true, an OpenSearch description file will be output, and all pages will</span>
+<span class="c1"># contain a &lt;link&gt; tag referring to it.  The value of this option must be the</span>
+<span class="c1"># base URL from which the finished HTML is served.</span>
+<span class="c1">#</span>
+<span class="c1"># html_use_opensearch = &#39;&#39;</span>
+
+<span class="c1"># This is the file name suffix for HTML files (e.g. &quot;.xhtml&quot;).</span>
+<span class="c1"># html_file_suffix = None</span>
+
+<span class="c1"># Language to be used for generating the HTML full-text search index.</span>
+<span class="c1"># Sphinx supports the following languages:</span>
+<span class="c1">#   &#39;da&#39;, &#39;de&#39;, &#39;en&#39;, &#39;es&#39;, &#39;fi&#39;, &#39;fr&#39;, &#39;hu&#39;, &#39;it&#39;, &#39;ja&#39;</span>
+<span class="c1">#   &#39;nl&#39;, &#39;no&#39;, &#39;pt&#39;, &#39;ro&#39;, &#39;ru&#39;, &#39;sv&#39;, &#39;tr&#39;, &#39;zh&#39;</span>
+<span class="c1">#</span>
+<span class="c1"># html_search_language = &#39;en&#39;</span>
+
+<span class="c1"># A dictionary with options for the search language support, empty by default.</span>
+<span class="c1"># &#39;ja&#39; uses this config value.</span>
+<span class="c1"># &#39;zh&#39; user can custom change `jieba` dictionary path.</span>
+<span class="c1">#</span>
+<span class="c1"># html_search_options = {&#39;type&#39;: &#39;default&#39;}</span>
+
+<span class="c1"># The name of a javascript file (relative to the configuration directory) that</span>
+<span class="c1"># implements a search results scorer. If empty, the default will be used.</span>
+<span class="c1">#</span>
+<span class="c1"># html_search_scorer = &#39;scorer.js&#39;</span>
+
+<span class="c1"># Output file base name for HTML help builder.</span>
+<span class="n">htmlhelp_basename</span> <span class="o">=</span> <span class="s1">&#39;testdoc&#39;</span>
+
+<span class="c1"># -- Options for LaTeX output ---------------------------------------------</span>
+
+<span class="n">latex_elements</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># The paper size (&#39;letterpaper&#39; or &#39;a4paper&#39;).</span>
+    <span class="c1">#</span>
+    <span class="c1"># &#39;papersize&#39;: &#39;letterpaper&#39;,</span>
+
+    <span class="c1"># The font size (&#39;10pt&#39;, &#39;11pt&#39; or &#39;12pt&#39;).</span>
+    <span class="c1">#</span>
+    <span class="c1"># &#39;pointsize&#39;: &#39;10pt&#39;,</span>
+
+    <span class="c1"># Additional stuff for the LaTeX preamble.</span>
+    <span class="c1">#</span>
+    <span class="c1"># &#39;preamble&#39;: &#39;&#39;,</span>
+
+    <span class="c1"># Latex figure (float) alignment</span>
+    <span class="c1">#</span>
+    <span class="c1"># &#39;figure_align&#39;: &#39;htbp&#39;,</span>
+<span class="p">}</span>
+
+<span class="c1"># Grouping the document tree into LaTeX files. List of tuples</span>
+<span class="c1"># (source start file, target name, title,</span>
+<span class="c1">#  author, documentclass [howto, manual, or own class]).</span>
+<span class="n">latex_documents</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">master_doc</span><span class="p">,</span> <span class="s1">&#39;test.tex&#39;</span><span class="p">,</span> <span class="sa">u</span><span class="s1">&#39;test Documentation&#39;</span><span class="p">,</span>
+     <span class="sa">u</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;manual&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># The name of an image file (relative to this directory) to place at the top of</span>
+<span class="c1"># the title page.</span>
+<span class="c1">#</span>
+<span class="c1"># latex_logo = None</span>
+
+<span class="c1"># If true, show page references after internal links.</span>
+<span class="c1">#</span>
+<span class="c1"># latex_show_pagerefs = False</span>
+
+<span class="c1"># If true, show URL addresses after external links.</span>
+<span class="c1">#</span>
+<span class="c1"># latex_show_urls = False</span>
+
+<span class="c1"># Documents to append as an appendix to all manuals.</span>
+<span class="c1">#</span>
+<span class="c1"># latex_appendices = []</span>
+
+<span class="c1"># If false, no module index is generated.</span>
+<span class="c1">#</span>
+<span class="c1"># latex_domain_indices = True</span>
+
+
+<span class="c1"># -- Options for manual page output ---------------------------------------</span>
+
+<span class="c1"># One entry per manual page. List of tuples</span>
+<span class="c1"># (source start file, name, description, authors, manual section).</span>
+<span class="n">man_pages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">master_doc</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="sa">u</span><span class="s1">&#39;test Documentation&#39;</span><span class="p">,</span>
+     <span class="p">[</span><span class="n">author</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="c1"># If true, show URL addresses after external links.</span>
+<span class="c1">#</span>
+<span class="c1"># man_show_urls = False</span>
+
+
+<span class="c1"># -- Options for Texinfo output -------------------------------------------</span>
+
+<span class="c1"># Grouping the document tree into Texinfo files. List of tuples</span>
+<span class="c1"># (source start file, target name, title, author,</span>
+<span class="c1">#  dir menu entry, description, category)</span>
+<span class="n">texinfo_documents</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">master_doc</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="sa">u</span><span class="s1">&#39;test Documentation&#39;</span><span class="p">,</span>
+     <span class="n">author</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;One line description of project.&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;Miscellaneous&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># Documents to append as an appendix to all manuals.</span>
+<span class="c1">#</span>
+<span class="c1"># texinfo_appendices = []</span>
+
+<span class="c1"># If false, no module index is generated.</span>
+<span class="c1">#</span>
+<span class="c1"># texinfo_domain_indices = True</span>
+
+<span class="c1"># How to display URL addresses: &#39;footnote&#39;, &#39;no&#39;, or &#39;inline&#39;.</span>
+<span class="c1">#</span>
+<span class="c1"># texinfo_show_urls = &#39;footnote&#39;</span>
+
+<span class="c1"># If true, do not generate a @detailmenu in the &quot;Top&quot; node&#39;s menu.</span>
+<span class="c1">#</span>
+<span class="c1"># texinfo_no_detailmenu = False</span>
+
+<span class="c1"># -- A random example -----------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+<span class="n">exclude_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zzz&#39;</span><span class="p">]</span>
+
+<span class="n">numfig</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c1">#language = &#39;ja&#39;</span>
+
+<span class="n">extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sphinx.ext.todo&#39;</span><span class="p">)</span>
+<span class="n">extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sphinx.ext.autodoc&#39;</span><span class="p">)</span>
+<span class="c1">#extensions.append(&#39;sphinx.ext.autosummary&#39;)</span>
+<span class="n">extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sphinx.ext.intersphinx&#39;</span><span class="p">)</span>
+<span class="n">extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sphinx.ext.mathjax&#39;</span><span class="p">)</span>
+<span class="n">extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sphinx.ext.viewcode&#39;</span><span class="p">)</span>
+<span class="n">extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;sphinx.ext.graphviz&#39;</span><span class="p">)</span>
+
+
+<span class="n">autosummary_generate</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">html_theme</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+<span class="c1">#source_suffix = [&#39;.rst&#39;, &#39;.txt&#39;]</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The build configuration file</a><ul>
+<li><a class="reference internal" href="#general-configuration">General configuration</a></li>
+<li><a class="reference internal" href="#project-information">Project information</a></li>
+<li><a class="reference internal" href="#options-for-internationalization">Options for internationalization</a></li>
+<li><a class="reference internal" href="#options-for-html-output">Options for HTML output</a></li>
+<li><a class="reference internal" href="#options-for-apple-help-output">Options for Apple Help output</a></li>
+<li><a class="reference internal" href="#options-for-epub-output">Options for epub output</a></li>
+<li><a class="reference internal" href="#options-for-latex-output">Options for LaTeX output</a></li>
+<li><a class="reference internal" href="#options-for-text-output">Options for text output</a></li>
+<li><a class="reference internal" href="#options-for-manual-page-output">Options for manual page output</a></li>
+<li><a class="reference internal" href="#options-for-texinfo-output">Options for Texinfo output</a></li>
+<li><a class="reference internal" href="#options-for-the-linkcheck-builder">Options for the linkcheck builder</a></li>
+<li><a class="reference internal" href="#options-for-the-xml-builder">Options for the XML builder</a></li>
+<li><a class="reference internal" href="#options-for-the-c-domain">Options for the C++ domain</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-of-configuration-file">Example of configuration file</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sphinx/doc/config.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/sphinx/doc/config.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

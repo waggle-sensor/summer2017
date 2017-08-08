@@ -1,0 +1,544 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinxcontrib.websupport.core &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinxcontrib.websupport.core</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinxcontrib.websupport.core</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Base Module for web support functions.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2016 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">posixpath</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">cPickle</span> <span class="k">as</span> <span class="n">pickle</span>
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">FileSystemLoader</span>
+<span class="kn">from</span> <span class="nn">docutils.core</span> <span class="k">import</span> <span class="n">publish_parts</span>
+
+<span class="kn">from</span> <span class="nn">sphinx.locale</span> <span class="k">import</span> <span class="n">_</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">ensuredir</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.jsonimpl</span> <span class="k">import</span> <span class="n">dumps</span> <span class="k">as</span> <span class="n">dump_json</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.pycompat</span> <span class="k">import</span> <span class="n">htmlescape</span>
+<span class="kn">from</span> <span class="nn">sphinxcontrib.websupport</span> <span class="k">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">sphinxcontrib.websupport.search</span> <span class="k">import</span> <span class="n">BaseSearch</span><span class="p">,</span> <span class="n">SEARCH_ADAPTERS</span>
+<span class="kn">from</span> <span class="nn">sphinxcontrib.websupport.storage</span> <span class="k">import</span> <span class="n">StorageBackend</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Dict</span>  <span class="c1"># NOQA</span>
+
+
+<div class="viewcode-block" id="WebSupport"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport">[docs]</a><span class="k">class</span> <span class="nc">WebSupport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The main API class for the web support package. All interactions</span>
+<span class="sd">    with the web support package should occur through this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">srcdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="c1"># only required for building</span>
+                 <span class="n">builddir</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>      <span class="c1"># the dir with data/static/doctrees subdirs</span>
+                 <span class="n">datadir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>     <span class="c1"># defaults to builddir/data</span>
+                 <span class="n">staticdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># defaults to builddir/static</span>
+                 <span class="n">doctreedir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># defaults to builddir/doctrees</span>
+                 <span class="n">search</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="c1"># defaults to no search</span>
+                 <span class="n">storage</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>     <span class="c1"># defaults to SQLite in datadir</span>
+                 <span class="n">status</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+                 <span class="n">warning</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                 <span class="n">moderation_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">allow_anonymous_comments</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">docroot</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">staticroot</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">,</span>
+                 <span class="p">):</span>
+        <span class="c1"># directories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span> <span class="o">=</span> <span class="n">srcdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="o">=</span> <span class="n">builddir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datadir</span> <span class="o">=</span> <span class="n">datadir</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">staticdir</span> <span class="o">=</span> <span class="n">staticdir</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;static&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span> <span class="o">=</span> <span class="n">staticdir</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="s1">&#39;doctrees&#39;</span><span class="p">)</span>
+        <span class="c1"># web server virtual paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">staticroot</span> <span class="o">=</span> <span class="n">staticroot</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">docroot</span> <span class="o">=</span> <span class="n">docroot</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span> <span class="o">=</span> <span class="n">warning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moderation_callback</span> <span class="o">=</span> <span class="n">moderation_callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_anonymous_comments</span> <span class="o">=</span> <span class="n">allow_anonymous_comments</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_templating</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_search</span><span class="p">(</span><span class="n">search</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_storage</span><span class="p">(</span><span class="n">storage</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_globalcontext</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_base_comment_options</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_init_storage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">storage</span><span class="p">,</span> <span class="n">StorageBackend</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">storage</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If a StorageBackend isn&#39;t provided, use the default</span>
+            <span class="c1"># SQLAlchemy backend.</span>
+            <span class="kn">from</span> <span class="nn">sphinxcontrib.websupport.storage.sqlalchemystorage</span> \
+                <span class="kn">import</span> <span class="nn">SQLAlchemyStorage</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">storage</span><span class="p">:</span>
+                <span class="c1"># no explicit DB path given; create default sqlite database</span>
+                <span class="n">db_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;db&#39;</span><span class="p">,</span> <span class="s1">&#39;websupport.db&#39;</span><span class="p">)</span>
+                <span class="n">ensuredir</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">db_path</span><span class="p">))</span>
+                <span class="n">storage</span> <span class="o">=</span> <span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">db_path</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">SQLAlchemyStorage</span><span class="p">(</span><span class="n">storage</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_templating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">sphinx</span>
+        <span class="n">template_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sphinx</span><span class="o">.</span><span class="n">package_dir</span><span class="p">,</span>
+                                  <span class="s1">&#39;themes&#39;</span><span class="p">,</span> <span class="s1">&#39;basic&#39;</span><span class="p">)</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">template_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template_env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">loader</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="n">BaseSearch</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">search</span> <span class="o">=</span> <span class="n">search</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mod</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="n">SEARCH_ADAPTERS</span><span class="p">[</span><span class="n">search</span> <span class="ow">or</span> <span class="s1">&#39;null&#39;</span><span class="p">]</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="s1">&#39;sphinxcontrib.websupport.search.&#39;</span> <span class="o">+</span> <span class="n">mod</span>
+            <span class="n">SearchClass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">__import__</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="bp">cls</span><span class="p">]),</span> <span class="bp">cls</span><span class="p">)</span>
+            <span class="n">search_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">search</span> <span class="o">=</span> <span class="n">SearchClass</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_template</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">template_env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;searchresults.html&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebSupport.build"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build the documentation. Places the data into the `outdir`</span>
+<span class="sd">        directory. Use it like this::</span>
+
+<span class="sd">            support = WebSupport(srcdir, builddir, search=&#39;xapian&#39;)</span>
+<span class="sd">            support.build()</span>
+
+<span class="sd">        This will read reStructured text files from `srcdir`. Then it will</span>
+<span class="sd">        build the pickles and search index, placing them into `builddir`.</span>
+<span class="sd">        It will also save node data to the database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No srcdir associated with WebSupport object&#39;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">Sphinx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">doctreedir</span><span class="p">,</span>
+                     <span class="s1">&#39;websupport&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">set_webinfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">staticdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">staticroot</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">pre_build</span><span class="p">()</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">post_build</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">get_globalcontext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load and return the &quot;global context&quot; pickle.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_globalcontext</span><span class="p">:</span>
+            <span class="n">infilename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;globalcontext.pickle&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infilename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_globalcontext</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_globalcontext</span>
+
+<div class="viewcode-block" id="WebSupport.get_document"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport.get_document">[docs]</a>    <span class="k">def</span> <span class="nf">get_document</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">moderator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load and return a document from a pickle. The document will</span>
+<span class="sd">        be a dict object which can be used to render a template::</span>
+
+<span class="sd">            support = WebSupport(datadir=datadir)</span>
+<span class="sd">            support.get_document(&#39;index&#39;, username, moderator)</span>
+
+<span class="sd">        In most cases `docname` will be taken from the request path and</span>
+<span class="sd">        passed directly to this function. In Flask, that would be something</span>
+<span class="sd">        like this::</span>
+
+<span class="sd">            @app.route(&#39;/&lt;path:docname&gt;&#39;)</span>
+<span class="sd">            def index(docname):</span>
+<span class="sd">                username = g.user.name if g.user else &#39;&#39;</span>
+<span class="sd">                moderator = g.user.moderator if g.user else False</span>
+<span class="sd">                try:</span>
+<span class="sd">                    document = support.get_document(docname, username,</span>
+<span class="sd">                                                    moderator)</span>
+<span class="sd">                except DocumentNotFoundError:</span>
+<span class="sd">                    abort(404)</span>
+<span class="sd">                render_template(&#39;doc.html&#39;, document=document)</span>
+
+<span class="sd">        The document dict that is returned contains the following items</span>
+<span class="sd">        to be used during template rendering.</span>
+
+<span class="sd">        * **body**: The main body of the document as HTML</span>
+<span class="sd">        * **sidebar**: The sidebar of the document as HTML</span>
+<span class="sd">        * **relbar**: A div containing links to related documents</span>
+<span class="sd">        * **title**: The title of the document</span>
+<span class="sd">        * **css**: Links to css files used by Sphinx</span>
+<span class="sd">        * **script**: Javascript containing comment options</span>
+
+<span class="sd">        This raises :class:`~sphinxcontrib.websupport.errors.DocumentNotFoundError`</span>
+<span class="sd">        if a document matching `docname` is not found.</span>
+
+<span class="sd">        :param docname: the name of the document to load.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">docpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;pickles&#39;</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">docpath</span><span class="p">):</span>
+            <span class="n">infilename</span> <span class="o">=</span> <span class="n">docpath</span> <span class="o">+</span> <span class="s1">&#39;/index.fpickle&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">docname</span><span class="p">:</span>
+                <span class="n">docname</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">docname</span> <span class="o">+=</span> <span class="s1">&#39;/index&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">infilename</span> <span class="o">=</span> <span class="n">docpath</span> <span class="o">+</span> <span class="s1">&#39;.fpickle&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">infilename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">document</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DocumentNotFoundError</span><span class="p">(</span>
+                <span class="s1">&#39;The document &quot;</span><span class="si">%s</span><span class="s1">&quot; could not be found&#39;</span> <span class="o">%</span> <span class="n">docname</span><span class="p">)</span>
+
+        <span class="n">comment_opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_comment_options</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">moderator</span><span class="p">)</span>
+        <span class="n">comment_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_metadata</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="n">docname</span><span class="p">,</span> <span class="n">moderator</span><span class="p">))</span>
+
+        <span class="n">document</span><span class="p">[</span><span class="s1">&#39;script&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comment_opts</span> <span class="o">+</span> <span class="n">comment_meta</span> <span class="o">+</span> <span class="n">document</span><span class="p">[</span><span class="s1">&#39;script&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">document</span></div>
+
+<div class="viewcode-block" id="WebSupport.get_search_results"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport.get_search_results">[docs]</a>    <span class="k">def</span> <span class="nf">get_search_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform a search for the query `q`, and create a set</span>
+<span class="sd">        of search results. Then render the search results as html and</span>
+<span class="sd">        return a context dict like the one created by</span>
+<span class="sd">        :meth:`get_document`::</span>
+
+<span class="sd">            document = support.get_search_results(q)</span>
+
+<span class="sd">        :param q: the search query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="n">q</span><span class="p">,</span>
+            <span class="s1">&#39;search_performed&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;search_results&#39;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span>
+            <span class="s1">&#39;docroot&#39;</span><span class="p">:</span> <span class="s1">&#39;../&#39;</span><span class="p">,</span>  <span class="c1"># XXX</span>
+            <span class="s1">&#39;_&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">document</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">ctx</span><span class="p">),</span>
+            <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Search Results&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;relbar&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">document</span></div>
+
+<div class="viewcode-block" id="WebSupport.get_data"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">moderator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the comments and source associated with `node_id`. If</span>
+<span class="sd">        `username` is given vote information will be included with the</span>
+<span class="sd">        returned comments. The default CommentBackend returns a dict with</span>
+<span class="sd">        two keys, *source*, and *comments*. *source* is raw source of the</span>
+<span class="sd">        node and is used as the starting point for proposals a user can</span>
+<span class="sd">        add. *comments* is a list of dicts that represent a comment, each</span>
+<span class="sd">        having the following items:</span>
+
+<span class="sd">        ============= ======================================================</span>
+<span class="sd">        Key           Contents</span>
+<span class="sd">        ============= ======================================================</span>
+<span class="sd">        text          The comment text.</span>
+<span class="sd">        username      The username that was stored with the comment.</span>
+<span class="sd">        id            The comment&#39;s unique identifier.</span>
+<span class="sd">        rating        The comment&#39;s current rating.</span>
+<span class="sd">        age           The time in seconds since the comment was added.</span>
+<span class="sd">        time          A dict containing time information. It contains the</span>
+<span class="sd">                      following keys: year, month, day, hour, minute, second,</span>
+<span class="sd">                      iso, and delta. `iso` is the time formatted in ISO</span>
+<span class="sd">                      8601 format. `delta` is a printable form of how old</span>
+<span class="sd">                      the comment is (e.g. &quot;3 hours ago&quot;).</span>
+<span class="sd">        vote          If `user_id` was given, this will be an integer</span>
+<span class="sd">                      representing the vote. 1 for an upvote, -1 for a</span>
+<span class="sd">                      downvote, or 0 if unvoted.</span>
+<span class="sd">        node          The id of the node that the comment is attached to.</span>
+<span class="sd">                      If the comment&#39;s parent is another comment rather than</span>
+<span class="sd">                      a node, this will be null.</span>
+<span class="sd">        parent        The id of the comment that this comment is attached</span>
+<span class="sd">                      to if it is not attached to a node.</span>
+<span class="sd">        children      A list of all children, in this format.</span>
+<span class="sd">        proposal_diff An HTML representation of the differences between the</span>
+<span class="sd">                      the current source and the user&#39;s proposed source.</span>
+<span class="sd">        ============= ======================================================</span>
+
+<span class="sd">        :param node_id: the id of the node to get comments for.</span>
+<span class="sd">        :param username: the username of the user viewing the comments.</span>
+<span class="sd">        :param moderator: whether the user is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">moderator</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">delete_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment_id</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">moderator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete a comment.</span>
+
+<span class="sd">        If `moderator` is True, the comment and all descendants will be deleted</span>
+<span class="sd">        from the database, and the function returns ``True``.</span>
+
+<span class="sd">        If `moderator` is False, the comment will be marked as deleted (but not</span>
+<span class="sd">        removed from the database so as not to leave any comments orphaned), but</span>
+<span class="sd">        only if the `username` matches the `username` on the comment.  The</span>
+<span class="sd">        username and text files are replaced with &quot;[deleted]&quot; .  In this case,</span>
+<span class="sd">        the function returns ``False``.</span>
+
+<span class="sd">        This raises :class:`~sphinxcontrib.websupport.errors.UserNotAuthorizedError`</span>
+<span class="sd">        if moderator is False and `username` doesn&#39;t match username on the</span>
+<span class="sd">        comment.</span>
+
+<span class="sd">        :param comment_id: the id of the comment to delete.</span>
+<span class="sd">        :param username: the username requesting the deletion.</span>
+<span class="sd">        :param moderator: whether the requestor is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">delete_comment</span><span class="p">(</span><span class="n">comment_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">moderator</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebSupport.add_comment"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport.add_comment">[docs]</a>    <span class="k">def</span> <span class="nf">add_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">node_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">parent_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">displayed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">proposal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">moderator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a comment to a node or another comment. Returns the comment</span>
+<span class="sd">        in the same format as :meth:`get_comments`. If the comment is being</span>
+<span class="sd">        attached to a node, pass in the node&#39;s id (as a string) with the</span>
+<span class="sd">        node keyword argument::</span>
+
+<span class="sd">            comment = support.add_comment(text, node_id=node_id)</span>
+
+<span class="sd">        If the comment is the child of another comment, provide the parent&#39;s</span>
+<span class="sd">        id (as a string) with the parent keyword argument::</span>
+
+<span class="sd">            comment = support.add_comment(text, parent_id=parent_id)</span>
+
+<span class="sd">        If you would like to store a username with the comment, pass</span>
+<span class="sd">        in the optional `username` keyword argument::</span>
+
+<span class="sd">            comment = support.add_comment(text, node=node_id,</span>
+<span class="sd">                                          username=username)</span>
+
+<span class="sd">        :param parent_id: the prefixed id of the comment&#39;s parent.</span>
+<span class="sd">        :param text: the text of the comment.</span>
+<span class="sd">        :param displayed: for moderation purposes</span>
+<span class="sd">        :param username: the username of the user making the comment.</span>
+<span class="sd">        :param time: the time the comment was created, defaults to now.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allow_anonymous_comments</span><span class="p">:</span>
+                <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;Anonymous&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">UserNotAuthorizedError</span><span class="p">()</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_comment_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">add_comment</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">displayed</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span>
+                                           <span class="n">time</span><span class="p">,</span> <span class="n">proposal</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span>
+                                           <span class="n">parent_id</span><span class="p">,</span> <span class="n">moderator</span><span class="p">)</span>
+        <span class="n">comment</span><span class="p">[</span><span class="s1">&#39;original_text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">displayed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">moderation_callback</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">moderation_callback</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">comment</span></div>
+
+<div class="viewcode-block" id="WebSupport.process_vote"><a class="viewcode-back" href="../../../sphinx/doc/web/api.html#sphinxcontrib.websupport.WebSupport.process_vote">[docs]</a>    <span class="k">def</span> <span class="nf">process_vote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Process a user&#39;s vote. The web support package relies</span>
+<span class="sd">        on the API user to perform authentication. The API user will</span>
+<span class="sd">        typically receive a comment_id and value from a form, and then</span>
+<span class="sd">        make sure the user is authenticated. A unique username  must be</span>
+<span class="sd">        passed in, which will also be used to retrieve the user&#39;s past</span>
+<span class="sd">        voting data. An example, once again in Flask::</span>
+
+<span class="sd">            @app.route(&#39;/docs/process_vote&#39;, methods=[&#39;POST&#39;])</span>
+<span class="sd">            def process_vote():</span>
+<span class="sd">                if g.user is None:</span>
+<span class="sd">                    abort(401)</span>
+<span class="sd">                comment_id = request.form.get(&#39;comment_id&#39;)</span>
+<span class="sd">                value = request.form.get(&#39;value&#39;)</span>
+<span class="sd">                if value is None or comment_id is None:</span>
+<span class="sd">                    abort(400)</span>
+<span class="sd">                support.process_vote(comment_id, g.user.name, value)</span>
+<span class="sd">                return &quot;success&quot;</span>
+
+<span class="sd">        :param comment_id: the comment being voted on</span>
+<span class="sd">        :param username: the unique username of the user voting</span>
+<span class="sd">        :param value: 1 for an upvote, -1 for a downvote, 0 for an unvote.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;vote value </span><span class="si">%s</span><span class="s1"> out of range (-1, 1)&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">process_vote</span><span class="p">(</span><span class="n">comment_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">update_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_username</span><span class="p">,</span> <span class="n">new_username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;To remain decoupled from a webapp&#39;s authentication system, the</span>
+<span class="sd">        web support package stores a user&#39;s username with each of their</span>
+<span class="sd">        comments and votes. If the authentication system allows a user to</span>
+<span class="sd">        change their username, this can lead to stagnate data in the web</span>
+<span class="sd">        support system. To avoid this, each time a username is changed, this</span>
+<span class="sd">        method should be called.</span>
+
+<span class="sd">        :param old_username: The original username.</span>
+<span class="sd">        :param new_username: The new username.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">update_username</span><span class="p">(</span><span class="n">old_username</span><span class="p">,</span> <span class="n">new_username</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">accept_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment_id</span><span class="p">,</span> <span class="n">moderator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Accept a comment that is pending moderation.</span>
+
+<span class="sd">        This raises :class:`~sphinxcontrib.websupport.errors.UserNotAuthorizedError`</span>
+<span class="sd">        if moderator is False.</span>
+
+<span class="sd">        :param comment_id: The id of the comment that was accepted.</span>
+<span class="sd">        :param moderator: Whether the user making the request is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">moderator</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">UserNotAuthorizedError</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">accept_comment</span><span class="p">(</span><span class="n">comment_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_make_base_comment_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to create the part of the COMMENT_OPTIONS javascript</span>
+<span class="sd">        that remains the same throughout the lifetime of the</span>
+<span class="sd">        :class:`~sphinxcontrib.websupport.WebSupport` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_comment_opts</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># type: Dict[unicode, unicode]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">docroot</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">comment_urls</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s1">&#39;addCommentURL&#39;</span><span class="p">,</span> <span class="s1">&#39;_add_comment&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;getCommentsURL&#39;</span><span class="p">,</span> <span class="s1">&#39;_get_comments&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;processVoteURL&#39;</span><span class="p">,</span> <span class="s1">&#39;_process_vote&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;acceptCommentURL&#39;</span><span class="p">,</span> <span class="s1">&#39;_accept_comment&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;deleteCommentURL&#39;</span><span class="p">,</span> <span class="s1">&#39;_delete_comment&#39;</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">comment_urls</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">base_comment_opts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">docroot</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">staticroot</span> <span class="o">!=</span> <span class="s1">&#39;static&#39;</span><span class="p">:</span>
+            <span class="n">static_urls</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s1">&#39;commentImage&#39;</span><span class="p">,</span> <span class="s1">&#39;comment.png&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;closeCommentImage&#39;</span><span class="p">,</span> <span class="s1">&#39;comment-close.png&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;loadingImage&#39;</span><span class="p">,</span> <span class="s1">&#39;ajax-loader.gif&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;commentBrightImage&#39;</span><span class="p">,</span> <span class="s1">&#39;comment-bright.png&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;upArrow&#39;</span><span class="p">,</span> <span class="s1">&#39;up.png&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;upArrowPressed&#39;</span><span class="p">,</span> <span class="s1">&#39;up-pressed.png&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;downArrow&#39;</span><span class="p">,</span> <span class="s1">&#39;down.png&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;downArrowPressed&#39;</span><span class="p">,</span> <span class="s1">&#39;down-pressed.png&#39;</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">static_urls</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">base_comment_opts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">staticroot</span><span class="p">,</span> <span class="s1">&#39;_static&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_make_comment_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">moderator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to create the parts of the COMMENT_OPTIONS</span>
+<span class="sd">        javascript that are unique to each request.</span>
+
+<span class="sd">        :param username: The username of the user making the request.</span>
+<span class="sd">        :param moderator: Whether the user making the request is a moderator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_comment_opts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">username</span><span class="p">:</span>
+            <span class="n">rv</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s1">&#39;voting&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                <span class="s1">&#39;moderator&#39;</span><span class="p">:</span> <span class="n">moderator</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;script type=&quot;text/javascript&quot;&gt;</span>
+<span class="s1">        var COMMENT_OPTIONS = </span><span class="si">%s</span><span class="s1">;</span>
+<span class="s1">        &lt;/script&gt;</span>
+<span class="s1">        &#39;&#39;&#39;</span> <span class="o">%</span> <span class="n">dump_json</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_make_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;script type=&quot;text/javascript&quot;&gt;</span>
+<span class="s1">        var COMMENT_METADATA = </span><span class="si">%s</span><span class="s1">;</span>
+<span class="s1">        &lt;/script&gt;</span>
+<span class="s1">        &#39;&#39;&#39;</span> <span class="o">%</span> <span class="n">dump_json</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_comment_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;file_insertion_enabled&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;raw_enabled&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;output_encoding&#39;</span><span class="p">:</span> <span class="s1">&#39;unicode&#39;</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">publish_parts</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">writer_name</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">,</span>
+                                <span class="n">settings_overrides</span><span class="o">=</span><span class="n">settings</span><span class="p">)[</span><span class="s1">&#39;fragment&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

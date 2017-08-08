@@ -1,0 +1,814 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Available builders &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.builders">
+<span id="available-builders"></span><span id="builders"></span><h1>Available builders<a class="headerlink" href="#module-sphinx.builders" title="Permalink to this headline">¶</a></h1>
+<p>These are the built-in Sphinx builders.  More builders can be added by
+<a class="reference internal" href="extensions.html#extensions"><span class="std std-ref">extensions</span></a>.</p>
+<p>The builder’s “name” must be given to the <strong>-b</strong> command-line option of
+<strong class="program">sphinx-build</strong> to select a builder.</p>
+<span class="target" id="module-sphinx.builders.html"></span><dl class="class">
+<dt id="sphinx.builders.html.StandaloneHTMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.html.</code><code class="descname">StandaloneHTMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/html.html#StandaloneHTMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.html.StandaloneHTMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the standard HTML builder.  Its output is a directory with HTML
+files, complete with style sheets and optionally the reST sources.  There are
+quite a few configuration values that customize the output of this builder,
+see the chapter <a class="reference internal" href="config.html#html-options"><span class="std std-ref">Options for HTML output</span></a> for details.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.html.StandaloneHTMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.html.StandaloneHTMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.StandaloneHTMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.html.StandaloneHTMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.StandaloneHTMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.html.StandaloneHTMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.builders.html.DirectoryHTMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.html.</code><code class="descname">DirectoryHTMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/html.html#DirectoryHTMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.html.DirectoryHTMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a subclass of the standard HTML builder.  Its output is a directory
+with HTML files, where each file is called <code class="docutils literal"><span class="pre">index.html</span></code> and placed in a
+subdirectory named like its page name.  For example, the document
+<code class="docutils literal"><span class="pre">markup/rest.rst</span></code> will not result in an output file <code class="docutils literal"><span class="pre">markup/rest.html</span></code>,
+but <code class="docutils literal"><span class="pre">markup/rest/index.html</span></code>.  When generating links between pages, the
+<code class="docutils literal"><span class="pre">index.html</span></code> is omitted, so that the URL would look like <code class="docutils literal"><span class="pre">markup/rest/</span></code>.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.html.DirectoryHTMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘dirhtml’</em><a class="headerlink" href="#sphinx.builders.html.DirectoryHTMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.DirectoryHTMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.html.DirectoryHTMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.DirectoryHTMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.html.DirectoryHTMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.6.</span></p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.builders.html.SingleFileHTMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.html.</code><code class="descname">SingleFileHTMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/html.html#SingleFileHTMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.html.SingleFileHTMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an HTML builder that combines the whole project in one output file.
+(Obviously this only works with smaller projects.)  The file is named like
+the master document.  No indices will be generated.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.html.SingleFileHTMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘singlehtml’</em><a class="headerlink" href="#sphinx.builders.html.SingleFileHTMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.SingleFileHTMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.html.SingleFileHTMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.SingleFileHTMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.html.SingleFileHTMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.0.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.htmlhelp"></span><dl class="class">
+<dt id="sphinx.builders.htmlhelp.HTMLHelpBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.htmlhelp.</code><code class="descname">HTMLHelpBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/htmlhelp.html#HTMLHelpBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.htmlhelp.HTMLHelpBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces the same output as the standalone HTML builder, but
+also generates HTML Help support files that allow the Microsoft HTML Help
+Workshop to compile them into a CHM file.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.htmlhelp.HTMLHelpBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘htmlhelp’</em><a class="headerlink" href="#sphinx.builders.htmlhelp.HTMLHelpBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.htmlhelp.HTMLHelpBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.htmlhelp.HTMLHelpBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.htmlhelp.HTMLHelpBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.htmlhelp.HTMLHelpBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.qthelp"></span><dl class="class">
+<dt id="sphinx.builders.qthelp.QtHelpBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.qthelp.</code><code class="descname">QtHelpBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/qthelp.html#QtHelpBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.qthelp.QtHelpBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces the same output as the standalone HTML builder, but
+also generates <a class="reference external" href="https://doc.qt.io/qt-4.8/qthelp-framework.html">Qt help</a> collection support files that allow
+the Qt collection generator to compile them.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.qthelp.QtHelpBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘qthelp’</em><a class="headerlink" href="#sphinx.builders.qthelp.QtHelpBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.qthelp.QtHelpBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.qthelp.QtHelpBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.qthelp.QtHelpBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.qthelp.QtHelpBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.applehelp"></span><dl class="class">
+<dt id="sphinx.builders.applehelp.AppleHelpBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.applehelp.</code><code class="descname">AppleHelpBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/applehelp.html#AppleHelpBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.applehelp.AppleHelpBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces an Apple Help Book based on the same output as the
+standalone HTML builder.</p>
+<p>If the source directory contains any <code class="docutils literal"><span class="pre">.lproj</span></code> folders, the one
+corresponding to the selected language will have its contents merged with
+the generated output.  These folders will be ignored by all other
+documentation types.</p>
+<p>In order to generate a valid help book, this builder requires the command
+line tool <strong class="program">hiutil</strong>, which is only available on Mac OS X 10.6 and
+above.  You can disable the indexing step by setting
+<a href="#id1"><span class="problematic" id="id2">:confval:`applehelp_disable_external_tools`</span></a> to <code class="docutils literal"><span class="pre">True</span></code>, in which case the
+output will not be valid until <strong class="program">hiutil</strong> has been run on all of the
+<code class="docutils literal"><span class="pre">.lproj</span></code> folders within the bundle.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.applehelp.AppleHelpBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘applehelp’</em><a class="headerlink" href="#sphinx.builders.applehelp.AppleHelpBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.applehelp.AppleHelpBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.applehelp.AppleHelpBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.applehelp.AppleHelpBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/png’, ‘image/gif’, ‘image/jpeg’, ‘image/tiff’, ‘image/jp2’, ‘image/svg+xml’]</em><a class="headerlink" href="#sphinx.builders.applehelp.AppleHelpBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.3.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.devhelp"></span><dl class="class">
+<dt id="sphinx.builders.devhelp.DevhelpBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.devhelp.</code><code class="descname">DevhelpBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/devhelp.html#DevhelpBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.devhelp.DevhelpBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces the same output as the standalone HTML builder, but
+also generates <a class="reference external" href="https://wiki.gnome.org/Apps/Devhelp">GNOME Devhelp</a>
+support file that allows the GNOME Devhelp reader to view them.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.devhelp.DevhelpBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘devhelp’</em><a class="headerlink" href="#sphinx.builders.devhelp.DevhelpBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.devhelp.DevhelpBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.devhelp.DevhelpBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.devhelp.DevhelpBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.devhelp.DevhelpBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.epub3"></span><dl class="class">
+<dt id="sphinx.builders.epub3.Epub3Builder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.epub3.</code><code class="descname">Epub3Builder</code><a class="reference internal" href="../../_modules/sphinx/builders/epub3.html#Epub3Builder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.epub3.Epub3Builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces the same output as the standalone HTML builder, but
+also generates an <em>epub</em> file for ebook readers.  See <a class="reference internal" href="faq.html#epub-faq"><span class="std std-ref">Epub info</span></a> for
+details about it.  For definition of the epub format, have a look at
+<a class="reference external" href="http://idpf.org/epub">http://idpf.org/epub</a> or <a class="reference external" href="https://en.wikipedia.org/wiki/EPUB">https://en.wikipedia.org/wiki/EPUB</a>.
+The builder creates <em>EPUB 3</em> files.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.epub3.Epub3Builder.name">
+<code class="descname">name</code><em class="property"> = ‘epub’</em><a class="headerlink" href="#sphinx.builders.epub3.Epub3Builder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.epub3.Epub3Builder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.epub3.Epub3Builder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.epub3.Epub3Builder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.epub3.Epub3Builder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.4.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.5: </span>Since Sphinx-1.5, the epub3 builder is used for the default builder of epub.</p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.latex"></span><dl class="class">
+<dt id="sphinx.builders.latex.LaTeXBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.latex.</code><code class="descname">LaTeXBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/latex.html#LaTeXBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.latex.LaTeXBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces a bunch of LaTeX files in the output directory.  You
+have to specify which documents are to be included in which LaTeX files via
+the <a href="#id3"><span class="problematic" id="id4">:confval:`latex_documents`</span></a> configuration value.  There are a few
+configuration values that customize the output of this builder, see the
+chapter <a class="reference internal" href="config.html#latex-options"><span class="std std-ref">Options for LaTeX output</span></a> for details.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The produced LaTeX file uses several LaTeX packages that may not be
+present in a “minimal” TeX distribution installation. For example, on
+Ubuntu, the following packages need to be installed for successful PDF
+builds:</p>
+<ul class="simple">
+<li>texlive-latex-recommended</li>
+<li>texlive-fonts-recommended</li>
+<li>texlive-latex-extra</li>
+<li>latexmk (for <code class="docutils literal"><span class="pre">make</span> <span class="pre">latexpdf</span></code>)</li>
+</ul>
+<p>Sphinx will use <code class="docutils literal"><span class="pre">xcolor.sty</span></code> if present: recent Ubuntu distributions
+have <code class="docutils literal"><span class="pre">xcolor.sty</span></code> included in latex-recommended, earlier ones have it
+in latex-xcolor. Unicode engines will need texlive-luatex or
+texlive-xetex.</p>
+<p>The testing of Sphinx LaTeX is done on Ubuntu trusty with the above
+mentioned packages, which are from a TeXLive 2013 snapshot dated
+February 2014.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.6: </span>Formerly, testing had been done for some years on Ubuntu precise
+(based on TeXLive 2009).</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.6: </span>Use of <code class="docutils literal"><span class="pre">latexmk</span></code> for <code class="docutils literal"><span class="pre">make</span> <span class="pre">latexpdf</span></code> on GNU/Linux and Mac OS X</p>
+</div>
+<p>Since 1.6, <code class="docutils literal"><span class="pre">make</span> <span class="pre">latexpdf</span></code> (or
+<code class="docutils literal"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">&quot;&lt;builddir&gt;/latex&quot;</span></code> after a <code class="docutils literal"><span class="pre">sphinx-build</span></code> run) uses
+<code class="docutils literal"><span class="pre">latexmk</span></code> (not on Windows).
+One can pass to <code class="docutils literal"><span class="pre">latexmk</span></code> options via the <code class="docutils literal"><span class="pre">LATEXMKOPTS</span></code>
+Makefile variable. For example:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">make latexpdf LATEXMKOPTS=&quot;-silent&quot;</span>
+</pre></div>
+</div>
+<p>reduces console output to a minimum. Also, if <code class="docutils literal"><span class="pre">latexmk</span></code> version is
+4.52b or higher (Jan 17) and <code class="docutils literal"><span class="pre">xelatex</span></code> is the <a href="#id5"><span class="problematic" id="id6">:confval:`latex_engine`</span></a>,
+then <code class="docutils literal"><span class="pre">LATEXMKOPTS=&quot;-xelatex&quot;</span></code> will speed up PDF builds.</p>
+<p class="last">To pass options directly to the
+<code class="docutils literal"><span class="pre">(pdf|xe|lua)latex</span></code> executable, use variable <code class="docutils literal"><span class="pre">LATEXOPTS</span></code> (for example
+<code class="docutils literal"><span class="pre">LATEXOPTS=&quot;--interaction=nonstopmode&quot;</span></code>).</p>
+</div>
+<dl class="attribute">
+<dt id="sphinx.builders.latex.LaTeXBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘latex’</em><a class="headerlink" href="#sphinx.builders.latex.LaTeXBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.latex.LaTeXBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘latex’</em><a class="headerlink" href="#sphinx.builders.latex.LaTeXBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.latex.LaTeXBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘application/pdf’, ‘image/png’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.latex.LaTeXBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<p>Note that a direct PDF builder is being provided by <a class="reference external" href="https://github.com/brechtm/rinohtype">rinohtype</a>. The builder’s
+name is <code class="docutils literal"><span class="pre">rinoh</span></code>. Refer to the <a class="reference external" href="http://www.mos6581.org/rinohtype/quickstart.html#sphinx-builder">rinohtype manual</a> for details. There is also
+PDF builder using ReportLab in <a class="reference external" href="https://github.com/rst2pdf/rst2pdf">rst2pdf</a> version 0.12 or greater. However,
+rst2pdf is no longer being actively maintained and suffers from some problems
+when used with recent Sphinx versions.  See the <a class="reference external" href="http://ralsina.me/static/manual.pdf">rst2pdf manual</a> for usage
+instructions.</p>
+<span class="target" id="module-sphinx.builders.text"></span><dl class="class">
+<dt id="sphinx.builders.text.TextBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.text.</code><code class="descname">TextBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/text.html#TextBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.text.TextBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces a text file for each reST file – this is almost the
+same as the reST source, but with much of the markup stripped for better
+readability.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.text.TextBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘text’</em><a class="headerlink" href="#sphinx.builders.text.TextBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.text.TextBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘text’</em><a class="headerlink" href="#sphinx.builders.text.TextBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.text.TextBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.text.TextBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.4.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.manpage"></span><dl class="class">
+<dt id="sphinx.builders.manpage.ManualPageBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.manpage.</code><code class="descname">ManualPageBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/manpage.html#ManualPageBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.manpage.ManualPageBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces manual pages in the groff format.  You have to specify
+which documents are to be included in which manual pages via the
+<a href="#id7"><span class="problematic" id="id8">:confval:`man_pages`</span></a> configuration value.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.manpage.ManualPageBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘man’</em><a class="headerlink" href="#sphinx.builders.manpage.ManualPageBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.manpage.ManualPageBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘man’</em><a class="headerlink" href="#sphinx.builders.manpage.ManualPageBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.manpage.ManualPageBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.manpage.ManualPageBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.0.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.texinfo"></span><dl class="class">
+<dt id="sphinx.builders.texinfo.TexinfoBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.texinfo.</code><code class="descname">TexinfoBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/texinfo.html#TexinfoBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.texinfo.TexinfoBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces Texinfo files that can be processed into Info files by
+the <strong class="program">makeinfo</strong> program.  You have to specify which documents are to
+be included in which Texinfo files via the <a href="#id9"><span class="problematic" id="id10">:confval:`texinfo_documents`</span></a>
+configuration value.</p>
+<p>The Info format is the basis of the on-line help system used by GNU Emacs and
+the terminal-based program <strong class="program">info</strong>.  See <a class="reference internal" href="faq.html#texinfo-faq"><span class="std std-ref">Texinfo info</span></a> for more
+details.  The Texinfo format is the official documentation system used by the
+GNU project.  More information on Texinfo can be found at
+<a class="reference external" href="https://www.gnu.org/software/texinfo/">https://www.gnu.org/software/texinfo/</a>.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.texinfo.TexinfoBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘texinfo’</em><a class="headerlink" href="#sphinx.builders.texinfo.TexinfoBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.texinfo.TexinfoBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘texinfo’</em><a class="headerlink" href="#sphinx.builders.texinfo.TexinfoBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.texinfo.TexinfoBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/png’, ‘image/jpeg’, ‘image/gif’]</em><a class="headerlink" href="#sphinx.builders.texinfo.TexinfoBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.1.</span></p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.builders.html.SerializingHTMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.html.</code><code class="descname">SerializingHTMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/html.html#SerializingHTMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.html.SerializingHTMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder uses a module that implements the Python serialization API
+(<cite>pickle</cite>, <cite>simplejson</cite>, <cite>phpserialize</cite>, and others) to dump the generated
+HTML documentation.  The pickle builder is a subclass of it.</p>
+<p>A concrete subclass of this builder serializing to the <a class="reference external" href="https://pypi.python.org/pypi/phpserialize">PHP serialization</a>
+format could look like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">phpserialize</span>
+
+<span class="k">class</span> <span class="nc">PHPSerializedBuilder</span><span class="p">(</span><span class="n">SerializingHTMLBuilder</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;phpserialized&#39;</span>
+    <span class="n">implementation</span> <span class="o">=</span> <span class="n">phpserialize</span>
+    <span class="n">out_suffix</span> <span class="o">=</span> <span class="s1">&#39;.file.phpdump&#39;</span>
+    <span class="n">globalcontext_filename</span> <span class="o">=</span> <span class="s1">&#39;globalcontext.phpdump&#39;</span>
+    <span class="n">searchindex_filename</span> <span class="o">=</span> <span class="s1">&#39;searchindex.phpdump&#39;</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="sphinx.builders.html.SerializingHTMLBuilder.implementation">
+<code class="descname">implementation</code><a class="headerlink" href="#sphinx.builders.html.SerializingHTMLBuilder.implementation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A module that implements <cite>dump()</cite>, <cite>load()</cite>, <cite>dumps()</cite> and <cite>loads()</cite>
+functions that conform to the functions with the same names from the
+pickle module.  Known modules implementing this interface are
+<cite>simplejson</cite>, <cite>phpserialize</cite>, <cite>plistlib</cite>, and others.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.SerializingHTMLBuilder.out_suffix">
+<code class="descname">out_suffix</code><a class="headerlink" href="#sphinx.builders.html.SerializingHTMLBuilder.out_suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The suffix for all regular files.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.SerializingHTMLBuilder.globalcontext_filename">
+<code class="descname">globalcontext_filename</code><a class="headerlink" href="#sphinx.builders.html.SerializingHTMLBuilder.globalcontext_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The filename for the file that contains the “global context”.  This
+is a dict with some general configuration values such as the name
+of the project.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.SerializingHTMLBuilder.searchindex_filename">
+<code class="descname">searchindex_filename</code><a class="headerlink" href="#sphinx.builders.html.SerializingHTMLBuilder.searchindex_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>The filename for the search index Sphinx generates.</p>
+</dd></dl>
+
+<p>See <a class="reference internal" href="#serialization-details"><span class="std std-ref">Serialization builder details</span></a> for details about the output format.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.5.</span></p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.builders.html.PickleHTMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.html.</code><code class="descname">PickleHTMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/html.html#PickleHTMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.html.PickleHTMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces a directory with pickle files containing mostly HTML
+fragments and TOC information, for use of a web application (or custom
+postprocessing tool) that doesn’t use the standard HTML templates.</p>
+<p>See <a class="reference internal" href="#serialization-details"><span class="std std-ref">Serialization builder details</span></a> for details about the output format.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.html.PickleHTMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘pickle’</em><a class="headerlink" href="#sphinx.builders.html.PickleHTMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The old name <code class="docutils literal"><span class="pre">web</span></code> still works as well.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.PickleHTMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.html.PickleHTMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.PickleHTMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.html.PickleHTMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The file suffix is <code class="docutils literal"><span class="pre">.fpickle</span></code>.  The global context is called
+<code class="docutils literal"><span class="pre">globalcontext.pickle</span></code>, the search index <code class="docutils literal"><span class="pre">searchindex.pickle</span></code>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.builders.html.JSONHTMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.html.</code><code class="descname">JSONHTMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/html.html#JSONHTMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.html.JSONHTMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces a directory with JSON files containing mostly HTML
+fragments and TOC information, for use of a web application (or custom
+postprocessing tool) that doesn’t use the standard HTML templates.</p>
+<p>See <a class="reference internal" href="#serialization-details"><span class="std std-ref">Serialization builder details</span></a> for details about the output format.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.html.JSONHTMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘json’</em><a class="headerlink" href="#sphinx.builders.html.JSONHTMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.JSONHTMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘html’</em><a class="headerlink" href="#sphinx.builders.html.JSONHTMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.html.JSONHTMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = [‘image/svg+xml’, ‘image/png’, ‘image/gif’, ‘image/jpeg’]</em><a class="headerlink" href="#sphinx.builders.html.JSONHTMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The file suffix is <code class="docutils literal"><span class="pre">.fjson</span></code>.  The global context is called
+<code class="docutils literal"><span class="pre">globalcontext.json</span></code>, the search index <code class="docutils literal"><span class="pre">searchindex.json</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 0.5.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.gettext"></span><dl class="class">
+<dt id="sphinx.builders.gettext.MessageCatalogBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.gettext.</code><code class="descname">MessageCatalogBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/gettext.html#MessageCatalogBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.gettext.MessageCatalogBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces gettext-style message catalogs.  Each top-level file or
+subdirectory grows a single <code class="docutils literal"><span class="pre">.pot</span></code> catalog template.</p>
+<p>See the documentation on <a class="reference internal" href="intl.html#intl"><span class="std std-ref">Internationalization</span></a> for further reference.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.gettext.MessageCatalogBuilder.name">
+<code class="descname">name</code><em class="property"> = u’gettext’</em><a class="headerlink" href="#sphinx.builders.gettext.MessageCatalogBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.gettext.MessageCatalogBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.builders.gettext.MessageCatalogBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.gettext.MessageCatalogBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.gettext.MessageCatalogBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.1.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.changes"></span><dl class="class">
+<dt id="sphinx.builders.changes.ChangesBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.changes.</code><code class="descname">ChangesBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/changes.html#ChangesBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.changes.ChangesBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces an HTML overview of all <a class="reference internal" href="markup/para.html#directive-versionadded" title="versionadded directive"><code class="xref rst rst-dir docutils literal"><span class="pre">versionadded</span></code></a>,
+<a class="reference internal" href="markup/para.html#directive-versionchanged" title="versionchanged directive"><code class="xref rst rst-dir docutils literal"><span class="pre">versionchanged</span></code></a> and <a class="reference internal" href="markup/para.html#directive-deprecated" title="deprecated directive"><code class="xref rst rst-dir docutils literal"><span class="pre">deprecated</span></code></a> directives for the
+current <a href="#id11"><span class="problematic" id="id12">:confval:`version`</span></a>.  This is useful to generate a ChangeLog file, for
+example.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.changes.ChangesBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘changes’</em><a class="headerlink" href="#sphinx.builders.changes.ChangesBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.changes.ChangesBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.builders.changes.ChangesBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.changes.ChangesBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.changes.ChangesBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.dummy"></span><dl class="class">
+<dt id="sphinx.builders.dummy.DummyBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.dummy.</code><code class="descname">DummyBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/dummy.html#DummyBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.dummy.DummyBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces no output.  The input is only parsed and checked for
+consistency.  This is useful for linting purposes.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.dummy.DummyBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘dummy’</em><a class="headerlink" href="#sphinx.builders.dummy.DummyBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.dummy.DummyBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.dummy.DummyBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.4.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.linkcheck"></span><dl class="class">
+<dt id="sphinx.builders.linkcheck.CheckExternalLinksBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.linkcheck.</code><code class="descname">CheckExternalLinksBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/linkcheck.html#CheckExternalLinksBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.linkcheck.CheckExternalLinksBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder scans all documents for external links, tries to open them with
+<a class="reference external" href="https://docs.python.org/2/library/urllib2.html#module-urllib2" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">urllib2</span></code></a>, and writes an overview which ones are broken and redirected
+to standard output and to <code class="file docutils literal"><span class="pre">output.txt</span></code> in the output directory.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.linkcheck.CheckExternalLinksBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘linkcheck’</em><a class="headerlink" href="#sphinx.builders.linkcheck.CheckExternalLinksBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.linkcheck.CheckExternalLinksBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.builders.linkcheck.CheckExternalLinksBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.linkcheck.CheckExternalLinksBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.linkcheck.CheckExternalLinksBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-sphinx.builders.xml"></span><dl class="class">
+<dt id="sphinx.builders.xml.XMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.xml.</code><code class="descname">XMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/xml.html#XMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.xml.XMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder produces Docutils-native XML files.  The output can be
+transformed with standard XML tools such as XSLT processors into arbitrary
+final forms.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.xml.XMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘xml’</em><a class="headerlink" href="#sphinx.builders.xml.XMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.xml.XMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘xml’</em><a class="headerlink" href="#sphinx.builders.xml.XMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.xml.XMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.xml.XMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.builders.xml.PseudoXMLBuilder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.xml.</code><code class="descname">PseudoXMLBuilder</code><a class="reference internal" href="../../_modules/sphinx/builders/xml.html#PseudoXMLBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.xml.PseudoXMLBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This builder is used for debugging the Sphinx/Docutils “Reader to Transform
+to Writer” pipeline. It produces compact pretty-printed “pseudo-XML”, files
+where nesting is indicated by indentation (no end-tags). External
+attributes for all elements are output, and internal attributes for any
+leftover “pending” elements are also given.</p>
+<dl class="attribute">
+<dt id="sphinx.builders.xml.PseudoXMLBuilder.name">
+<code class="descname">name</code><em class="property"> = ‘pseudoxml’</em><a class="headerlink" href="#sphinx.builders.xml.PseudoXMLBuilder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.xml.PseudoXMLBuilder.format">
+<code class="descname">format</code><em class="property"> = ‘pseudoxml’</em><a class="headerlink" href="#sphinx.builders.xml.PseudoXMLBuilder.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.xml.PseudoXMLBuilder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.xml.PseudoXMLBuilder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="versionadded">
+<p><span class="versionmodified">New in version 1.2.</span></p>
+</div>
+</dd></dl>
+
+<p>Built-in Sphinx extensions that offer more builders are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="ext/doctest.html#module-sphinx.ext.doctest" title="sphinx.ext.doctest: Test snippets in the documentation."><code class="xref py py-mod docutils literal"><span class="pre">doctest</span></code></a></li>
+<li><a class="reference internal" href="ext/coverage.html#module-sphinx.ext.coverage" title="sphinx.ext.coverage: Check Python modules and C API for coverage in the documentation."><code class="xref py py-mod docutils literal"><span class="pre">coverage</span></code></a></li>
+</ul>
+<div class="section" id="serialization-builder-details">
+<span id="serialization-details"></span><h2>Serialization builder details<a class="headerlink" href="#serialization-builder-details" title="Permalink to this headline">¶</a></h2>
+<p>All serialization builders outputs one file per source file and a few special
+files.  They also copy the reST source files in the directory <code class="docutils literal"><span class="pre">_sources</span></code>
+under the output directory.</p>
+<p>The <a class="reference internal" href="#sphinx.builders.html.PickleHTMLBuilder" title="sphinx.builders.html.PickleHTMLBuilder"><code class="xref py py-class docutils literal"><span class="pre">PickleHTMLBuilder</span></code></a> is a builtin subclass that implements the pickle
+serialization interface.</p>
+<p>The files per source file have the extensions of
+<a class="reference internal" href="#sphinx.builders.html.SerializingHTMLBuilder.out_suffix" title="sphinx.builders.html.SerializingHTMLBuilder.out_suffix"><code class="xref py py-attr docutils literal"><span class="pre">out_suffix</span></code></a>, and are arranged in directories
+just as the source files are.  They unserialize to a dictionary (or dictionary
+like structure) with these keys:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">body</span></code></dt>
+<dd>The HTML “body” (that is, the HTML rendering of the source file), as rendered
+by the HTML translator.</dd>
+<dt><code class="docutils literal"><span class="pre">title</span></code></dt>
+<dd>The title of the document, as HTML (may contain markup).</dd>
+<dt><code class="docutils literal"><span class="pre">toc</span></code></dt>
+<dd>The table of contents for the file, rendered as an HTML <code class="docutils literal"><span class="pre">&lt;ul&gt;</span></code>.</dd>
+<dt><code class="docutils literal"><span class="pre">display_toc</span></code></dt>
+<dd>A boolean that is <code class="docutils literal"><span class="pre">True</span></code> if the <code class="docutils literal"><span class="pre">toc</span></code> contains more than one entry.</dd>
+<dt><code class="docutils literal"><span class="pre">current_page_name</span></code></dt>
+<dd>The document name of the current file.</dd>
+<dt><code class="docutils literal"><span class="pre">parents</span></code>, <code class="docutils literal"><span class="pre">prev</span></code> and <code class="docutils literal"><span class="pre">next</span></code></dt>
+<dd>Information about related chapters in the TOC tree.  Each relation is a
+dictionary with the keys <code class="docutils literal"><span class="pre">link</span></code> (HREF for the relation) and <code class="docutils literal"><span class="pre">title</span></code>
+(title of the related document, as HTML).  <code class="docutils literal"><span class="pre">parents</span></code> is a list of
+relations, while <code class="docutils literal"><span class="pre">prev</span></code> and <code class="docutils literal"><span class="pre">next</span></code> are a single relation.</dd>
+<dt><code class="docutils literal"><span class="pre">sourcename</span></code></dt>
+<dd>The name of the source file under <code class="docutils literal"><span class="pre">_sources</span></code>.</dd>
+</dl>
+<p>The special files are located in the root output directory.  They are:</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="#sphinx.builders.html.SerializingHTMLBuilder.globalcontext_filename" title="sphinx.builders.html.SerializingHTMLBuilder.globalcontext_filename"><code class="xref py py-attr docutils literal"><span class="pre">SerializingHTMLBuilder.globalcontext_filename</span></code></a></dt>
+<dd><p class="first">A pickled dict with these keys:</p>
+<dl class="last docutils">
+<dt><code class="docutils literal"><span class="pre">project</span></code>, <code class="docutils literal"><span class="pre">copyright</span></code>, <code class="docutils literal"><span class="pre">release</span></code>, <code class="docutils literal"><span class="pre">version</span></code></dt>
+<dd>The same values as given in the configuration file.</dd>
+<dt><code class="docutils literal"><span class="pre">style</span></code></dt>
+<dd><a href="#id13"><span class="problematic" id="id14">:confval:`html_style`</span></a>.</dd>
+<dt><code class="docutils literal"><span class="pre">last_updated</span></code></dt>
+<dd>Date of last build.</dd>
+<dt><code class="docutils literal"><span class="pre">builder</span></code></dt>
+<dd>Name of the used builder, in the case of pickles this is always
+<code class="docutils literal"><span class="pre">'pickle'</span></code>.</dd>
+<dt><code class="docutils literal"><span class="pre">titles</span></code></dt>
+<dd>A dictionary of all documents’ titles, as HTML strings.</dd>
+</dl>
+</dd>
+<dt><a class="reference internal" href="#sphinx.builders.html.SerializingHTMLBuilder.searchindex_filename" title="sphinx.builders.html.SerializingHTMLBuilder.searchindex_filename"><code class="xref py py-attr docutils literal"><span class="pre">SerializingHTMLBuilder.searchindex_filename</span></code></a></dt>
+<dd><p class="first">An index that can be used for searching the documentation.  It is a pickled
+list with these entries:</p>
+<ul class="last simple">
+<li>A list of indexed docnames.</li>
+<li>A list of document titles, as HTML strings, in the same order as the first
+list.</li>
+<li>A dict mapping word roots (processed by an English-language stemmer) to a
+list of integers, which are indices into the first list.</li>
+</ul>
+</dd>
+<dt><code class="docutils literal"><span class="pre">environment.pickle</span></code></dt>
+<dd><p class="first">The build environment.  This is always a pickle file, independent of the
+builder and a copy of the environment that was used when the builder was
+started.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Document common members.</p>
+</div>
+<p class="last">Unlike the other pickle files this pickle file requires that the <code class="docutils literal"><span class="pre">sphinx</span></code>
+package is available on unpickling.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Available builders</a><ul>
+<li><a class="reference internal" href="#serialization-builder-details">Serialization builder details</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sphinx/doc/builders.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../_sources/sphinx/doc/builders.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

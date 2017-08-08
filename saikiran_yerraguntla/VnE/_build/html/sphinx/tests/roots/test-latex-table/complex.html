@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>complex tables &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="complex-tables">
+<h1>complex tables<a class="headerlink" href="#complex-tables" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="grid-table">
+<h2>grid table<a class="headerlink" href="#grid-table" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">header1</th>
+<th class="head">header2</th>
+<th class="head">header3</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cell1-1</td>
+<td rowspan="2">cell1-2</td>
+<td>cell1-3</td>
+</tr>
+<tr class="row-odd"><td rowspan="2">cell2-1</td>
+<td>cell2-3</td>
+</tr>
+<tr class="row-even"><td colspan="2" rowspan="2">cell3-2</td>
+</tr>
+<tr class="row-odd"><td>cell4-1</td>
+</tr>
+<tr class="row-even"><td colspan="3">cell5-1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="complex-spanning-cell">
+<h2>complex spanning cell<a class="headerlink" href="#complex-spanning-cell" title="Permalink to this headline">¶</a></h2>
+<p>table having …</p>
+<ul class="simple">
+<li>consecutive multirow at top of row (1-1 and 1-2)</li>
+<li>consecutive multirow at end of row (1-4 and 1-5)</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td rowspan="3">cell1-1</td>
+<td rowspan="3">cell1-2</td>
+<td>cell1-3</td>
+<td rowspan="3">cell1-4</td>
+<td rowspan="2">cell1-5</td>
+</tr>
+<tr class="row-even"><td rowspan="2">cell2-3</td>
+</tr>
+<tr class="row-odd"><td>cell3-5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">complex tables</a><ul>
+<li><a class="reference internal" href="#grid-table">grid table</a></li>
+<li><a class="reference internal" href="#complex-spanning-cell">complex spanning cell</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/sphinx/tests/roots/test-latex-table/complex.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../../_sources/sphinx/tests/roots/test-latex-table/complex.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

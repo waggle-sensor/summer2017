@@ -1,0 +1,206 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Builder API &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="builder-api">
+<span id="writing-builders"></span><h1>Builder API<a class="headerlink" href="#builder-api" title="Permalink to this headline">¶</a></h1>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Expand this.</p>
+</div>
+<dl class="class">
+<dt id="sphinx.builders.Builder">
+<em class="property">class </em><code class="descclassname">sphinx.builders.</code><code class="descname">Builder</code><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the base class for all builders.</p>
+<p>These attributes should be set on builder classes:</p>
+<dl class="attribute">
+<dt id="sphinx.builders.Builder.name">
+<code class="descname">name</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.builders.Builder.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The builder’s name, for the -b command line option.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.Builder.format">
+<code class="descname">format</code><em class="property"> = ‘’</em><a class="headerlink" href="#sphinx.builders.Builder.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>The builder’s output format, or ‘’ if no document output is produced.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.builders.Builder.supported_image_types">
+<code class="descname">supported_image_types</code><em class="property"> = []</em><a class="headerlink" href="#sphinx.builders.Builder.supported_image_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of MIME types of image formats supported by the builder.
+Image files are searched in the order in which they appear here.</p>
+</dd></dl>
+
+<p>These methods are predefined and will be called from the application:</p>
+<dl class="method">
+<dt id="sphinx.builders.Builder.get_relative_uri">
+<code class="descname">get_relative_uri</code><span class="sig-paren">(</span><em>from_</em>, <em>to</em>, <em>typ=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.get_relative_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.get_relative_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a relative URI between two source filenames.</p>
+<p>May raise environment.NoUri if there’s no way to return a sensible URI.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.build_all">
+<code class="descname">build_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.build_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.build_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build all source files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.build_specific">
+<code class="descname">build_specific</code><span class="sig-paren">(</span><em>filenames</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.build_specific"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.build_specific" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only rebuild as much as needed for changes in the <em>filenames</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.build_update">
+<code class="descname">build_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.build_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.build_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only rebuild what was changed or added since last build.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.build">
+<code class="descname">build</code><span class="sig-paren">(</span><em>docnames</em>, <em>summary=None</em>, <em>method=’update’</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main build method.</p>
+<p>First updates the environment, and then calls <code class="xref py py-meth docutils literal"><span class="pre">write()</span></code>.</p>
+</dd></dl>
+
+<p>These methods can be overridden in concrete builder classes:</p>
+<dl class="method">
+<dt id="sphinx.builders.Builder.init">
+<code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load necessary templates and perform initialization.  The default
+implementation does nothing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.get_outdated_docs">
+<code class="descname">get_outdated_docs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.get_outdated_docs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.get_outdated_docs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterable of output files that are outdated, or a string
+describing what an update build will build.</p>
+<p>If the builder does not output individual files corresponding to
+source files, return a string here.  If it does, return an iterable
+of those files that need to be written.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.get_target_uri">
+<code class="descname">get_target_uri</code><span class="sig-paren">(</span><em>docname</em>, <em>typ=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.get_target_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.get_target_uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the target URI for a document name.</p>
+<p><em>typ</em> can be used to qualify the link characteristic for individual
+builders.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.prepare_writing">
+<code class="descname">prepare_writing</code><span class="sig-paren">(</span><em>docnames</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.prepare_writing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.prepare_writing" title="Permalink to this definition">¶</a></dt>
+<dd><p>A place where you can add logic before <a class="reference internal" href="#sphinx.builders.Builder.write_doc" title="sphinx.builders.Builder.write_doc"><code class="xref py py-meth docutils literal"><span class="pre">write_doc()</span></code></a> is run</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.write_doc">
+<code class="descname">write_doc</code><span class="sig-paren">(</span><em>docname</em>, <em>doctree</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.write_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.write_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Where you actually write something to the filesystem.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.builders.Builder.finish">
+<code class="descname">finish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/builders.html#Builder.finish"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.builders.Builder.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finish the building process.</p>
+<p>The default implementation does nothing.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/builderapi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/builderapi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

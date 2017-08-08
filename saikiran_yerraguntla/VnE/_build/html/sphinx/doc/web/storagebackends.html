@@ -1,0 +1,285 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Storage Backends &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="storage-backends">
+<span id="storagebackends"></span><h1>Storage Backends<a class="headerlink" href="#storage-backends" title="Permalink to this headline">¶</a></h1>
+<p>To create a custom storage backend you will need to subclass the
+<a class="reference internal" href="#sphinxcontrib.websupport.storage.StorageBackend" title="sphinxcontrib.websupport.storage.StorageBackend"><code class="xref py py-class docutils literal"><span class="pre">StorageBackend</span></code></a> class.  Then create an instance of the new class and
+pass that as the <cite>storage</cite> keyword argument when you create the
+<a class="reference internal" href="api.html#sphinxcontrib.websupport.WebSupport" title="sphinxcontrib.websupport.WebSupport"><code class="xref py py-class docutils literal"><span class="pre">WebSupport</span></code></a> object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">support</span> <span class="o">=</span> <span class="n">WebSupport</span><span class="p">(</span><span class="n">srcdir</span><span class="o">=</span><span class="n">srcdir</span><span class="p">,</span>
+                     <span class="n">builddir</span><span class="o">=</span><span class="n">builddir</span><span class="p">,</span>
+                     <span class="n">storage</span><span class="o">=</span><span class="n">MyStorage</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>For more information about creating a custom storage backend, please see the
+documentation of the <a class="reference internal" href="#sphinxcontrib.websupport.storage.StorageBackend" title="sphinxcontrib.websupport.storage.StorageBackend"><code class="xref py py-class docutils literal"><span class="pre">StorageBackend</span></code></a> class below.</p>
+<dl class="class">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend">
+<em class="property">class </em><code class="descclassname">sphinxcontrib.websupport.storage.</code><code class="descname">StorageBackend</code><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines an interface for storage backends.</p>
+</dd></dl>
+
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 1.6: </span>StorageBackend class is moved to sphinxcontrib.websupport.storage from
+sphinx.websupport.storage.</p>
+</div>
+<div class="section" id="storagebackend-methods">
+<h2>StorageBackend Methods<a class="headerlink" href="#storagebackend-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.pre_build">
+<code class="descclassname">StorageBackend.</code><code class="descname">pre_build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.pre_build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.pre_build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called immediately before the build process begins. Use this
+to prepare the StorageBackend for the addition of nodes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.add_node">
+<code class="descclassname">StorageBackend.</code><code class="descname">add_node</code><span class="sig-paren">(</span><em>id</em>, <em>document</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a node to the StorageBackend.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> – a unique id for the comment.</li>
+<li><strong>document</strong> – the name of the document the node belongs to.</li>
+<li><strong>source</strong> – the source files name.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.post_build">
+<code class="descclassname">StorageBackend.</code><code class="descname">post_build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.post_build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.post_build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called after a build has completed. Use this to finalize the
+addition of nodes if needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.add_comment">
+<code class="descclassname">StorageBackend.</code><code class="descname">add_comment</code><span class="sig-paren">(</span><em>text</em>, <em>displayed</em>, <em>username</em>, <em>time</em>, <em>proposal</em>, <em>node_id</em>, <em>parent_id</em>, <em>moderator</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.add_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.add_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a comment is being added.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>text</strong> – the text of the comment</li>
+<li><strong>displayed</strong> – whether the comment should be displayed</li>
+<li><strong>username</strong> – the name of the user adding the comment</li>
+<li><strong>time</strong> – a date object with the time the comment was added</li>
+<li><strong>proposal</strong> – the text of the proposal the user made</li>
+<li><strong>node_id</strong> – the id of the node that the comment is being added to</li>
+<li><strong>parent_id</strong> – the id of the comment’s parent comment.</li>
+<li><strong>moderator</strong> – whether the user adding the comment is a moderator</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.delete_comment">
+<code class="descclassname">StorageBackend.</code><code class="descname">delete_comment</code><span class="sig-paren">(</span><em>comment_id</em>, <em>username</em>, <em>moderator</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.delete_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.delete_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a comment.</p>
+<p>Raises <code class="xref py py-class docutils literal"><span class="pre">UserNotAuthorizedError</span></code>
+if moderator is False and <cite>username</cite> doesn’t match the username
+on the comment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>comment_id</strong> – The id of the comment being deleted.</li>
+<li><strong>username</strong> – The username of the user requesting the deletion.</li>
+<li><strong>moderator</strong> – Whether the user is a moderator.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.get_data">
+<code class="descclassname">StorageBackend.</code><code class="descname">get_data</code><span class="sig-paren">(</span><em>node_id</em>, <em>username</em>, <em>moderator</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called to retrieve all data for a node. This should return a
+dict with two keys, <em>source</em> and <em>comments</em> as described by
+<a class="reference internal" href="api.html#sphinxcontrib.websupport.WebSupport" title="sphinxcontrib.websupport.WebSupport"><code class="xref py py-class docutils literal"><span class="pre">WebSupport</span></code></a>’s
+<a class="reference internal" href="api.html#sphinxcontrib.websupport.WebSupport.get_data" title="sphinxcontrib.websupport.WebSupport.get_data"><code class="xref py py-meth docutils literal"><span class="pre">get_data()</span></code></a> method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node_id</strong> – The id of the node to get data for.</li>
+<li><strong>username</strong> – The name of the user requesting the data.</li>
+<li><strong>moderator</strong> – Whether the requestor is a moderator.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.process_vote">
+<code class="descclassname">StorageBackend.</code><code class="descname">process_vote</code><span class="sig-paren">(</span><em>comment_id</em>, <em>username</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.process_vote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.process_vote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a vote that is being cast. <cite>value</cite> will be either -1, 0,
+or 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>comment_id</strong> – The id of the comment being voted on.</li>
+<li><strong>username</strong> – The username of the user casting the vote.</li>
+<li><strong>value</strong> – The value of the vote being cast.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.update_username">
+<code class="descclassname">StorageBackend.</code><code class="descname">update_username</code><span class="sig-paren">(</span><em>old_username</em>, <em>new_username</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.update_username"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.update_username" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a user is allowed to change their username this method should
+be called so that there is not stagnate data in the storage system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>old_username</strong> – The username being changed.</li>
+<li><strong>new_username</strong> – What the username is being changed to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinxcontrib.websupport.storage.StorageBackend.accept_comment">
+<code class="descclassname">StorageBackend.</code><code class="descname">accept_comment</code><span class="sig-paren">(</span><em>comment_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinxcontrib/websupport/storage.html#StorageBackend.accept_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinxcontrib.websupport.storage.StorageBackend.accept_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a moderator accepts a comment. After the method is
+called the comment should be displayed to all users.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>comment_id</strong> – The id of the comment being accepted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Storage Backends</a><ul>
+<li><a class="reference internal" href="#storagebackend-methods">StorageBackend Methods</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/web/storagebackends.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/web/storagebackends.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

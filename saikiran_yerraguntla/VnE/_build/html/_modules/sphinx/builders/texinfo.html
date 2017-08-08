@@ -1,0 +1,368 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.builders.texinfo &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.builders.texinfo</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.builders.texinfo</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Texinfo builder.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>
+<span class="kn">from</span> <span class="nn">docutils.io</span> <span class="k">import</span> <span class="n">FileOutput</span>
+<span class="kn">from</span> <span class="nn">docutils.utils</span> <span class="k">import</span> <span class="n">new_document</span>
+<span class="kn">from</span> <span class="nn">docutils.frontend</span> <span class="k">import</span> <span class="n">OptionParser</span>
+
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">addnodes</span>
+<span class="kn">from</span> <span class="nn">sphinx.locale</span> <span class="k">import</span> <span class="n">_</span>
+<span class="kn">from</span> <span class="nn">sphinx.builders</span> <span class="k">import</span> <span class="n">Builder</span>
+<span class="kn">from</span> <span class="nn">sphinx.environment</span> <span class="k">import</span> <span class="n">NoUri</span>
+<span class="kn">from</span> <span class="nn">sphinx.environment.adapters.asset</span> <span class="k">import</span> <span class="n">ImageAdapter</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">status_iterator</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.fileutil</span> <span class="k">import</span> <span class="n">copy_asset_file</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.nodes</span> <span class="k">import</span> <span class="n">inline_all_toctrees</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">SEP</span><span class="p">,</span> <span class="n">make_filename</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.console</span> <span class="k">import</span> <span class="n">bold</span><span class="p">,</span> <span class="n">darkgreen</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">sphinx.writers.texinfo</span> <span class="k">import</span> <span class="n">TexinfoWriter</span><span class="p">,</span> <span class="n">TexinfoTranslator</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>  <span class="c1"># NOQA</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">TEXINFO_MAKEFILE</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1"># Makefile for Sphinx Texinfo output</span>
+
+<span class="s1">infodir ?= /usr/share/info</span>
+
+<span class="s1">MAKEINFO = makeinfo --no-split</span>
+<span class="s1">MAKEINFO_html = makeinfo --no-split --html</span>
+<span class="s1">MAKEINFO_plaintext = makeinfo --no-split --plaintext</span>
+<span class="s1">TEXI2PDF = texi2pdf --batch --expand</span>
+<span class="s1">INSTALL_INFO = install-info</span>
+
+<span class="s1">ALLDOCS = $(basename $(wildcard *.texi))</span>
+
+<span class="s1">all: info</span>
+<span class="s1">info: $(addsuffix .info,$(ALLDOCS))</span>
+<span class="s1">plaintext: $(addsuffix .txt,$(ALLDOCS))</span>
+<span class="s1">html: $(addsuffix .html,$(ALLDOCS))</span>
+<span class="s1">pdf: $(addsuffix .pdf,$(ALLDOCS))</span>
+
+<span class="s1">install-info: info</span>
+<span class="se">\t</span><span class="s1">for f in *.info; do </span><span class="se">\\</span><span class="s1"></span>
+<span class="se">\t</span><span class="s1">  cp -t $(infodir) &quot;$$f&quot; &amp;&amp; </span><span class="se">\\</span><span class="s1"></span>
+<span class="se">\t</span><span class="s1">  $(INSTALL_INFO) --info-dir=$(infodir) &quot;$$f&quot; ; </span><span class="se">\\</span><span class="s1"></span>
+<span class="se">\t</span><span class="s1">done</span>
+
+<span class="s1">uninstall-info: info</span>
+<span class="se">\t</span><span class="s1">for f in *.info; do </span><span class="se">\\</span><span class="s1"></span>
+<span class="se">\t</span><span class="s1">  rm -f &quot;$(infodir)/$$f&quot;  ; </span><span class="se">\\</span><span class="s1"></span>
+<span class="se">\t</span><span class="s1">  $(INSTALL_INFO) --delete --info-dir=$(infodir) &quot;$$f&quot; ; </span><span class="se">\\</span><span class="s1"></span>
+<span class="se">\t</span><span class="s1">done</span>
+
+<span class="s1">%.info: %.texi</span>
+<span class="se">\t</span><span class="s1">$(MAKEINFO) -o &#39;$@&#39; &#39;$&lt;&#39;</span>
+
+<span class="s1">%.txt: %.texi</span>
+<span class="se">\t</span><span class="s1">$(MAKEINFO_plaintext) -o &#39;$@&#39; &#39;$&lt;&#39;</span>
+
+<span class="s1">%.html: %.texi</span>
+<span class="se">\t</span><span class="s1">$(MAKEINFO_html) -o &#39;$@&#39; &#39;$&lt;&#39;</span>
+
+<span class="s1">%.pdf: %.texi</span>
+<span class="se">\t</span><span class="s1">-$(TEXI2PDF) &#39;$&lt;&#39;</span>
+<span class="se">\t</span><span class="s1">-$(TEXI2PDF) &#39;$&lt;&#39;</span>
+<span class="se">\t</span><span class="s1">-$(TEXI2PDF) &#39;$&lt;&#39;</span>
+
+<span class="s1">clean:</span>
+<span class="se">\t</span><span class="s1">rm -f *.info *.pdf *.txt *.html</span>
+<span class="se">\t</span><span class="s1">rm -f *.log *.ind *.aux *.toc *.syn *.idx *.out *.ilg *.pla *.ky *.pg</span>
+<span class="se">\t</span><span class="s1">rm -f *.vr *.tp *.fn *.fns *.def *.defs *.cp *.cps *.ge *.ges *.mo</span>
+
+<span class="s1">.PHONY: all info plaintext html pdf install-info uninstall-info clean</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="TexinfoBuilder"><a class="viewcode-back" href="../../../sphinx/doc/builders.html#sphinx.builders.texinfo.TexinfoBuilder">[docs]</a><span class="k">class</span> <span class="nc">TexinfoBuilder</span><span class="p">(</span><span class="n">Builder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds Texinfo output to create Info documentation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;texinfo&#39;</span>
+    <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;texinfo&#39;</span>
+    <span class="n">supported_image_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;image/png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;image/gif&#39;</span><span class="p">]</span>
+    <span class="n">default_translator_class</span> <span class="o">=</span> <span class="n">TexinfoTranslator</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">docnames</span> <span class="o">=</span> <span class="p">[]</span>       <span class="c1"># type: Iterable[unicode]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document_data</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[Tuple[unicode, unicode, unicode, unicode, unicode, unicode, unicode, bool]]  # NOQA</span>
+
+    <span class="k">def</span> <span class="nf">get_outdated_docs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Union[unicode, List[unicode]]</span>
+        <span class="k">return</span> <span class="s1">&#39;all documents&#39;</span>  <span class="c1"># for now</span>
+
+    <span class="k">def</span> <span class="nf">get_target_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docname</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; unicode</span>
+        <span class="k">if</span> <span class="n">docname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">docnames</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoUri</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="n">docname</span>
+
+    <span class="k">def</span> <span class="nf">get_relative_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode, unicode) -&gt; unicode</span>
+        <span class="c1"># ignore source path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_uri</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">typ</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">init_document_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">preliminary_document_data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">texinfo_documents</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">preliminary_document_data</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;no &quot;texinfo_documents&quot; config value found; no documents &#39;</span>
+                           <span class="s1">&#39;will be written&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c1"># assign subdirs to titles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[Tuple[unicode, unicode]]</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">preliminary_document_data</span><span class="p">:</span>
+            <span class="n">docname</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">docname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">all_docs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;&quot;texinfo_documents&quot; config value references unknown &#39;</span>
+                               <span class="s1">&#39;document </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">docname</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">document_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">docname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">SEP</span> <span class="o">+</span> <span class="s1">&#39;index&#39;</span><span class="p">):</span>
+                <span class="n">docname</span> <span class="o">=</span> <span class="n">docname</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">docname</span><span class="p">,</span> <span class="n">entry</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">ignored</span><span class="p">):</span>
+        <span class="c1"># type: (Any) -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_document_data</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">document_data</span><span class="p">:</span>
+            <span class="n">docname</span><span class="p">,</span> <span class="n">targetname</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">author</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">targetname</span> <span class="o">+=</span> <span class="s1">&#39;.texi&#39;</span>
+            <span class="n">direntry</span> <span class="o">=</span> <span class="n">description</span> <span class="o">=</span> <span class="n">category</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># type: unicode</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="n">direntry</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">category</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span>
+            <span class="n">toctree_only</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="n">toctree_only</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+            <span class="n">destination</span> <span class="o">=</span> <span class="n">FileOutput</span><span class="p">(</span>
+                <span class="n">destination_path</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="n">targetname</span><span class="p">),</span>
+                <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;processing &quot;</span> <span class="o">+</span> <span class="n">targetname</span> <span class="o">+</span> <span class="s2">&quot;... &quot;</span><span class="p">,</span> <span class="n">nonl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">doctree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">assemble_doctree</span><span class="p">(</span>
+                <span class="n">docname</span><span class="p">,</span> <span class="n">toctree_only</span><span class="p">,</span>
+                <span class="n">appendices</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">texinfo_appendices</span> <span class="ow">or</span> <span class="p">[]))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;writing... &quot;</span><span class="p">,</span> <span class="n">nonl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_process_images</span><span class="p">(</span><span class="n">doctree</span><span class="p">)</span>
+            <span class="n">docwriter</span> <span class="o">=</span> <span class="n">TexinfoWriter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span>
+                <span class="n">defaults</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span>
+                <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="n">docwriter</span><span class="p">,),</span>
+                <span class="n">read_config_files</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">get_default_values</span><span class="p">()</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">author</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">texinfo_filename</span> <span class="o">=</span> <span class="n">targetname</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.info&#39;</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">texinfo_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">texinfo_elements</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">texinfo_dir_entry</span> <span class="o">=</span> <span class="n">direntry</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">texinfo_dir_category</span> <span class="o">=</span> <span class="n">category</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">texinfo_dir_description</span> <span class="o">=</span> <span class="n">description</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">docname</span> <span class="o">=</span> <span class="n">docname</span>
+            <span class="n">doctree</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+            <span class="n">docwriter</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">doctree</span><span class="p">,</span> <span class="n">destination</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">assemble_doctree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexfile</span><span class="p">,</span> <span class="n">toctree_only</span><span class="p">,</span> <span class="n">appendices</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, bool, List[unicode]) -&gt; nodes.Node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">docnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">indexfile</span><span class="p">]</span> <span class="o">+</span> <span class="n">appendices</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">darkgreen</span><span class="p">(</span><span class="n">indexfile</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">nonl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_doctree</span><span class="p">(</span><span class="n">indexfile</span><span class="p">)</span>
+        <span class="n">tree</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indexfile</span>
+        <span class="k">if</span> <span class="n">toctree_only</span><span class="p">:</span>
+            <span class="c1"># extract toctree nodes from the tree and put them in a</span>
+            <span class="c1"># fresh document</span>
+            <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_document</span><span class="p">(</span><span class="s1">&#39;&lt;texinfo output&gt;&#39;</span><span class="p">)</span>
+            <span class="n">new_sect</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="n">section</span><span class="p">()</span>
+            <span class="n">new_sect</span> <span class="o">+=</span> <span class="n">nodes</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;&lt;Set title in conf.py&gt;&#39;</span><span class="p">,</span>
+                                    <span class="sa">u</span><span class="s1">&#39;&lt;Set title in conf.py&gt;&#39;</span><span class="p">)</span>
+            <span class="n">new_tree</span> <span class="o">+=</span> <span class="n">new_sect</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">addnodes</span><span class="o">.</span><span class="n">toctree</span><span class="p">):</span>
+                <span class="n">new_sect</span> <span class="o">+=</span> <span class="n">node</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">new_tree</span>
+        <span class="n">largetree</span> <span class="o">=</span> <span class="n">inline_all_toctrees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">docnames</span><span class="p">,</span> <span class="n">indexfile</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span>
+                                        <span class="n">darkgreen</span><span class="p">,</span> <span class="p">[</span><span class="n">indexfile</span><span class="p">])</span>
+        <span class="n">largetree</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indexfile</span>
+        <span class="k">for</span> <span class="n">docname</span> <span class="ow">in</span> <span class="n">appendices</span><span class="p">:</span>
+            <span class="n">appendix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_doctree</span><span class="p">(</span><span class="n">docname</span><span class="p">)</span>
+            <span class="n">appendix</span><span class="p">[</span><span class="s1">&#39;docname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">docname</span>
+            <span class="n">largetree</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">appendix</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;resolving references...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">resolve_references</span><span class="p">(</span><span class="n">largetree</span><span class="p">,</span> <span class="n">indexfile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># TODO: add support for external :ref:s</span>
+        <span class="k">for</span> <span class="n">pendingnode</span> <span class="ow">in</span> <span class="n">largetree</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">addnodes</span><span class="o">.</span><span class="n">pending_xref</span><span class="p">):</span>
+            <span class="n">docname</span> <span class="o">=</span> <span class="n">pendingnode</span><span class="p">[</span><span class="s1">&#39;refdocname&#39;</span><span class="p">]</span>
+            <span class="n">sectname</span> <span class="o">=</span> <span class="n">pendingnode</span><span class="p">[</span><span class="s1">&#39;refsectname&#39;</span><span class="p">]</span>
+            <span class="n">newnodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">nodes</span><span class="o">.</span><span class="n">emphasis</span><span class="p">(</span><span class="n">sectname</span><span class="p">,</span> <span class="n">sectname</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">titles</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">docname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">subdir</span><span class="p">):</span>
+                    <span class="n">newnodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39; (in &#39;</span><span class="p">),</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39; (in &#39;</span><span class="p">)))</span>
+                    <span class="n">newnodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">emphasis</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">title</span><span class="p">))</span>
+                    <span class="n">newnodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">))</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">pendingnode</span><span class="o">.</span><span class="n">replace_self</span><span class="p">(</span><span class="n">newnodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">largetree</span>
+
+    <span class="k">def</span> <span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_image_files</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bold</span><span class="p">(</span><span class="s1">&#39;copying Texinfo support files... &#39;</span><span class="p">),</span> <span class="n">nonl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># copy Makefile</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="s1">&#39;Makefile&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">nonl</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mkfile</span><span class="p">:</span>
+                <span class="n">mkfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">TEXINFO_MAKEFILE</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;error writing file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39; done&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">copy_image_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">:</span>
+            <span class="n">stringify_func</span> <span class="o">=</span> <span class="n">ImageAdapter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">get_original_image_uri</span>
+            <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">status_iterator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">,</span> <span class="s1">&#39;copying images... &#39;</span><span class="p">,</span> <span class="s2">&quot;brown&quot;</span><span class="p">,</span>
+                                       <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">verbosity</span><span class="p">,</span>
+                                       <span class="n">stringify_func</span><span class="o">=</span><span class="n">stringify_func</span><span class="p">):</span>
+                <span class="n">dest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="n">src</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">copy_asset_file</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">src</span><span class="p">),</span>
+                                    <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="n">dest</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;cannot copy image file </span><span class="si">%r</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                                   <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcdir</span><span class="p">,</span> <span class="n">src</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="c1"># type: (Sphinx) -&gt; Dict[unicode, Any]</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">TexinfoBuilder</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;texinfo_documents&#39;</span><span class="p">,</span>
+                         <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">master_doc</span><span class="p">,</span> <span class="n">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">),</span>
+                                        <span class="s1">&#39;The </span><span class="si">%s</span><span class="s1"> reference manual.&#39;</span> <span class="o">%</span>
+                                        <span class="n">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">),</span>
+                                        <span class="s1">&#39;Python&#39;</span><span class="p">)],</span>
+                         <span class="kc">None</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;texinfo_appendices&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;texinfo_elements&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;texinfo_domain_indices&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="nb">list</span><span class="p">])</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;texinfo_show_urls&#39;</span><span class="p">,</span> <span class="s1">&#39;footnote&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;texinfo_no_detailmenu&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;builtin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_read_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_write_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../builders.html">sphinx.builders</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,204 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Logging API &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="logging-api">
+<span id="id1"></span><h1>Logging API<a class="headerlink" href="#logging-api" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="sphinx.util.logging.getLogger">
+<code class="descclassname">sphinx.util.logging.</code><code class="descname">getLogger</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#sphinx.util.logging.getLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a logger wrapped by <a class="reference internal" href="#SphinxLoggerAdapter" title="SphinxLoggerAdapter"><code class="xref py py-class docutils literal"><span class="pre">SphinxLoggerAdapter</span></code></a> with the specified <em>name</em>.</p>
+<p>Example usage:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">logging</span>  <span class="c1"># Load on top of python&#39;s logging module</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Hello, this is an extension!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="SphinxLoggerAdapter">
+<em class="property">class </em><code class="descname">SphinxLoggerAdapter</code><span class="sig-paren">(</span><em>logging.LoggerAdapter</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="SphinxLoggerAdapter.error">
+<code class="descname">error</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="SphinxLoggerAdapter.critical">
+<code class="descname">critical</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.critical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="SphinxLoggerAdapter.warning">
+<code class="descname">warning</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs a message on this logger with the specified level.
+Basically, the arguments are as with python’s logging module.</p>
+<p>In addition, Sphinx logger supports following keyword arguments:</p>
+<dl class="docutils">
+<dt><strong>type</strong>, <strong>*subtype*</strong></dt>
+<dd>Categories of warning logs.  It is used to suppress
+warnings by <a href="#id2"><span class="problematic" id="id3">:confval:`suppress_warnings`</span></a> setting.</dd>
+<dt><strong>location</strong></dt>
+<dd><p class="first">Where the warning happened.  It is used to include
+the path and line number in each log.  It allows docname,
+tuple of docname and line number and nodes:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">sphinx</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning happened!&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning happened!&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;chapter1/index&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning happened!&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">some_node</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>color</strong></dt>
+<dd>The color of logs.  By default, warning level logs are
+colored as <code class="docutils literal"><span class="pre">&quot;darkred&quot;</span></code>.  The others are not colored.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="SphinxLoggerAdapter.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="SphinxLoggerAdapter.info">
+<code class="descname">info</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="SphinxLoggerAdapter.verbose">
+<code class="descname">verbose</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.verbose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="SphinxLoggerAdapter.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><em>level</em>, <em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#SphinxLoggerAdapter.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs a message to this logger with the specified level.
+Basically, the arguments are as with python’s logging module.</p>
+<p>In addition, Sphinx logger supports following keyword arguments:</p>
+<dl class="docutils">
+<dt><strong>nonl</strong></dt>
+<dd>If true, the logger does not fold lines at the end of the log message.
+The default is <code class="docutils literal"><span class="pre">False</span></code>.</dd>
+<dt><strong>color</strong></dt>
+<dd>The color of logs.  By default, debug level logs are
+colored as <code class="docutils literal"><span class="pre">&quot;darkgray&quot;</span></code>, and debug2 level ones are <code class="docutils literal"><span class="pre">&quot;lightgray&quot;</span></code>.
+The others are not colored.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pending_logging">
+<code class="descname">pending_logging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pending_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks all logs as pending:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pending_logging</span><span class="p">():</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning message!&#39;</span><span class="p">)</span>  <span class="c1"># not flushed yet</span>
+  <span class="n">some_long_process</span><span class="p">()</span>
+
+<span class="c1"># the warning is flushed here</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pending_warnings">
+<code class="descname">pending_warnings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pending_warnings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks warning logs as pending.  Similar to <a class="reference internal" href="#pending_logging" title="pending_logging"><code class="xref py py-func docutils literal"><span class="pre">pending_logging()</span></code></a>.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/logging.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/logging.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

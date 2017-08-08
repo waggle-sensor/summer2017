@@ -1,0 +1,216 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Build environment API &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.environment">
+<span id="build-environment-api"></span><h1>Build environment API<a class="headerlink" href="#module-sphinx.environment" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sphinx.environment.BuildEnvironment">
+<em class="property">class </em><code class="descclassname">sphinx.environment.</code><code class="descname">BuildEnvironment</code><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Attributes</strong></p>
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.app">
+<code class="descname">app</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference to the <a class="reference internal" href="appapi.html#sphinx.application.Sphinx" title="sphinx.application.Sphinx"><code class="xref py py-class docutils literal"><span class="pre">Sphinx</span></code></a> (application) object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.config">
+<code class="descname">config</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference to the <a class="reference internal" href="appapi.html#sphinx.config.Config" title="sphinx.config.Config"><code class="xref py py-class docutils literal"><span class="pre">Config</span></code></a> object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.srcdir">
+<code class="descname">srcdir</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.srcdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Source directory.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.confdir">
+<code class="descname">confdir</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.confdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory containing <code class="docutils literal"><span class="pre">conf.py</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.doctreedir">
+<code class="descname">doctreedir</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.doctreedir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Directory for storing pickled doctrees.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.found_docs">
+<code class="descname">found_docs</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.found_docs" title="Permalink to this definition">¶</a></dt>
+<dd><p>A set of all existing docnames.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.metadata">
+<code class="descname">metadata</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary mapping docnames to “metadata” (see <a class="reference internal" href="../markup/misc.html#metadata"><span class="std std-ref">File-wide metadata</span></a>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.titles">
+<code class="descname">titles</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.titles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary mapping docnames to the docutils node for their main title.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sphinx.environment.BuildEnvironment.docname">
+<code class="descname">docname</code><a class="headerlink" href="#sphinx.environment.BuildEnvironment.docname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the docname of the document currently being parsed.</p>
+</dd></dl>
+
+<p><strong>Utility methods</strong></p>
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.warn">
+<code class="descname">warn</code><span class="sig-paren">(</span><em>docname</em>, <em>msg</em>, <em>lineno=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.warn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a warning.</p>
+<p>This differs from using <code class="docutils literal"><span class="pre">app.warn()</span></code> in that the warning may not
+be emitted instantly, but collected for emitting all warnings after
+the update of the environment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.warn_node">
+<code class="descname">warn_node</code><span class="sig-paren">(</span><em>msg</em>, <em>node</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.warn_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.warn_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#sphinx.environment.BuildEnvironment.warn" title="sphinx.environment.BuildEnvironment.warn"><code class="xref py py-meth docutils literal"><span class="pre">warn()</span></code></a>, but with source information taken from <em>node</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.doc2path">
+<code class="descname">doc2path</code><span class="sig-paren">(</span><em>docname</em>, <em>base=True</em>, <em>suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.doc2path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.doc2path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the filename for the document name.</p>
+<p>If <em>base</em> is True, return absolute path under self.srcdir.
+If <em>base</em> is None, return relative path to self.srcdir.
+If <em>base</em> is a path string, return absolute path under that.
+If <em>suffix</em> is not None, add it instead of config.source_suffix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.relfn2path">
+<code class="descname">relfn2path</code><span class="sig-paren">(</span><em>filename</em>, <em>docname=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.relfn2path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.relfn2path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return paths to a file referenced from a document, relative to
+documentation root and absolute.</p>
+<p>In the input “filename”, absolute filenames are taken as relative to the
+source dir, while relative filenames are relative to the dir of the
+containing document.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.note_dependency">
+<code class="descname">note_dependency</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.note_dependency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.note_dependency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add <em>filename</em> as a dependency of the current document.</p>
+<p>This means that the document will be rebuilt if this file changes.</p>
+<p><em>filename</em> should be absolute or relative to the source directory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.new_serialno">
+<code class="descname">new_serialno</code><span class="sig-paren">(</span><em>category=’‘</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.new_serialno"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.new_serialno" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a serial number, e.g. for index entry targets.</p>
+<p>The number is guaranteed to be unique in the current document.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sphinx.environment.BuildEnvironment.note_reread">
+<code class="descname">note_reread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/environment.html#BuildEnvironment.note_reread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.environment.BuildEnvironment.note_reread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the current document to the list of documents that will
+automatically be re-read at the next build.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/envapi.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/envapi.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

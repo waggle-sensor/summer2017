@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
+
+  <!-- Header of HTML File -->
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Publisher Script Module</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  </head>
+
+  <body>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="document">
+            <div class="documentwrapper">
+            <div class="bodywrapper">
+            <div class="body">
+
+              <div class="section" id="publisher-script">
+                <h1>The Publisher Script Module<a class="headerlink" href="#" title="Permalink to this headline">¶</a></h1>
+                  <p>The following module will explain how to implement the outershell of your plugin client.</p>
+                  <p>......................................................................................................................................</p>
+
+                  <div class="highlight-default">
+                    <div class="highlight">
+                      <pre>
+                        <span class="n">#!/usr/bin/env python3</span>
+                      </pre>
+                    </div>
+                    <p>This tells your system to compile the following script using the latest python package present at your respective directory.</p>
+                  </div>
+
+                  <div class="highlight-default">
+                    <div class="highlight">
+                      <pre>
+                        <span class="p"><p style="text-align:left;">from waggle import beehive</p></span><span class="n">import pika</span>
+                      </pre>
+                    </div>
+                    <p>The following packages and dependicies to import in order to run plugin. Other packages can be imported as well.</p>
+                  </div>
+
+                  <div class="highlight-default">
+                    <div class="highlight">
+                      <pre>
+                        <span class="p"></span><p style="text-align:left;">config = beehive.ClientConfig(</p></span><span class="n"><p style="margin-left:40px" class="tab">host='10.10.10.5',</p></span><span class="n"><p style="margin-left:40px">port=23181,</p></span><span class="n"><p style="margin-left:40px" class="tab">node='000002000000000(n)',</p></span><span class="n"><p style="margin-left:40px" class="tab">username = 'test-plugin',</p></span><span class="n"><p style="margin-left:40px" class="tab">password = 'waggle'</p></span><span class="n"><p style="margin-left:40px" class="tab">cacert='/path/to/cacert.pem',</p></span><span class="n"><p style="margin-left:40px" class="tab">cert='/path/to/cert.pem',</p></span><span class="n"><p style="margin-left:40px" class="tab">key='/path/to/key.pem')</p></span>
+                      </pre>
+                    </div>
+                    <p>The Config function initalizes your config paramters, allowing you to: Connect to beehive-dev's rabbitmq server, Connect and transmit data to the respective virtual node, and Uses the respective authentication certificates for a secure connection.</p>
+                  </div>
+
+                  <div class="highlight-default">
+                    <div class="highlight">
+                      <pre>
+                        <span class="p"></span><p style="text-align:left;">client = beehive.PluginClient(</p></span><span class="n"><p style="margin-left:40px" class="tab">name='(name_of_queue)',</p></span><span class="n"><p style="margin-left:40px">config=config)</p></span>
+                      </pre>
+                    </div>
+                    <p>This Client function allows you to create your client script and connection. It allows you to declare a queue to send all your information and sets your configuration parameters to your config file.</p>
+                  </div>
+
+                  <p><b><center>The remaining part of the script takes in your software/program/data to be sent to beehive-dev.</center></b></p>
+                  <p>At the end of your program, in order to send your resepctive data/plugin to rabbitmq server, you must add the following line of code:</p>
+                  <div class="highlight-default">
+                    <div class="highlight">
+                      <pre>
+                        <span class="p"></span><p style="text-align:left;">client.publish('(key)', (value))</p>
+                    </div>
+                    <p>By assigning the aggregate of data to a particular variable, it becomes the value you send to rabbitmq. Thus, the following piece of code defines a unique key it assigns to your data, that when published, the rabbitmq server will easily be able to identify and process it accordingly.</p>
+                  </div>
+
+              </div>
+            </div>
+            </div>
+            </div>
+              <!-- Footer of HTML File -->
+            <div class="footer">
+              &copy; Copyright 2017 | Property of Argonne National Laboratory, Waggle, The Array of Things
+              |
+              Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+              |
+              <a href="_sources/master.rst.txt" rel="nofollow">Page source</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="js/bootstrap.min.js"></script>
+
+    </body>
+  </html>

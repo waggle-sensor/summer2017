@@ -1,0 +1,156 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Builtin Sphinx extensions &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="builtin-sphinx-extensions">
+<h1>Builtin Sphinx extensions<a class="headerlink" href="#builtin-sphinx-extensions" title="Permalink to this headline">¶</a></h1>
+<p>These extensions are built in and can be activated by respective entries in the
+<a href="#id1"><span class="problematic" id="id2">:confval:`extensions`</span></a> configuration value:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autodoc.html"><code class="docutils literal"><span class="pre">sphinx.ext.autodoc</span></code> – Include documentation from docstrings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autodoc.html#docstring-preprocessing">Docstring preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autodoc.html#skipping-members">Skipping members</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autosectionlabel.html"><code class="docutils literal"><span class="pre">sphinx.ext.autosectionlabel</span></code> – Allow reference sections using its title</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autosectionlabel.html#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autosummary.html"><code class="docutils literal"><span class="pre">sphinx.ext.autosummary</span></code> – Generate autodoc summaries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autosummary.html#sphinx-autogen-generate-autodoc-stub-pages"><strong class="program">sphinx-autogen</strong> – generate autodoc stub pages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autosummary.html#generating-stub-pages-automatically">Generating stub pages automatically</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autosummary.html#customizing-templates">Customizing templates</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="coverage.html"><code class="docutils literal"><span class="pre">sphinx.ext.coverage</span></code> – Collect doc coverage stats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doctest.html"><code class="docutils literal"><span class="pre">sphinx.ext.doctest</span></code> – Test snippets in the documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doctest.html#directives">Directives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doctest.html#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="extlinks.html"><code class="docutils literal"><span class="pre">sphinx.ext.extlinks</span></code> – Markup to shorten external links</a></li>
+<li class="toctree-l1"><a class="reference internal" href="githubpages.html"><code class="docutils literal"><span class="pre">sphinx.ext.githubpages</span></code> – Publish HTML docs in GitHub Pages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="graphviz.html"><code class="docutils literal"><span class="pre">sphinx.ext.graphviz</span></code> – Add Graphviz graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ifconfig.html"><code class="docutils literal"><span class="pre">sphinx.ext.ifconfig</span></code> – Include content based on configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="imgconverter.html"><code class="docutils literal"><span class="pre">sphinx.ext.imgconverter</span></code> – Convert images to appropriate format for builders</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="imgconverter.html#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inheritance.html"><code class="docutils literal"><span class="pre">sphinx.ext.inheritance_diagram</span></code> – Include inheritance diagrams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intersphinx.html"><code class="docutils literal"><span class="pre">sphinx.ext.intersphinx</span></code> – Link to other projects’ documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linkcode.html"><code class="docutils literal"><span class="pre">sphinx.ext.linkcode</span></code> – Add external links to source code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="math.html">Math support in Sphinx</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="math.html#module-sphinx.ext.imgmath"><code class="docutils literal"><span class="pre">sphinx.ext.imgmath</span></code> – Render math as images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="math.html#module-sphinx.ext.mathjax"><code class="docutils literal"><span class="pre">sphinx.ext.mathjax</span></code> – Render math via JavaScript</a></li>
+<li class="toctree-l2"><a class="reference internal" href="math.html#module-sphinx.ext.jsmath"><code class="docutils literal"><span class="pre">sphinx.ext.jsmath</span></code> – Render math via JavaScript</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="napoleon.html"><code class="docutils literal"><span class="pre">sphinx.ext.napoleon</span></code> – Support for NumPy and Google style docstrings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="napoleon.html#napoleon-marching-toward-legible-docstrings">Napoleon - <em>Marching toward legible docstrings</em></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="napoleon.html#getting-started">Getting Started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="napoleon.html#id1">Docstrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="napoleon.html#docstring-sections">Docstring Sections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="napoleon.html#google-vs-numpy">Google vs NumPy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="napoleon.html#type-annotations">Type Annotations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="napoleon.html#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="todo.html"><code class="docutils literal"><span class="pre">sphinx.ext.todo</span></code> – Support for todo items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="viewcode.html"><code class="docutils literal"><span class="pre">sphinx.ext.viewcode</span></code> – Add links to highlighted source code</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/ext/builtins.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/ext/builtins.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

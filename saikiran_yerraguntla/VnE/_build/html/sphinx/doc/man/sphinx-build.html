@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx-build manual page &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sphinx-build-manual-page">
+<h1>sphinx-build manual page<a class="headerlink" href="#sphinx-build-manual-page" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><strong>sphinx-build</strong> [<em>options</em>] &lt;<em>sourcedir</em>&gt; &lt;<em>outdir</em>&gt; [<em>filenames</em> …]</p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p><strong class="program">sphinx-build</strong> generates documentation from the files in
+<code class="docutils literal"><span class="pre">&lt;sourcedir&gt;</span></code> and places it in the <code class="docutils literal"><span class="pre">&lt;outdir&gt;</span></code>.</p>
+<p><strong class="program">sphinx-build</strong> looks for <code class="docutils literal"><span class="pre">&lt;sourcedir&gt;/conf.py</span></code> for the configuration
+settings.  <em class="manpage">sphinx-quickstart(1)</em> may be used to generate template
+files, including <code class="docutils literal"><span class="pre">conf.py</span></code>.</p>
+<p><strong class="program">sphinx-build</strong> can create documentation in different formats.  A format
+is selected by specifying the builder name on the command line; it defaults to
+HTML.  Builders can also perform other tasks related to documentation
+processing.</p>
+<p>By default, everything that is outdated is built.  Output only for selected
+files can be built by specifying individual filenames.</p>
+<p>List of available builders:</p>
+<dl class="docutils">
+<dt>html</dt>
+<dd>HTML file generation.  This is the default builder.</dd>
+<dt>dirhtml</dt>
+<dd>HTML file generation with every HTML file named “index.html” in a separate
+directory.</dd>
+<dt>singlehtml</dt>
+<dd>HTML file generation with all content in a single HTML file.</dd>
+<dt>htmlhelp</dt>
+<dd>Generates files for CHM (compiled help files) generation.</dd>
+<dt>qthelp</dt>
+<dd>Generates files for Qt help collection generation.</dd>
+<dt>devhelp</dt>
+<dd>Generates files for the GNOME Devhelp help viewer.</dd>
+<dt>latex</dt>
+<dd>Generates LaTeX output that can be compiled to a PDF document.</dd>
+<dt>man</dt>
+<dd>Generates manual pages.</dd>
+<dt>texinfo</dt>
+<dd>Generates Texinfo output that can be processed by <strong class="program">makeinfo</strong> to
+generate an Info document.</dd>
+<dt>epub</dt>
+<dd>Generates an ePub e-book version of the HTML output.</dd>
+<dt>text</dt>
+<dd>Generates a plain-text version of the documentation.</dd>
+<dt>gettext</dt>
+<dd>Generates Gettext message catalogs for content translation.</dd>
+<dt>changes</dt>
+<dd>Generates HTML files listing changed/added/deprecated items for
+the current version of the documented project.</dd>
+<dt>linkcheck</dt>
+<dd>Checks the integrity of all external links in the source.</dd>
+<dt>pickle / json</dt>
+<dd>Generates serialized HTML files for use in web applications.</dd>
+<dt>xml</dt>
+<dd>Generates Docutils-native XML files.</dd>
+<dt>pseudoxml</dt>
+<dd>Generates compact pretty-printed “pseudo-XML” files displaying the
+internal structure of the intermediate document trees.</dd>
+</dl>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-b <var>&lt;builder&gt;</var></span></kbd></td>
+<td>Builder to use; defaults to html. See the full list
+of builders above.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-a</span></kbd></td>
+<td>Generate output for all files; without this option only
+output for new and changed files is generated.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-E</span></kbd></td>
+<td>Ignore cached files, forces to re-read all source files
+from disk.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-d <var>&lt;path&gt;</var></span></kbd></td>
+<td>Path to cached files; defaults to &lt;outdir&gt;/.doctrees.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-j <var>&lt;N&gt;</var></span></kbd></td>
+<td>Build in parallel with N processes where possible.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-c <var>&lt;path&gt;</var></span></kbd></td>
+<td>Locate the conf.py file in the specified path instead of
+&lt;sourcedir&gt;.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-C</span></kbd></td>
+<td>Specify that no conf.py file at all is to be used.
+Configuration can only be set with the -D option.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-D <var>&lt;setting=value&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Override a setting from the configuration file.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t <var>&lt;tag&gt;</var></span></kbd></td>
+<td>Define <em>tag</em> for use in “only” blocks.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">-A <var>&lt;name=value&gt;</var></span></kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Pass a value into the HTML templates (only for HTML
+builders).</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n</span></kbd></td>
+<td>Run in nit-picky mode, warn about all missing references.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v</span></kbd></td>
+<td>Increase verbosity (can be repeated).</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-N</span></kbd></td>
+<td>Prevent colored output.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q</span></kbd></td>
+<td>Quiet operation, just print warnings and errors on stderr.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-Q</span></kbd></td>
+<td>Very quiet operation, don’t print anything except for
+errors.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-w <var>&lt;file&gt;</var></span></kbd></td>
+<td>Write warnings and errors into the given file, in addition
+to stderr.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-W</span></kbd></td>
+<td>Turn warnings into errors.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-T</span></kbd></td>
+<td>Show full traceback on exception.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-P</span></kbd></td>
+<td>Run Pdb on exception.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<p><em class="manpage">sphinx-quickstart(1)</em></p>
+</div>
+<div class="section" id="author">
+<h2>Author<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h2>
+<p>Georg Brandl &lt;<a class="reference external" href="mailto:georg&#37;&#52;&#48;python&#46;org">georg<span>&#64;</span>python<span>&#46;</span>org</a>&gt;, Armin Ronacher &lt;<a class="reference external" href="mailto:armin&#46;ronacher&#37;&#52;&#48;active-4&#46;com">armin<span>&#46;</span>ronacher<span>&#64;</span>active-4<span>&#46;</span>com</a>&gt; et
+al.</p>
+<p>This manual page was initially written by Mikhail Gusarov
+&lt;<a class="reference external" href="mailto:dottedmag&#37;&#52;&#48;dottedmag&#46;net">dottedmag<span>&#64;</span>dottedmag<span>&#46;</span>net</a>&gt;, for the Debian project.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">sphinx-build manual page</a><ul>
+<li><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
+<li><a class="reference internal" href="#author">Author</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/man/sphinx-build.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/man/sphinx-build.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,361 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Testing object descriptions &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="testing-object-descriptions">
+<h1>Testing object descriptions<a class="headerlink" href="#testing-object-descriptions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="func_without_module">
+<code class="descname">func_without_module</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>*c</em><span class="optional">[</span>, <em>d</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#func_without_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does something.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="func_without_body">
+<code class="descname">func_without_body</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#func_without_body" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descname">func_noindex</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="foolib.func_with_module">
+<code class="descclassname">foolib.</code><code class="descname">func_with_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#foolib.func_with_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Referring to <code class="xref py py-func docutils literal"><span class="pre">func</span> <span class="pre">with</span> <span class="pre">no</span> <span class="pre">index</span></code>.
+Referring to <code class="xref py py-func docutils literal"><span class="pre">nothing</span></code>.</p>
+<span class="target" id="module-mod"></span><dl class="function">
+<dt id="mod.func_in_module">
+<code class="descclassname">mod.</code><code class="descname">func_in_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mod.func_in_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mod.Cls">
+<em class="property">class </em><code class="descclassname">mod.</code><code class="descname">Cls</code><a class="headerlink" href="#mod.Cls" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="mod.Cls.meth1">
+<code class="descname">meth1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mod.Cls.meth1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="mod.Cls.meths">
+<em class="property">static </em><code class="descname">meths</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mod.Cls.meths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mod.Cls.attr">
+<code class="descname">attr</code><a class="headerlink" href="#mod.Cls.attr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="mod.Cls.meth2">
+<code class="descclassname">Cls.</code><code class="descname">meth2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mod.Cls.meth2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="errmod.Error">
+<em class="property">exception </em><code class="descclassname">errmod.</code><code class="descname">Error</code><span class="sig-paren">(</span><em>arg1</em>, <em>arg2</em><span class="sig-paren">)</span><a class="headerlink" href="#errmod.Error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="data">
+<dt id="mod.var">
+<code class="descclassname">mod.</code><code class="descname">var</code><a class="headerlink" href="#mod.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="func_without_module2">
+<code class="descname">func_without_module2</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; annotation<a class="headerlink" href="#func_without_module2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="object">
+<dt>
+<code class="descname">long(parameter,   list)</code></dt>
+<dt>
+<code class="descname">another one</code></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="TimeInt">
+<em class="property">class </em><code class="descname">TimeInt</code><a class="headerlink" href="#TimeInt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Has only one parameter (triggers special behavior…)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>moo</strong> (Moo) – Moo</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="Time">
+<em class="property">class </em><code class="descname">Time</code><span class="sig-paren">(</span><em>hour</em>, <em>minute</em>, <em>isdst</em><span class="sig-paren">)</span><a class="headerlink" href="#Time" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>year</strong> (<a class="reference internal" href="#TimeInt" title="TimeInt"><em>TimeInt</em></a>) – The year.</li>
+<li><strong>minute</strong> (<a class="reference internal" href="#TimeInt" title="TimeInt"><em>TimeInt</em></a>) – The minute.</li>
+<li><strong>isdst</strong> – whether it’s DST</li>
+<li><strong>hour</strong> (<em>DuplicateType</em>) – Some parameter</li>
+<li><strong>hour</strong> – Duplicate param.  Should not lead to crashes.</li>
+<li><strong>extcls</strong> (<a class="reference internal" href="#mod.Cls" title="mod.Cls"><em>Cls</em></a>) – A class from another module.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a new <a class="reference internal" href="#Time" title="Time"><code class="xref py py-class docutils literal"><span class="pre">Time</span></code></a> instance</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#Time" title="Time"><code class="xref py py-class docutils literal"><span class="pre">Time</span></code></a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong> – if the values are out of range</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>hour</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – like <em>hour</em></li>
+<li><strong>minute</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – like <em>minute</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="c-items">
+<h1>C items<a class="headerlink" href="#c-items" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="c.Sphinx_DoSomething">
+<code class="descname">Sphinx_DoSomething</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.Sphinx_DoSomething" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="c.SphinxStruct.member">
+<code class="descname">SphinxStruct.member</code><a class="headerlink" href="#c.SphinxStruct.member" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.SPHINX_USE_PYTHON">
+<code class="descname">SPHINX_USE_PYTHON</code><a class="headerlink" href="#c.SPHINX_USE_PYTHON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="type">
+<dt id="c.SphinxType">
+<code class="descname">SphinxType</code><a class="headerlink" href="#c.SphinxType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="var">
+<dt id="c.sphinx_global">
+<code class="descname">sphinx_global</code><a class="headerlink" href="#c.sphinx_global" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="javascript-items">
+<h1>Javascript items<a class="headerlink" href="#javascript-items" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="foo">
+<code class="descname">foo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#foo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="data">
+<dt id="bar">
+<code class="descname">bar</code><a class="headerlink" href="#bar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="bar.baz">
+<code class="descclassname">bar.</code><code class="descname">baz</code><span class="sig-paren">(</span><em>href</em>, <em>callback</em><span class="optional">[</span>, <em>errback</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#bar.baz" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Arguments:</th><td class="field-body"><ul class="first simple">
+<li><strong>href</strong> (<em>string</em>) – The location of the resource.</li>
+<li><strong>callback</strong> – Get’s called with the data returned by the resource.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Throws:</th><td class="field-body"><p class="first"><strong>InvalidHref</strong> – If the <cite>href</cite> is invalid.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><cite>undefined</cite></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bar.spam">
+<code class="descclassname">bar.</code><code class="descname">spam</code><a class="headerlink" href="#bar.spam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
+<p>Referencing <a class="reference internal" href="#mod.Cls" title="mod.Cls"><code class="xref py py-class docutils literal"><span class="pre">mod.Cls</span></code></a> or <a class="reference internal" href="#mod.Cls" title="mod.Cls"><code class="xref py py-class docutils literal"><span class="pre">mod.Cls</span></code></a> should be the same.</p>
+<p>With target: <a class="reference internal" href="#c.Sphinx_DoSomething" title="Sphinx_DoSomething"><code class="xref c c-func docutils literal"><span class="pre">Sphinx_DoSomething()</span></code></a> (parentheses are handled),
+<a class="reference internal" href="#c.SphinxStruct.member" title="SphinxStruct.member"><code class="xref c c-member docutils literal"><span class="pre">SphinxStruct.member</span></code></a>, <a class="reference internal" href="#c.SPHINX_USE_PYTHON" title="SPHINX_USE_PYTHON"><code class="xref c c-macro docutils literal"><span class="pre">SPHINX_USE_PYTHON</span></code></a>,
+<a class="reference internal" href="#c.SphinxType" title="SphinxType"><code class="xref c c-type docutils literal"><span class="pre">SphinxType</span> <span class="pre">*</span></code></a> (pointer is handled), <a class="reference internal" href="#c.sphinx_global" title="sphinx_global"><code class="xref c c-data docutils literal"><span class="pre">sphinx_global</span></code></a>.</p>
+<p>Without target: <code class="xref c c-func docutils literal"><span class="pre">CFunction()</span></code>. <code class="xref c c-func docutils literal"><span class="pre">malloc()</span></code>.</p>
+<p><a class="reference internal" href="#foo" title="foo"><code class="xref js js-func docutils literal"><span class="pre">foo()</span></code></a>
+<a class="reference internal" href="#foo" title="foo"><code class="xref js js-func docutils literal"><span class="pre">foo()</span></code></a></p>
+<p><a class="reference internal" href="#bar" title="bar"><code class="xref js js-data docutils literal"><span class="pre">bar</span></code></a>
+<a class="reference internal" href="#bar.baz" title="bar.baz"><code class="xref js js-func docutils literal"><span class="pre">bar.baz()</span></code></a>
+<a class="reference internal" href="#bar.baz" title="bar.baz"><code class="xref js js-func docutils literal"><span class="pre">bar.baz()</span></code></a>
+<a class="reference internal" href="#bar.baz" title="bar.baz"><code class="xref js js-func docutils literal"><span class="pre">baz()</span></code></a></p>
+<p><a class="reference internal" href="#bar.baz" title="bar.baz"><code class="xref js js-attr docutils literal"><span class="pre">bar.baz</span></code></a></p>
+</div>
+<div class="section" id="others">
+<h1>Others<a class="headerlink" href="#others" title="Permalink to this headline">¶</a></h1>
+<dl class="envvar">
+<dt id="envvar-HOME">
+<code class="descname">HOME</code><a class="headerlink" href="#envvar-HOME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-python-c">
+<code class="descname">-c</code><code class="descclassname"> command</code><a class="headerlink" href="#cmdoption-python-c" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-perl-c">
+<code class="descname">-c</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-perl-c" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-perl-arg-p">
+<code class="descname">+p</code><code class="descclassname"></code><a class="headerlink" href="#cmdoption-perl-arg-p" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Link to <a class="reference internal" href="#cmdoption-perl-arg-p"><code class="xref std std-option docutils literal"><span class="pre">perl</span> <span class="pre">+p</span></code></a>.</p>
+</div>
+<div class="section" id="user-markup">
+<h1>User markup<a class="headerlink" href="#user-markup" title="Permalink to this headline">¶</a></h1>
+<p>Referencing <a href="#id1"><span class="problematic" id="id2">:userdescrole:`myobj`</span></a>.</p>
+</div>
+<div class="section" id="cpp-domain">
+<h1>CPP domain<a class="headerlink" href="#cpp-domain" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="_CPPv2IEN1n5ArrayI1T1dEE">
+template&lt;&gt;<br /><em class="property">class </em><code class="descclassname">n::</code><code class="descname">Array</code>&lt;T, d&gt;<a class="headerlink" href="#_CPPv2IEN1n5ArrayI1T1dEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="function">
+<dt id="_CPPv2N1n5ArrayI1T1dEixEj">
+<span id="n::Array:T.d:::subscript-operator__unsigned"></span>T &amp;<code class="descclassname"></code><code class="descname">operator[]</code><span class="sig-paren">(</span>unsigned <em>j</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N1n5ArrayI1T1dEixEj" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2NK1n5ArrayI1T1dEixEj">
+<span id="n::Array:T.d:::subscript-operator__unsignedC"></span><em class="property">const</em> T &amp;<code class="descclassname"></code><code class="descname">operator[]</code><span class="sig-paren">(</span>unsigned <em>j</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv2NK1n5ArrayI1T1dEixEj" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Testing object descriptions</a></li>
+<li><a class="reference internal" href="#c-items">C items</a></li>
+<li><a class="reference internal" href="#javascript-items">Javascript items</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#others">Others</a></li>
+<li><a class="reference internal" href="#user-markup">User markup</a></li>
+<li><a class="reference internal" href="#cpp-domain">CPP domain</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/sphinx/tests/roots/test-ext-viewcode/objects.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../../_sources/sphinx/tests/roots/test-ext-viewcode/objects.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,428 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sphinx.builders.qthelp &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sphinx.builders.qthelp</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sphinx.builders.qthelp</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Build input files for the Qt collection generator.</span>
+
+<span class="sd">    :copyright: Copyright 2007-2017 by the Sphinx team, see AUTHORS.</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">import</span> <span class="nn">posixpath</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">text_type</span>
+
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>
+
+<span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">addnodes</span>
+<span class="kn">from</span> <span class="nn">sphinx.builders.html</span> <span class="k">import</span> <span class="n">StandaloneHTMLBuilder</span>
+<span class="kn">from</span> <span class="nn">sphinx.environment.adapters.indexentries</span> <span class="k">import</span> <span class="n">IndexEntries</span>
+<span class="kn">from</span> <span class="nn">sphinx.util</span> <span class="k">import</span> <span class="n">force_decode</span><span class="p">,</span> <span class="n">logging</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">make_filename</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.pycompat</span> <span class="k">import</span> <span class="n">htmlescape</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>  <span class="c1"># NOQA</span>
+    <span class="kn">from</span> <span class="nn">sphinx.application</span> <span class="k">import</span> <span class="n">Sphinx</span>  <span class="c1"># NOQA</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="n">_idpattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s1">&#39;(?P&lt;title&gt;.+) (\((class in )?(?P&lt;id&gt;[\w\.]+)( (?P&lt;descr&gt;\w+))?\))$&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Qt Help Collection Project (.qhcp).</span>
+<span class="c1"># Is the input file for the help collection generator.</span>
+<span class="c1"># It contains references to compressed help files which should be</span>
+<span class="c1"># included in the collection.</span>
+<span class="c1"># It may contain various other information for customizing Qt Assistant.</span>
+<span class="n">collection_template</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span>
+<span class="s1">&lt;QHelpCollectionProject version=&quot;1.0&quot;&gt;</span>
+<span class="s1">    &lt;assistant&gt;</span>
+<span class="s1">        &lt;title&gt;</span><span class="si">%(title)s</span><span class="s1">&lt;/title&gt;</span>
+<span class="s1">        &lt;homePage&gt;</span><span class="si">%(homepage)s</span><span class="s1">&lt;/homePage&gt;</span>
+<span class="s1">        &lt;startPage&gt;</span><span class="si">%(startpage)s</span><span class="s1">&lt;/startPage&gt;</span>
+<span class="s1">    &lt;/assistant&gt;</span>
+<span class="s1">    &lt;docFiles&gt;</span>
+<span class="s1">        &lt;generate&gt;</span>
+<span class="s1">            &lt;file&gt;</span>
+<span class="s1">                &lt;input&gt;</span><span class="si">%(outname)s</span><span class="s1">.qhp&lt;/input&gt;</span>
+<span class="s1">                &lt;output&gt;</span><span class="si">%(outname)s</span><span class="s1">.qch&lt;/output&gt;</span>
+<span class="s1">            &lt;/file&gt;</span>
+<span class="s1">        &lt;/generate&gt;</span>
+<span class="s1">        &lt;register&gt;</span>
+<span class="s1">            &lt;file&gt;</span><span class="si">%(outname)s</span><span class="s1">.qch&lt;/file&gt;</span>
+<span class="s1">        &lt;/register&gt;</span>
+<span class="s1">    &lt;/docFiles&gt;</span>
+<span class="s1">&lt;/QHelpCollectionProject&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="c1"># Qt Help Project (.qhp)</span>
+<span class="c1"># This is the input file for the help generator.</span>
+<span class="c1"># It contains the table of contents, indices and references to the</span>
+<span class="c1"># actual documentation files (*.html).</span>
+<span class="c1"># In addition it defines a unique namespace for the documentation.</span>
+<span class="n">project_template</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span>
+<span class="s1">&lt;QtHelpProject version=&quot;1.0&quot;&gt;</span>
+<span class="s1">    &lt;namespace&gt;</span><span class="si">%(namespace)s</span><span class="s1">&lt;/namespace&gt;</span>
+<span class="s1">    &lt;virtualFolder&gt;doc&lt;/virtualFolder&gt;</span>
+<span class="s1">    &lt;customFilter name=&quot;</span><span class="si">%(project)s</span><span class="s1"> </span><span class="si">%(version)s</span><span class="s1">&quot;&gt;</span>
+<span class="s1">        &lt;filterAttribute&gt;</span><span class="si">%(outname)s</span><span class="s1">&lt;/filterAttribute&gt;</span>
+<span class="s1">        &lt;filterAttribute&gt;</span><span class="si">%(version)s</span><span class="s1">&lt;/filterAttribute&gt;</span>
+<span class="s1">    &lt;/customFilter&gt;</span>
+<span class="s1">    &lt;filterSection&gt;</span>
+<span class="s1">        &lt;filterAttribute&gt;</span><span class="si">%(outname)s</span><span class="s1">&lt;/filterAttribute&gt;</span>
+<span class="s1">        &lt;filterAttribute&gt;</span><span class="si">%(version)s</span><span class="s1">&lt;/filterAttribute&gt;</span>
+<span class="s1">        &lt;toc&gt;</span>
+<span class="s1">            &lt;section title=&quot;</span><span class="si">%(title)s</span><span class="s1">&quot; ref=&quot;</span><span class="si">%(masterdoc)s</span><span class="s1">.html&quot;&gt;</span>
+<span class="si">%(sections)s</span><span class="s1"></span>
+<span class="s1">            &lt;/section&gt;</span>
+<span class="s1">        &lt;/toc&gt;</span>
+<span class="s1">        &lt;keywords&gt;</span>
+<span class="si">%(keywords)s</span><span class="s1"></span>
+<span class="s1">        &lt;/keywords&gt;</span>
+<span class="s1">        &lt;files&gt;</span>
+<span class="si">%(files)s</span><span class="s1"></span>
+<span class="s1">        &lt;/files&gt;</span>
+<span class="s1">    &lt;/filterSection&gt;</span>
+<span class="s1">&lt;/QtHelpProject&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="n">section_template</span> <span class="o">=</span> <span class="s1">&#39;&lt;section title=&quot;</span><span class="si">%(title)s</span><span class="s1">&quot; ref=&quot;</span><span class="si">%(ref)s</span><span class="s1">&quot;/&gt;&#39;</span>
+<span class="n">file_template</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s1">&#39;&lt;file&gt;</span><span class="si">%(filename)s</span><span class="s1">&lt;/file&gt;&#39;</span>
+
+
+<div class="viewcode-block" id="QtHelpBuilder"><a class="viewcode-back" href="../../../sphinx/doc/builders.html#sphinx.builders.qthelp.QtHelpBuilder">[docs]</a><span class="k">class</span> <span class="nc">QtHelpBuilder</span><span class="p">(</span><span class="n">StandaloneHTMLBuilder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builder that also outputs Qt help project, contents and index files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;qthelp&#39;</span>
+
+    <span class="c1"># don&#39;t copy the reST source</span>
+    <span class="n">copysource</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">supported_image_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;image/svg+xml&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">,</span> <span class="s1">&#39;image/gif&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;image/jpeg&#39;</span><span class="p">]</span>
+
+    <span class="c1"># don&#39;t add links</span>
+    <span class="n">add_permalinks</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># don&#39;t add sidebar etc.</span>
+    <span class="n">embedded</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># disable download role</span>
+    <span class="n">download_support</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># don&#39;t generate the search index or include the search page</span>
+    <span class="n">search</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="n">StandaloneHTMLBuilder</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># the output files for HTML help must be .html only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_suffix</span> <span class="o">=</span> <span class="s1">&#39;.html&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_suffix</span> <span class="o">=</span> <span class="s1">&#39;.html&#39;</span>
+        <span class="c1"># self.config.html_style = &#39;traditional.css&#39;</span>
+
+    <span class="k">def</span> <span class="nf">get_theme_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; Tuple[unicode, Dict]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">qthelp_theme</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">qthelp_theme_options</span>
+
+    <span class="k">def</span> <span class="nf">handle_finish</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># type: () -&gt; None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_qhp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">qthelp_basename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">build_qhp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, unicode) -&gt; None</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;writing project file...&#39;</span><span class="p">)</span>
+
+        <span class="c1"># sections</span>
+        <span class="n">tocdoc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">get_and_resolve_doctree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
+                                                  <span class="n">prune_toctrees</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">istoctree</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="c1"># type: (nodes.Node) -&gt; bool</span>
+            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">compact_paragraph</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="s1">&#39;toctree&#39;</span> <span class="ow">in</span> <span class="n">node</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tocdoc</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">istoctree</span><span class="p">):</span>
+            <span class="n">sections</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">write_toc</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">indexname</span><span class="p">,</span> <span class="n">indexcls</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">collapse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_indices</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">section_template</span> <span class="o">%</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">indexcls</span><span class="o">.</span><span class="n">localname</span><span class="p">,</span>
+                                       <span class="s1">&#39;ref&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.html&#39;</span> <span class="o">%</span> <span class="n">indexname</span><span class="p">}</span>
+            <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">item</span><span class="p">)</span>
+        <span class="c1"># sections may be unicode strings or byte strings, we have to make sure</span>
+        <span class="c1"># they are all unicode strings before joining them</span>
+        <span class="n">new_sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">text_type</span><span class="p">):</span>
+                <span class="n">new_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">force_decode</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_sections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_sections</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># keywords</span>
+        <span class="n">keywords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">IndexEntries</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_entries</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="p">(</span><span class="n">refs</span><span class="p">,</span> <span class="n">subitems</span><span class="p">,</span> <span class="n">key_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                <span class="n">keywords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_keywords</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">refs</span><span class="p">,</span> <span class="n">subitems</span><span class="p">))</span>
+        <span class="n">keywords</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keywords</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># files</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">outdir</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">):</span>
+            <span class="n">outdir</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+        <span class="n">olen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+        <span class="n">projectfiles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">staticdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="s1">&#39;_static&#39;</span><span class="p">)</span>
+        <span class="n">imagesdir</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imagedir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+            <span class="n">resourcedir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">staticdir</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="n">root</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">imagesdir</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">resourcedir</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.js&#39;</span><span class="p">))</span> <span class="ow">or</span> \
+                   <span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.html&#39;</span><span class="p">):</span>
+                    <span class="n">filename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">fn</span><span class="p">)[</span><span class="n">olen</span><span class="p">:]</span>
+                    <span class="n">projectfiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_template</span> <span class="o">%</span>
+                                        <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">filename</span><span class="p">)})</span>
+        <span class="n">projectfiles</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">projectfiles</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># it seems that the &quot;namespace&quot; may not contain non-alphanumeric</span>
+        <span class="c1"># characters, and more than one successive dot, or leading/trailing</span>
+        <span class="c1"># dots, are also forbidden</span>
+        <span class="n">nspace</span> <span class="o">=</span> <span class="s1">&#39;org.sphinx.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="n">nspace</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;[^a-zA-Z0-9.]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">nspace</span><span class="p">)</span>
+        <span class="n">nspace</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.+&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">nspace</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">nspace</span> <span class="o">=</span> <span class="n">nspace</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># write the project file</span>
+        <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s1">&#39;.qhp&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  <span class="c1"># type: ignore  # NOQA</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">project_template</span> <span class="o">%</span> <span class="p">{</span>
+                <span class="s1">&#39;outname&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">outname</span><span class="p">),</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_title</span><span class="p">),</span>
+                <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">version</span><span class="p">),</span>
+                <span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">project</span><span class="p">),</span>
+                <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">nspace</span><span class="p">),</span>
+                <span class="s1">&#39;masterdoc&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">),</span>
+                <span class="s1">&#39;sections&#39;</span><span class="p">:</span> <span class="n">sections</span><span class="p">,</span>
+                <span class="s1">&#39;keywords&#39;</span><span class="p">:</span> <span class="n">keywords</span><span class="p">,</span>
+                <span class="s1">&#39;files&#39;</span><span class="p">:</span> <span class="n">projectfiles</span><span class="p">})</span>
+
+        <span class="n">homepage</span> <span class="o">=</span> <span class="s1">&#39;qthelp://&#39;</span> <span class="o">+</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">nspace</span><span class="p">,</span> <span class="s1">&#39;doc&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_target_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">master_doc</span><span class="p">))</span>
+        <span class="n">startpage</span> <span class="o">=</span> <span class="s1">&#39;qthelp://&#39;</span> <span class="o">+</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nspace</span><span class="p">,</span> <span class="s1">&#39;doc&#39;</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;writing collection project file...&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">outname</span> <span class="o">+</span> <span class="s1">&#39;.qhcp&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  <span class="c1"># type: ignore  # NOQA</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">collection_template</span> <span class="o">%</span> <span class="p">{</span>
+                <span class="s1">&#39;outname&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">outname</span><span class="p">),</span>
+                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_short_title</span><span class="p">),</span>
+                <span class="s1">&#39;homepage&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">homepage</span><span class="p">),</span>
+                <span class="s1">&#39;startpage&#39;</span><span class="p">:</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">startpage</span><span class="p">)})</span>
+
+    <span class="k">def</span> <span class="nf">isdocnode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c1"># type: (nodes.Node) -&gt; bool</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">list_item</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">compact_paragraph</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">nodes</span><span class="o">.</span><span class="n">reference</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">nodes</span><span class="o">.</span><span class="n">bullet_list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">write_toc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">indentlevel</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="c1"># type: (nodes.Node, int) -&gt; List[unicode]</span>
+        <span class="c1"># XXX this should return a Unicode string, not a bytestring</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[unicode]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isdocnode</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="n">refnode</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">refnode</span><span class="p">[</span><span class="s1">&#39;refuri&#39;</span><span class="p">]</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">refnode</span><span class="o">.</span><span class="n">astext</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;quot;&#39;</span><span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="s1">&#39;&lt;section title=&quot;</span><span class="si">%(title)s</span><span class="s1">&quot; ref=&quot;</span><span class="si">%(ref)s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> \
+                <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s1">&#39;ref&#39;</span><span class="p">:</span> <span class="n">link</span><span class="p">}</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">indentlevel</span> <span class="o">+</span> <span class="n">item</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">indentlevel</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">indentlevel</span> <span class="o">+</span> <span class="s1">&#39;&lt;/section&gt;&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">list_item</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">indentlevel</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">reference</span><span class="p">):</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;refuri&#39;</span><span class="p">]</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">astext</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&amp;quot;&#39;</span><span class="p">)</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">section_template</span> <span class="o">%</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s1">&#39;ref&#39;</span><span class="p">:</span> <span class="n">link</span><span class="p">}</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">indentlevel</span> <span class="o">+</span> <span class="n">item</span>  <span class="c1"># type: ignore</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">bullet_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">indentlevel</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">addnodes</span><span class="o">.</span><span class="n">compact_paragraph</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">subnode</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">write_toc</span><span class="p">(</span><span class="n">subnode</span><span class="p">,</span> <span class="n">indentlevel</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">parts</span>
+
+    <span class="k">def</span> <span class="nf">keyword_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, Any) -&gt; unicode</span>
+        <span class="n">matchobj</span> <span class="o">=</span> <span class="n">_idpattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="n">matchobj</span><span class="p">:</span>
+            <span class="n">groupdict</span> <span class="o">=</span> <span class="n">matchobj</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+            <span class="n">shortname</span> <span class="o">=</span> <span class="n">groupdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">groupdict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+            <span class="c1"># descr = groupdict.get(&#39;descr&#39;)</span>
+            <span class="k">if</span> <span class="n">shortname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">):</span>
+                <span class="n">shortname</span> <span class="o">=</span> <span class="n">shortname</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">shortname</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s1">&#39;&lt;keyword name=&quot;</span><span class="si">%s</span><span class="s1">&quot; id=&quot;</span><span class="si">%s</span><span class="s1">&quot; ref=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">ref</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">+</span> <span class="s1">&#39;&lt;keyword name=&quot;</span><span class="si">%s</span><span class="s1">&quot; ref=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span>
+
+    <span class="k">def</span> <span class="nf">build_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">refs</span><span class="p">,</span> <span class="n">subitems</span><span class="p">):</span>
+        <span class="c1"># type: (unicode, List[Any], Any) -&gt; List[unicode]</span>
+        <span class="n">keywords</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: List[unicode]</span>
+
+        <span class="n">title</span> <span class="o">=</span> <span class="n">htmlescape</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="c1"># if len(refs) == 0: # XXX</span>
+        <span class="c1">#     write_param(&#39;See Also&#39;, title)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">keywords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyword_item</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">refs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">refs</span><span class="p">):</span>  <span class="c1"># XXX</span>
+                <span class="c1"># item = (&#39; &#39;*12 +</span>
+                <span class="c1">#         &#39;&lt;keyword name=&quot;%s [%d]&quot; ref=&quot;%s&quot;/&gt;&#39; % (</span>
+                <span class="c1">#          title, i, ref))</span>
+                <span class="c1"># item.encode(&#39;ascii&#39;, &#39;xmlcharrefreplace&#39;)</span>
+                <span class="c1"># keywords.append(item)</span>
+                <span class="n">keywords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyword_item</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">ref</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">subitems</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">subitem</span> <span class="ow">in</span> <span class="n">subitems</span><span class="p">:</span>
+                <span class="n">keywords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_keywords</span><span class="p">(</span><span class="n">subitem</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subitem</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[]))</span>
+
+        <span class="k">return</span> <span class="n">keywords</span></div>
+
+
+<span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="c1"># type: (Sphinx) -&gt; Dict[unicode, Any]</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">setup_extension</span><span class="p">(</span><span class="s1">&#39;sphinx.builders.html&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_builder</span><span class="p">(</span><span class="n">QtHelpBuilder</span><span class="p">)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;qthelp_basename&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="n">make_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;qthelp_theme&#39;</span><span class="p">,</span> <span class="s1">&#39;nonav&#39;</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_config_value</span><span class="p">(</span><span class="s1">&#39;qthelp_theme_options&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">&#39;html&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;builtin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_read_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;parallel_write_safe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  <li><a href="../builders.html">sphinx.builders</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

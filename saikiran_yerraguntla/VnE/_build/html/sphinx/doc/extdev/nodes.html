@@ -1,0 +1,319 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Doctree node classes added by Sphinx &#8212; Virtual Node Environment Documentation 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sphinx.addnodes">
+<span id="doctree-node-classes-added-by-sphinx"></span><span id="nodes"></span><h1>Doctree node classes added by Sphinx<a class="headerlink" href="#module-sphinx.addnodes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="nodes-for-domain-specific-object-descriptions">
+<h2>Nodes for domain-specific object descriptions<a class="headerlink" href="#nodes-for-domain-specific-object-descriptions" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sphinx.addnodes.desc">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for object descriptions.</p>
+<p>This node is similar to a “definition list” with one definition.  It
+contains one or more <code class="docutils literal"><span class="pre">desc_signature</span></code> and a <code class="docutils literal"><span class="pre">desc_content</span></code>.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_signature">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_signature</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_signature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for object signatures.</p>
+<p>The “term” part of the custom Sphinx definition list.</p>
+<p>As default the signature is a single line signature,
+but set <code class="docutils literal"><span class="pre">is_multiline</span> <span class="pre">=</span> <span class="pre">True</span></code> to describe a multi-line signature.
+In that case all child nodes must be <code class="docutils literal"><span class="pre">desc_signature_line</span></code> nodes.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_signature_line">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_signature_line</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_signature_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_signature_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for a line in a multi-line object signatures.</p>
+<p>It should only be used in a <code class="docutils literal"><span class="pre">desc_signature</span></code> with <code class="docutils literal"><span class="pre">is_multiline</span></code> set.
+Set <code class="docutils literal"><span class="pre">add_permalink</span> <span class="pre">=</span> <span class="pre">True</span></code> for the line that should get the permalink.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_addname">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_addname</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_addname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_addname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for additional name parts (module name, class name).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_type">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_type</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for return types or object type names.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_returns">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_returns</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_returns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_returns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for a “returns” annotation (a la -&gt; in Python).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_name">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_name</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for the main object name.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_parameterlist">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_parameterlist</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_parameterlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_parameterlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for a general parameter list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_parameter">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_parameter</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for a single parameter.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_optional">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_optional</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_optional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_optional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for marking optional parts of the parameter list.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_annotation">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_annotation</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for signature annotations (not Python 3-style annotations).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.desc_content">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">desc_content</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#desc_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.desc_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for object description content.</p>
+<p>This is the “definition” part of the custom Sphinx definition list.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="new-admonition-like-constructs">
+<h2>New admonition-like constructs<a class="headerlink" href="#new-admonition-like-constructs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sphinx.addnodes.versionmodified">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">versionmodified</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#versionmodified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.versionmodified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for version change entries.</p>
+<p>Currently used for “versionadded”, “versionchanged” and “deprecated”
+directives.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.seealso">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">seealso</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#seealso"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.seealso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom “see also” admonition.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="other-paragraph-level-nodes">
+<h2>Other paragraph-level nodes<a class="headerlink" href="#other-paragraph-level-nodes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sphinx.addnodes.compact_paragraph">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">compact_paragraph</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#compact_paragraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.compact_paragraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for a compact paragraph (which never makes a &lt;p&gt; node).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="new-inline-nodes">
+<h2>New inline nodes<a class="headerlink" href="#new-inline-nodes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sphinx.addnodes.index">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">index</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for index entries.</p>
+<p>This node is created by the <code class="docutils literal"><span class="pre">index</span></code> directive and has one attribute,
+<code class="docutils literal"><span class="pre">entries</span></code>.  Its value is a list of 5-tuples of <code class="docutils literal"><span class="pre">(entrytype,</span> <span class="pre">entryname,</span>
+<span class="pre">target,</span> <span class="pre">ignored,</span> <span class="pre">key)</span></code>.</p>
+<p><em>entrytype</em> is one of “single”, “pair”, “double”, “triple”.</p>
+<p><em>key</em> is categolziation characters (usually it is single character) for
+general index page. For the detail of this, please see also:
+<a class="reference internal" href="../markup/para.html#directive-glossary" title="glossary directive"><code class="xref rst rst-dir docutils literal"><span class="pre">glossary</span></code></a> and issue #2320.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.pending_xref">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">pending_xref</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#pending_xref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.pending_xref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for cross-references that cannot be resolved without complete
+information about all documents.</p>
+<p>These nodes are resolved before writing output, in
+BuildEnvironment.resolve_references.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.literal_emphasis">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">literal_emphasis</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#literal_emphasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.literal_emphasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node that behaves like <cite>emphasis</cite>, but further text processors are not
+applied (e.g. smartypants for HTML output).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.abbreviation">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">abbreviation</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#abbreviation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.abbreviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for abbreviations with explanations.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.download_reference">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">download_reference</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#download_reference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.download_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for download references, similar to pending_xref.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="special-nodes">
+<h2>Special nodes<a class="headerlink" href="#special-nodes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sphinx.addnodes.only">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">only</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#only"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for “only” directives (conditional inclusion based on tags).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.meta">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">meta</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for meta directive – same as docutils’ standard meta node,
+but pickleable.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.highlightlang">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">highlightlang</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#highlightlang"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.highlightlang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserted to set the highlight language and line number options for
+subsequent code blocks.</p>
+</dd></dl>
+
+<p>You should not need to generate the nodes below in extensions.</p>
+<dl class="class">
+<dt id="sphinx.addnodes.glossary">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">glossary</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#glossary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.glossary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node to insert a glossary.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.toctree">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">toctree</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#toctree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.toctree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for inserting a “TOC tree”.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.start_of_file">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">start_of_file</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#start_of_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.start_of_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node to mark start of a new file, used in the LaTeX builder only.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.productionlist">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">productionlist</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#productionlist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.productionlist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for grammar production lists.</p>
+<p>Contains <code class="docutils literal"><span class="pre">production</span></code> nodes.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sphinx.addnodes.production">
+<em class="property">class </em><code class="descclassname">sphinx.addnodes.</code><code class="descname">production</code><span class="sig-paren">(</span><em>rawsource=’‘</em>, <em>text=’‘</em>, <em>*children</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/sphinx/addnodes.html#production"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sphinx.addnodes.production" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node for a single grammar production rule.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../../master.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Doctree node classes added by Sphinx</a><ul>
+<li><a class="reference internal" href="#nodes-for-domain-specific-object-descriptions">Nodes for domain-specific object descriptions</a></li>
+<li><a class="reference internal" href="#new-admonition-like-constructs">New admonition-like constructs</a></li>
+<li><a class="reference internal" href="#other-paragraph-level-nodes">Other paragraph-level nodes</a></li>
+<li><a class="reference internal" href="#new-inline-nodes">New inline nodes</a></li>
+<li><a class="reference internal" href="#special-nodes">Special nodes</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../master.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/sphinx/doc/extdev/nodes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Saikiran Yerraguntla.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../../../_sources/sphinx/doc/extdev/nodes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
