@@ -1,0 +1,17 @@
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0037", TAG+="systemd", SYMLINK+="waggle_sysmon", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'wagman up'"
+ACTION=="remove", ENV{ID_VENDOR_ID}=="2341", ENV{ID_MODEL_ID}=="0037", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'wagman down'"
+
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="8037", TAG+="systemd", SYMLINK+="waggle_sysmon", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'wagman up'"
+ACTION=="remove", ENV{ID_VENDOR_ID}=="2341", ENV{ID_MODEL_ID}=="8037", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'wagman down'"
+
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003e", TAG+="systemd", SYMLINK+="waggle_coresense%n", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'coresense up'"
+ACTION=="remove", ENV{ID_VENDOR_ID}=="2341", ENV{ID_MODEL_ID}=="003e", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'coresense down'"
+
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="6124", TAG+="systemd", SYMLINK+="waggle_coresense", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'coresense up'"
+ACTION=="remove", ENV{ID_VENDOR_ID}=="03eb", ENV{ID_MODEL_ID}=="6124", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'coresense down'"
+
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="ffee", TAG+="systemd", SYMLINK+="alphasense", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'alphasense up'"
+ACTION=="remove", ENV{ID_VENDOR_ID}=="04d8", ENV{ID_MODEL_ID}=="ffee", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'alphasense down'"
+
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*", ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a7", TAG+="systemd", SYMLINK+="gps_module", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'gps up'"
+ACTION=="remove", ENV{ID_VENDOR_ID}=="1546", ENV{ID_MODEL_ID}=="01a7", RUN+="/usr/lib/waggle/core/scripts/beehive-log -t udev 'gps down'"

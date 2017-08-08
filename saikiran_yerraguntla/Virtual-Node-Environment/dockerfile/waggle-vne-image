@@ -1,0 +1,9 @@
+FROM waggle-node-controller:2.6.0-pre1
+
+RUN /home/sai6kiran/
+WORKDIR /home/sai6kiran/
+
+RUN git clone https://github.com/waggle-sensor/pywaggle.git
+RUN git clone https://github.com/sai6kiran/Plugin-Data-Pipeline.git
+
+RUN apt-get update

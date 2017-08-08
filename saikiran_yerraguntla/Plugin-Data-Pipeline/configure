@@ -1,0 +1,4 @@
+#!/bin/bash
+
+pip3 install -r requirements.txt -U
+sed -i "s:/path/to/:$(pwd)/:" test-worker.py
