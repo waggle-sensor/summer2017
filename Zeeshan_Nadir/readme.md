@@ -9,4 +9,4 @@ A tracking problem by nature works with video signals. Generally, a basic tracki
 Following figure shows the workflow of pedestrian detection and tracking problem:
 
 ![picture2](https://user-images.githubusercontent.com/29146711/29292918-9f1ccc86-810e-11e7-91b0-5aff9223e8a2.png)
-
+We detect pedestrians in the input video frames, and track then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure.
