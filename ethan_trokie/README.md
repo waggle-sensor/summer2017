@@ -93,17 +93,17 @@ Then LoopsThroughAllVids() concatenates all of the totalFeatures from each video
 
 To retrain the classifier you just have the change the inputs of loopThroughAllVids()
 
-•	pathToVidsFolder - (string) path to folder with folders of water videos
-•	pathToMaskFolder - (string) path to folder with folders of water masks
-•	pathToOtherTextures - (string) path to folder with folders of non water videos
-•	numFrames - (int) - number of frames for the video to get frames for (400-500 reccomended)
-•	dFactor - (int) - amount of times its going to downscale the video (2 reccomended)
-•	densityMode - (int) - whether to use density or direct mode (use 0)
-•	boxSize – (int) size of kernel to smooth image
-•	TemporalLength - (int) length of temporal features to be sampled (currently using 200)
-•	numbofSamples - (int) - amount of sample feature vectors youre going to get per video (make sure decision forest is trained with around 700,000 data points
-•	patchSize – (int) size of 2-D patch where the Local Binary Pattern will be calculated and histogram taken of
-•	numFramesAvg – (int) number of frames of size patchSize which the histogram will be taken of
+•	pathToVidsFolder - (string) path to folder with folders of water videos  
+•	pathToMaskFolder - (string) path to folder with folders of water masks  
+•	pathToOtherTextures - (string) path to folder with folders of non water videos  
+•	numFrames - (int) - number of frames for the video to get frames for (400-500 reccomended)  
+•	dFactor - (int) - amount of times its going to downscale the video (2 reccomended)  
+•	densityMode - (int) - whether to use density or direct mode (use 0)  
+•	boxSize – (int) size of kernel to smooth image  
+•	TemporalLength - (int) length of temporal features to be sampled (currently using 200)  
+•	numbofSamples - (int) - amount of sample feature vectors youre going to get per video (make sure decision forest is trained with around 700,000 data points  
+•	patchSize – (int) size of 2-D patch where the Local Binary Pattern will be calculated and histogram taken of  
+•	numFramesAvg – (int) number of frames of size patchSize which the histogram will be taken of  
 
 
 # Data Visualization
