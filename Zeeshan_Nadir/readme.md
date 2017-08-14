@@ -8,4 +8,5 @@ A tracking problem by nature works with video signals. Generally, a basic tracki
 
 Following figure shows the workflow of pedestrian detection and tracking problem:
 
-![picture2](https://user-images.githubusercontent.com/29146711/29292757-fdfb33ce-810d-11e7-8525-7e7c9b88329d.png)
+![picture2](https://user-images.githubusercontent.com/29146711/29292885-7b751338-810e-11e7-9865-d52c5312db1a.png)
+
