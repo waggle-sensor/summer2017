@@ -10,6 +10,14 @@ In order to tackle the challenges faced in tracking the pedestrians, pedestrian 
 
 ![picture3](https://user-images.githubusercontent.com/29146711/29339017-ccfef8c0-81dd-11e7-852c-44a6f59c8680.png)
 
+The rest of the read me documentation is organized as follows:
+1. Pedestrian Detection
+2. Kalman Filtering
+3. Kanade Lucas Tomasi (KLT) Tracker
+4. Detection and Tracking Algorithm
+5. Results
+
+## Pedestrian Detection using Histogram of Gradient Features
 Generally, a basic object detection problem is defined as finding a given object of interest in any given image of a fixed size. Therefore, given an image of predefined size, the object detector must decide if the image is of the object of interest or not. However, in practice, real images can have the objects of interest in any possible location inside the image. Morever, the size of the object in real images need not be equal to the predefined size, that is, the object can be at different scale levels (zoom levels) inside the image. In order to cope with this, we use a basic object detector and use sliding window and scale space to try to detect objects inside the images. In the context of pedestrian detection, what it means is that given any monocular image that may or may not contain pedestrians, we want to detect pedestrians inside this image and indicate it's location by drawing a (preferably tight) bouding box around the pedestrian. One of the most popular method to detect pedestrians is based on [Histogram of Gradients (HOG)](https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) by Navneet and Dalal. We shall be using HOG in our work to detect pedestrians.
 
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
@@ -18,12 +26,5 @@ Following figure shows the workflow of pedestrian detection and tracking problem
 
 ![picture2](https://user-images.githubusercontent.com/29146711/29292918-9f1ccc86-810e-11e7-91b0-5aff9223e8a2.png)
 We detect pedestrians in the input video frames, and then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure. In practice, however, performing detection on each of the input video frames may be computationally prohibitive to yield real time processing results. Therefore, we use an additional preprocessing step of [Background Subtraction](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html). This removes all the background clutter from the video frame, thereby helping us focus computations on the regions in the image belonging to the foreground. 
-
-The rest of the read me documentation is organized as follows:
-1. Pedestrian Detection
-2. Kalman Filtering
-3. Kanade Lucas Tomasi (KLT) Tracker
-4. Detection and Tracking Algorithm
-5. Results
  
 
