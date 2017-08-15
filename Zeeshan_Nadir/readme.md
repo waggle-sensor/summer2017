@@ -1,6 +1,6 @@
 # Pedestrian Detection and Tracking using Kalman Filter and KLT Tracker
 
-Pedestrian detection and tracking is an important problem in the field of computer vision and is still being researched. Similar it may sound, but pedestrian detection and tracking are two separate problems. In this description, I shall discuss both the two problems, give a brief literature survey and then describe the approach that I have taken to tackle these problems.
+Pedestrian detection and tracking is an important problem in the field of computer vision and is still being researched. Similar it may sound, but pedestrian detection and tracking are two separate problems. In this description, I shall discuss both the two problems, give a brief literature survey and then describe the approach that I have taken to tackle these problems. I shall then provide a unified framework for pedestrian detection and tracking in real time video sequences.
 
 Generally, a basic object detection problem is defined as finding a given object of interest in any given image of a fixed size. Therefore, given an image of predefined size, the object detector must decide if the image is of the object of interest or not. However, in practice, real images can have the objects of interest in any possible location inside the image. Morever, the size of the object in real images need not be equal to the predefined size, that is, the object can be at different scale levels (zoom levels) inside the image. In order to cope with this, we use a basic object detector and use sliding window and scale space to try to detect objects inside the images. In the context of pedestrian detection, what it means is that given any monocular image that may or may not contain pedestrians, we want to detect pedestrians inside this image and indicate it's location by drawing a (preferably tight) bouding box around the pedestrian. One of the most popular method to detect pedestrians is based on [Histogram of Gradients (HOG)](https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) by Navneet and Dalal. We shall be using HOG in our work to detect pedestrians.
 
@@ -10,12 +10,6 @@ Following figure shows the workflow of pedestrian detection and tracking problem
 
 ![picture2](https://user-images.githubusercontent.com/29146711/29292918-9f1ccc86-810e-11e7-91b0-5aff9223e8a2.png)
 We detect pedestrians in the input video frames, and then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure. In practice, however, performing detection on each of the input video frames may be computationally prohibitive to yield real time processing results. Therefore, we use an additional preprocessing step of [Background Subtraction](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html). This removes all the background clutter from the video frame, thereby helping us focus computations on the regions in the image belonging to the foreground. 
-
-In order to put things in perspective, I shall talk about the important parts of pedestrian detection and tracking and then present the layout of this read me documentation. Following are the major parts of our Pedestrian Detection and Tracking system:
-- A pedestrian detector based on HOG features and linear SVM
-- A dynamic model based on Kalman Filter
-- A KLT tracker for providing observations to the dynamic model
-- A color histogram based appearance model to tie the detections to pedestrians
 
 The rest of the read me documentation is organized as follows:
 1. Pedestrian Detection
