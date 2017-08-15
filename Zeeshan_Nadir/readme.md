@@ -11,6 +11,8 @@ Following figure shows the workflow of pedestrian detection and tracking problem
 ![picture2](https://user-images.githubusercontent.com/29146711/29292918-9f1ccc86-810e-11e7-91b0-5aff9223e8a2.png)
 We detect pedestrians in the input video frames, and then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure. In practice, however, performing detection on each of the input video frames may be computationally prohibitive to yield real time processing results. Therefore, we use an additional preprocessing step of [Background Subtraction](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html). This removes all the background clutter from the video frame, thereby helping us focus computations on the regions in the image belonging to the foreground. 
 
+In order to put things in perspective, I shall talk about the important parts of pedestrian detection and tracking and then present the layout of this read me documentation. Following are the
+
 The rest of the read me documentation is organized as follows:
 1. Pedestrian Detection
 2. Kalman Filtering
