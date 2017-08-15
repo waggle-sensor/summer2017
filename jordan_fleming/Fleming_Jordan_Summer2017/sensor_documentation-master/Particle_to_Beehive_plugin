@@ -1,0 +1,44 @@
+This code pushes data from Particle.io cloud to Beehive dev.
+
+#!/usr/bin/env python3
+from waggle import beehive
+import pika
+from sseclient import SSEClient
+import requests, json
+import time
+
+n=4
+
+config = beehive.ClientConfig(
+   host='10.10.10.5',
+   port=23181,
+   node='000002000000000' + str(n-1),
+   username = 'fib-publisher',
+   password = 'waggle',
+   cacert='/home/waggle/plugin/cacert.pem',
+   cert='/home/waggle/plugin/vnode/vnode' + str(n) + '/cert.pem',
+   key='/home/waggle/plugin/vnode/vnode' + str(n) + '/key.pem')
+
+client = beehive.PluginClient(
+   name='test:1',
+   config=config)
+
+
+messages = SSEClient('https://api.particle.io/v1/devices/events?access_token=78399ac5d475df2ded6e98628c26af59fbfde2af')
+
+for msg in messages:
+   event = msg.event
+   data = msg.data
+
+   if not data:
+       continue
+
+   print ('event:', event)
+   dataJson = json.loads(data)
+   print ("Device ID: ", dataJson["coreid"])
+   print ("Publication Time: ", dataJson["published_at"])
+   print ("Data: ", dataJson["data"])
+   data = 'Device ID: %s, Publication Time: %s, Data: %s' %(dataJson["coreid"], dataJson["published_at"], dataJson["data"])
+   client.publish("cloud-data", data)
+
+   time.sleep(0.001)
