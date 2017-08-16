@@ -1,5 +1,6 @@
 # Pedestrian Detection and Tracking using Kalman Filter and KLT Tracker
 
+## Introduction
 Pedestrian detection and tracking is an important problem in the field of computer vision and is still being researched. Similar it may sound, but pedestrian detection and tracking are two separate problems. In this description, I shall discuss both the two problems, give a brief literature survey and then describe the approach that I have taken to tackle these problems. I shall then provide a unified framework for pedestrian detection and tracking in real time video sequences.
 
 Pedestrian detection and tracking problem is defined as keeping track of existing pedestrians in the video and finding new pedestrians as they become visible. Typically, the detection part is posed as a machine learning problem where a set of features are chosen to distinguish between pedestrian and non-pedestrian images and are then fed to a classifier such as [Support Vector Machines](http://docs.opencv.org/2.4/modules/ml/doc/support_vector_machines.html). In 2005, Navneet and Dalal popularized [Histogram of gradients (HOG)](https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) as a set of features for their effectivity in pedestrian detection problems. In this paper, we shall use HOG based pedestrian detector along with a linear Support vector machine to detect pedestrians. Major challenges that are faced in pedestrian detection are occlusion, non-rigid nature of pedestrians and slanted pose angles of pedestrians with respect to the camera. The result of these challenges are missed detections (false negatives) and detections of non-pedestrian regions of images as pedestrians (false positives).
@@ -70,6 +71,8 @@ def preProcess(img):
 ### Detecting Pedestrians in Images
 After training the SVM classifier with HOG features, the next natural step is to detect pedestrians in images. The file [new_ped_detector.py](/Zeeshan_Nadir/new_ped_detector.py) contains the code that can be used to detect pedestrians in images. It includes the module named **tkinter** that helps the user select an arbitrary image file and then uses the opencv's default pedestrian detector as well as our trained detector from the previous section to detect pedestrians. An example of results from our pedestrian detector is given as follows:
 ![picture6](https://user-images.githubusercontent.com/29146711/29382250-98ef552a-8291-11e7-9ca2-a9dc95562f02.png)
+
+## Background Subtraction
 
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
