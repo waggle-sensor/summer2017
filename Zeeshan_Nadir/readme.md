@@ -73,7 +73,15 @@ After training the SVM classifier with HOG features, the next natural step is to
 ![picture6](https://user-images.githubusercontent.com/29146711/29382250-98ef552a-8291-11e7-9ca2-a9dc95562f02.png)
 
 ## Background Subtraction
+In practice, however, performing detection on each of the input video frames may be computationally prohibitive to yield real time processing results. Therefore, we use an additional preprocessing step of [Background Subtraction](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html). This removes all the background clutter from the video frame, thereby helping us focus computations on the regions in the image belonging to the foreground. In other words, as we process each of the incoming frames of the video, we only focus on regions where we have motion, thereby, essentially not spending computations on regions that do not have motion. Fruther, in order to improve performance, we can disregard motion regions that are very small e.g., motion of a dog or leave, or motion regions that are extremely large e.g., motion of a large truck or a random illumination change due to lightning etc. This is done by using opencv's mixture of Gaussians based background detector. 
 
+In simple words, this works by maintaining a running model for the background where each pixels is assumed to have a Gaussian mixture distribution. When we encoutner some pixel that cannot be explained by model, we declare that it's a foreground pixel. Following code snippet gives a brief example of how this can be done in opencv:
+```
+# create background subtraction object
+fgbg = cv2.createBackgroundSubtractorMOG2()
+fgmask = fgbg.apply(frame)
+```
+More details about background subtraction can be seen here[http://docs.opencv.org/3.0-beta/modules/video/doc/motion_analysis_and_object_tracking.html#backgroundsubtractormog2], [here](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html) and [here](https://pythonprogramming.net/mog-background-reduction-python-opencv-tutorial/)
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
@@ -81,6 +89,6 @@ A tracking problem by nature works with video signals. Generally, a basic tracki
 Following figure shows the workflow of pedestrian detection and tracking problem:
 
 ![picture2](https://user-images.githubusercontent.com/29146711/29378814-12920fa0-8286-11e7-8d2a-11bde795e58d.png)
-We detect pedestrians in the input video frames, and then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure. In practice, however, performing detection on each of the input video frames may be computationally prohibitive to yield real time processing results. Therefore, we use an additional preprocessing step of [Background Subtraction](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html). This removes all the background clutter from the video frame, thereby helping us focus computations on the regions in the image belonging to the foreground. 
+We detect pedestrians in the input video frames, and then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure. 
   
 
