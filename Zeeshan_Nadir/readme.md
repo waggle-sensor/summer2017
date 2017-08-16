@@ -94,5 +94,7 @@ Following figure shows the workflow of pedestrian detection and tracking problem
 
 ![picture2](https://user-images.githubusercontent.com/29146711/29378814-12920fa0-8286-11e7-8d2a-11bde795e58d.png)
 We detect pedestrians in the input video frames, and then track the pedestrians by updating their current location. Even if we are not able to detect the pedestrian in the input frame, we can use the current location to perform detection as shown by the feedback loop in the above figure. 
-  
+ 
+In order to track pedestrians between frames, we shall use a Kalman Filter and KLT tracker. There are many tutorials/documentation available on the internet on these two, therefore, I shall only give a very brief overview. In general, Kalman filter helps us estimate the state of a system from it's uncertain and inaccurate measurements. It helps us make an educated guess in the presence of uncertainty. The Kalman filter assumes that all the states have a Gaussian distribution and the measurements that are made of these states also have gaussian noise in them. Further, it assumes a prior model in the form a linear transition between the states from one time instant to the next. More specifically, it assumes that in an ideal case, the new state could be predicted by performing a linear transformation of the existing state. 
 
+At each time instant, we predict the next state and feed the noisy measurements and get our "optimal" estimate of the current state. In our example, we shall want to estimate the location of the pedestrians in the image, therefore, our state variables shall consist of *x-location*, *y-location*, *x-velocity* and *y-velocity*. We use a constant velocity model and therefore, our measurements only consists of the position of the pedestrian. 
