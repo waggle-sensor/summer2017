@@ -117,4 +117,5 @@ The basic idea behind KLT tracker is that of optical flow. It works by making a 
 
 An example KLT tracker in working is shown in the figure below:
 ![pedestrians_klt](https://user-images.githubusercontent.com/29146711/29387509-ee0bb09e-82a5-11e7-87b4-f2fd7c57913c.png)
+
 The dots represent the feature points that we have selected of the pedestrians. As the pedestrian would move from one frame to the next, so shall the dots move and we shall use their collective motion to capture the direction.
