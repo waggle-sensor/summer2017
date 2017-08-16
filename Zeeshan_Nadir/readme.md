@@ -36,6 +36,7 @@ We use the Histogram of Gradient features for pedestrian detection. In simple wo
  
 An example of gradient images from an image of a pedestrian (guess who this person is?) is shown below.
 ![picture5](https://user-images.githubusercontent.com/29146711/29377568-cc05c396-8281-11e7-84d9-c6200eb9ae29.png)
+
 It can be seen that it's still easy for a human to tell that it's a pedestrian's image simply by looking at the gradient images.
 An example of computed features of a single 8x8 cell is shown below.
 ![picture4](https://user-images.githubusercontent.com/29146711/29377251-df5a4828-8280-11e7-8894-ff98d884ca6a.png)
