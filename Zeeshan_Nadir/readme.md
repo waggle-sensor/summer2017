@@ -115,7 +115,7 @@ As mentioned above, at each frame, we require a measurement for the Kalman filte
 ### Kanade Lucas Tomasi (KLT) Tracker
 The basic idea behind KLT tracker is that of optical flow. It works by making a very reasonable assumption that there isn't a lot of change happening as we move from one frame to the next i.e., the temporal change between two consecutive frames is almost negligible. This can be used to estimate the motion vectors for different objects between different frames. The way this works is that first we estimate some key interest points in the object of interest that we want to track. Then as we go to the next frame, we look for the same interest points and calculate the drift in these key points which gives us the direction of the motion of the object. We can use this information to feed measurements of location to our Kalman filter. Therefore, we have a computaionally inexpensive way of updating the Kalman filter and once every set number of frames, we can perform an expensive detection step to get rid of any accumulated errors (if there are any).
 
-An example KLT tracker in working is shown in the figure below:
+An example of KLT tracker in working is shown in the figure below:
 ![pedestrians_klt](https://user-images.githubusercontent.com/29146711/29387509-ee0bb09e-82a5-11e7-87b4-f2fd7c57913c.png)
 
-The dots represent the feature points that we have selected of the pedestrians. As the pedestrian would move from one frame to the next, so shall the dots move and we shall use their collective motion to capture the direction.
+Here we are able to detect two pedestrians in this video so far. The dots on each of the pedestrians represent the feature points that we have selected of the pedestrians. As the pedestrians would move from one frame to the next, so shall the dots move and we shall use their collective motion to capture the direction.
