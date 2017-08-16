@@ -64,8 +64,10 @@ def preProcess(img):
     # This is a function which is quite arbitray
     # In particular it depends on what kind of data you are reading
     # This function should be customized to different training sets
-    img = img[17:145, 17:81, :]
-    img = imutils.resize(img, width = 32, height = 64)
+    # Read out the appropriate portion of the image to extract the pedestrian
+    img = img[17:145, 17:81, :] 
+    # Potentially resize the image to your desired window size
+    #img = imutils.resize(img, width = 32, height = 64)
     return img
 ```
 
