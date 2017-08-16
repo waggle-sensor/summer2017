@@ -29,10 +29,16 @@ Given an input image, we extract some features that help us discriminate between
 ### Feature Extraction
 We use the Histogram of Gradient features for pedestrian detection. In simple words, these features use the information in the edges of the images to distinguish between pedestrian and non-pedestrians. This makes a lot of sense, since for pedestrian images, gradients have a lot of information in them as opposed to smooth images. One could expect a lot of vertical gradients in pedestrian images because of the edges of torso, legs, and arms. Though we shall be using opencv's ``` hog ``` class, however, I think it's instructive to give a brief description of how it works.
 - Compute the gradient of the input image
-- Divide the input image in different cells and Blocks (Blocks are larger than Cells)
+- Divide the input image in different cells and blocks (blocks are larger than cells)
 - Compute the a histogram of gradients corresponding to these cells
 - Normalize the histogram of gradients in each cell using the corresponding block
 - Combine the histogram of gradients from all the cells to make the feature vector
+ 
+An example of gradient images from an image of a pedestrian (guess who this person is?) is shown below.
+![picture5](https://user-images.githubusercontent.com/29146711/29377298-0e6a3c36-8281-11e7-9778-77f2d5e1d837.png)
+It can be seen that it's still easy for a human to tell that it's a pedestrian's image simply by looking at the gradient images.
+An example of computed features of a single 8x8 cell is shown below.
+![picture4](https://user-images.githubusercontent.com/29146711/29377251-df5a4828-8280-11e7-8894-ff98d884ca6a.png)
 
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
