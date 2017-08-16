@@ -52,7 +52,6 @@ def preProcess(img):
     # In particular it depends on what kind of data you are reading
     # This function should be customized to different training sets
     img = img[17:145, 17:81, :]
-    img = imutils.resize(img, width = 32, height = 64)
     return img
 
 def collectINRAPosSamples(path_of_input_images, featureLength, hog):
@@ -140,7 +139,7 @@ def main():
     beginingOfTime = datetime.datetime.now()
 
     # HOG descriptor
-    winSize = (32, 64); blockSize = (8, 8); blockStride = (4, 4); cellSize = (4, 4); nbins = 5
+    winSize = (64, 128); blockSize = (16, 16); blockStride = (8, 8); cellSize = (8, 8); nbins = 9
     hog = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins)
 
     # compute the feature vector length
@@ -150,12 +149,12 @@ def main():
     # Collect positive samples
     start = datetime.datetime.now()
     print('Obtaining Positive/Negative Samples for Training ... Please be patient!!!')
-    path_of_input_images ='C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\pos'
-    pos_samples = collectINRAPosSamples(path_of_input_images, featureLength, hog)
+    path_of_pos_input_images ='C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\pos'
+    pos_samples = collectINRAPosSamples(path_of_pos_input_images, featureLength, hog)
 
     # Collect negative samples
-    path_of_input_images = 'C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\neg\\'
-    neg_samples = collectINRANegSamples(path_of_input_images, winSize[0], winSize[1], featureLength, hog)
+    path_of_neg_input_images = 'C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\neg\\'
+    neg_samples = collectINRANegSamples(path_of_neg_input_images, winSize[0], winSize[1], featureLength, hog)
 
     # Concatenate negative and positive samples
     samples = np.concatenate((pos_samples, neg_samples))
@@ -235,7 +234,7 @@ def main():
     # Save the linear classifier without the hard negative mining
     print('Saving the Final SVM Classifier ... Please be patient!!!')
     start = datetime.datetime.now()
-    SVM_Object.save("./model_linear_with_hard_neg_mining_64_32.xml")
+    SVM_Object.save("./model_linear_with_hard_neg_mining_128_64.xml")
     end = datetime.datetime.now()
     print("[INFO] Total Time in Saving the Final SVM Classifier: {}s\n".format(
         (end-start).total_seconds()))
