@@ -26,6 +26,8 @@ The following block diagram gives a brief overview of pedestrian detection pipel
 ![picture1](https://user-images.githubusercontent.com/29146711/29368654-fb9db90e-8265-11e7-8ec5-34d1047917e7.png)
 Given an input image, we extract some features that help us discriminate between pedestrians/non-pedestrian images. Next, we feed it to our SVM classifier (must be trained by us offline) and then finally we get our decision if it's a pedestrian or not. 
 
+### Feature Extraction
+
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
 
