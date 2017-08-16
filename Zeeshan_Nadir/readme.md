@@ -35,7 +35,7 @@ We use the Histogram of Gradient features for pedestrian detection. In simple wo
 - Combine the histogram of gradients from all the cells to make the feature vector
  
 An example of gradient images from an image of a pedestrian (guess who this person is?) is shown below.
-![picture5](https://user-images.githubusercontent.com/29146711/29377298-0e6a3c36-8281-11e7-9778-77f2d5e1d837.png)
+![picture5](https://user-images.githubusercontent.com/29146711/29377498-9baff856-8281-11e7-8812-6677782ab26f.png)
 It can be seen that it's still easy for a human to tell that it's a pedestrian's image simply by looking at the gradient images.
 An example of computed features of a single 8x8 cell is shown below.
 ![picture4](https://user-images.githubusercontent.com/29146711/29377251-df5a4828-8280-11e7-8894-ff98d884ca6a.png)
