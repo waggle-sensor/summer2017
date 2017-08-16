@@ -35,13 +35,13 @@ We use the Histogram of Gradient features for pedestrian detection. In simple wo
 - Combine the histogram of gradients from all the cells to make the feature vector
  
 An example of gradient images from an image of a pedestrian (guess who this person is?) is shown below.
-![picture5](https://user-images.githubusercontent.com/29146711/29377682-283c0a94-8282-11e7-8d57-73490e6e55eb.png)
-
+![picture5](https://user-images.githubusercontent.com/29146711/29377799-87ff619c-8282-11e7-97b6-4742c6859b95.png)
 
 It can be seen that it's still easy for a human to tell that it's a pedestrian's image simply by looking at the gradient images.
 The green boxes represent different cells in which we have divided our image into. In this particular example, we are using the most popular 8x8 cells. The blue box represents a block. In this particular example, we have chosen a block size of 4x4 cells.
 An example of computed features of a single 8x8 cell is shown below.
-![picture4](https://user-images.githubusercontent.com/29146711/29377251-df5a4828-8280-11e7-8894-ff98d884ca6a.png)
+![picture4](https://user-images.githubusercontent.com/29146711/29377824-9b7da4d6-8282-11e7-8209-938c5d1bc028.png)
+
 
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
