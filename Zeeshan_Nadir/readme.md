@@ -41,7 +41,7 @@ It can be seen that it's still easy for a human to tell that it's a pedestrian's
 The green boxes represent different cells in which we have divided our image into. In this particular example, we are using the most popular 8x8 cells. The blue box represents a block. In this particular example, we have chosen a block size of 4x4 cells.
 An example of computed features of a single 8x8 cell is shown below.
 ![picture4](https://user-images.githubusercontent.com/29146711/29377824-9b7da4d6-8282-11e7-8209-938c5d1bc028.png)
-
+The matrix on the left hand side represents the direction of the gradient and the matrix on the right hand side represents the corresponding magnitude. In order to get the histogram, we divide the angles in a set number of bins. For example, in the given example, we use 9 bins and each magnitude gradient is assigned to a bin or two based upon their angle. More details about this can be found [here](http://www.learnopencv.com/histogram-of-oriented-gradients/).
 
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
