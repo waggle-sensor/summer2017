@@ -28,6 +28,12 @@ Given an input image, we extract some features that help us discriminate between
 
 ### Feature Extraction
 We use the Histogram of Gradient features for pedestrian detection. In simple words, these features use the information in the edges of the images to distinguish between pedestrian and non-pedestrians. This makes a lot of sense, since for pedestrian images, gradients have a lot of information in them as opposed to smooth images. One could expect a lot of vertical gradients in pedestrian images because of the edges of torso, legs, and arms. Though we shall be using opencv's ``` hog ``` class, however, I think it's instructive to give a brief description of how it works.
+- Compute the gradient of the input image
+- Divide the input image in different cells and Blocks (Blocks are larger than Cells)
+- Compute the a histogram of gradients corresponding to these cells
+- Normalize the histogram of gradients in each cell using the corresponding block
+- Combine the histogram of gradients from all the cells to make the feature vector
+
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
