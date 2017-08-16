@@ -83,6 +83,7 @@ fgmask = fgbg.apply(frame)
 More details about background subtraction can be seen [here](http://docs.opencv.org/3.0-beta/modules/video/doc/motion_analysis_and_object_tracking.html#backgroundsubtractormog2), [here](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html) and [here](https://pythonprogramming.net/mog-background-reduction-python-opencv-tutorial/)
 
 As shown in the figure below, once the background is subtracted, we can separate out the regions in the foreground and try to search pedestrians in the windows around the foreground region. It's important to keep the window around the foreground object a little bit bigger than the actual foreground object to make sure that we don't accidently miss part of the pedestrian.
+
 ![background_subtraction](https://user-images.githubusercontent.com/29146711/29384148-a8732c0e-8298-11e7-8208-8fed09ab559c.png)
 
 ## Pedestrian Tracking using Kalman Filter and Kanade Lucas Tomasi (KLT) Tracker
