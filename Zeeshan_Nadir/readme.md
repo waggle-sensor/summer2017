@@ -82,7 +82,7 @@ fgmask = fgbg.apply(frame)
 ```
 More details about background subtraction can be seen [here](http://docs.opencv.org/3.0-beta/modules/video/doc/motion_analysis_and_object_tracking.html#backgroundsubtractormog2), [here](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html) and [here](https://pythonprogramming.net/mog-background-reduction-python-opencv-tutorial/)
 
-## Pedestrian Tracking using Kalman Filter and KLT Tracker
+## Pedestrian Tracking using Kalman Filter and Kanade Lucas Tomasi (KLT) Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
 
 Following figure shows the workflow of pedestrian detection and tracking problem:
