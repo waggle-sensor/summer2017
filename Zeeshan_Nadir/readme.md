@@ -43,7 +43,16 @@ An example of computed features of a single 8x8 cell is shown below.
 ![picture4](https://user-images.githubusercontent.com/29146711/29377824-9b7da4d6-8282-11e7-8209-938c5d1bc028.png)
 The matrix on the left hand side represents the direction of the gradient and the matrix on the right hand side represents the corresponding magnitude. In order to get the histogram, we divide the angles in a set number of bins. For example, in the given example, we use 9 bins and each magnitude gradient is assigned to a bin or two based upon their angle. More details about this can be found [here](http://www.learnopencv.com/histogram-of-oriented-gradients/). 
 
-All of this can be performed using the opencv library. 
+All of this can be performed using the opencv library functions. Following code snippet gives an example of computing the HOG features for a given image:
+```
+winSize = (64, 128)
+blockSize = (16, 16)
+blockStride = (8, 8)
+cellSize = (8, 8)
+nbins = 9
+hog  = cv2.HOGDescriptor(winSize, blockSize, blockStride, cellSize, nbins)
+h = hog.compute(image)
+```
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
