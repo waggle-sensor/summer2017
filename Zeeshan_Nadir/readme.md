@@ -24,7 +24,6 @@ Generally, a basic object detection problem is defined as finding a given object
 The following block diagram gives a brief overview of pedestrian detection pipeline.
 
 ![picture1](https://user-images.githubusercontent.com/29146711/29368654-fb9db90e-8265-11e7-8ec5-34d1047917e7.png)
-
 Given an input image, we extract some features that help us discriminate between pedestrians/non-pedestrian images. Next, we feed it to our SVM classifier (must be trained by us offline) and then finally we get our decision if it's a pedestrian or not. 
 
 ## Pedestrian Tracking using Kalman Filter and KLT Tracker
