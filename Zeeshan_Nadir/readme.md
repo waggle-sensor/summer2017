@@ -84,7 +84,8 @@ More details about background subtraction can be seen [here](http://docs.opencv.
 
 As shown in the figure below, once the background is subtracted, we can separate out the regions in the foreground and try to search pedestrians in the windows around the foreground region. It's important to keep the window around the foreground object a little bit bigger than the actual foreground object to make sure that we don't accidently miss part of the pedestrian.
 
-![background_subtraction](https://user-images.githubusercontent.com/29146711/29384148-a8732c0e-8298-11e7-8208-8fed09ab559c.png)
+![background_subtraction](https://user-images.githubusercontent.com/29146711/29384202-e1282c16-8298-11e7-807e-c6c3116c81c2.png)
+
 
 ## Pedestrian Tracking using Kalman Filter and Kanade Lucas Tomasi (KLT) Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
