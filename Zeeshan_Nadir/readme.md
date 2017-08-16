@@ -14,10 +14,9 @@ In order to tackle the challenges faced in tracking the pedestrians, pedestrian 
 The rest of the read me documentation is organized as follows:
 1. Pedestrian Detection
 2. Background Subtraction
-3. Kalman Filtering
-4. Kanade Lucas Tomasi (KLT) Tracker
-5. Detection and Tracking Algorithm
-6. Results
+3. Pedestrian Tracking using Kalman Filtering and Kanade Lucas Tomasi (KLT) Tracker
+4. Detection and Tracking Algorithm
+5. Results
 
 ## Pedestrian Detection using HOG Features and Linear SVM
 Generally, a basic object detection problem is defined as finding a given object of interest in any given image of a fixed size. Therefore, given an image of predefined size, the object detector must decide if the image is of the object of interest or not. However, in practice, the size of the object in real images need not be equal to the predefined size, that is, the object can be at different scale levels (zoom levels) inside the image. Moreover, real images can have the objects of interest in any possible location inside the image i.e., at different coordinates inside the image. In order to cope with this, we use a basic object detector and use sliding window and scale space to try to detect objects inside the images. In the context of pedestrian detection, what this means is that given any monocular image that may or may not contain pedestrians, we want to detect pedestrians inside this image and indicate it's location by drawing a (preferably tight) bouding box around the pedestrian. One of the most popular method to detect pedestrians is based on [Histogram of Gradients (HOG)](https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) by Navneet and Dalal. We shall be using HOG in our work to detect pedestrians. 
