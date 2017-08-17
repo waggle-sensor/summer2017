@@ -87,7 +87,7 @@ In order to perform background subtraction, we use opencv's mixture of Gaussians
 fgbg = cv2.createBackgroundSubtractorMOG2()
 fgmask = fgbg.apply(frame)
 ```
-More details about background subtraction can be seen [here](http://docs.opencv.org/3.0-beta/modules/video/doc/motion_analysis_and_object_tracking.html#backgroundsubtractormog2), [here](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html) and [here](https://pythonprogramming.net/mog-background-reduction-python-opencv-tutorial/). Opencv's background subtractor is very versatile and has a lot of builtin funcationlity that can further be explored to further improve the results and the users are encouraged to explore it.
+More details about background subtraction can be seen [here](http://docs.opencv.org/3.0-beta/modules/video/doc/motion_analysis_and_object_tracking.html#backgroundsubtractormog2), [here](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html) and [here](https://pythonprogramming.net/mog-background-reduction-python-opencv-tutorial/). Opencv's background subtractor is very versatile and has a lot of builtin funcationlity that can be explored to further improve the results and the users are encouraged to explore it.
 
 As shown in the figure below, once the background is subtracted, we can separate out the regions in the foreground and try to search pedestrians in the windows around the foreground region. It's important to keep the window around the foreground object a little bit bigger than the actual foreground object to make sure that we don't accidently miss part of the pedestrian.
 
