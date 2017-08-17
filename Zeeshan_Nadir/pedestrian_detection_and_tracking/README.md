@@ -74,5 +74,12 @@ Following is a brief discription about each of these parameters:
 
 - **detectScaleUp** - The factor by which we increase the size of the bounding box around the foreground objects. This is because we want to make sure that we do not miss any part of the pedestrian due to shortcomings of background subtractor. Therefore, we increase the width and height of the bounding box obtained from the background subtractor by a factor of *detectScaleUp* and then detect the pedestrian in relatively larger window.
 
+- **maxSpeed** - The maximum speed in terms of pixels per frame for each of the pedestrians. This is to make sure that none of the pedestrian objects goes astray. *Note that in practice, this parameter should depend on the frame rate of the input capture device and the distance of the pedestrian from the camera.*
+
+- **h_to_w** - The ratio of height to width of the foreground objects that background subtractor gives. We use this parameter to delete all the foreground objects whose height to width ratio is smaller than *h_to_w*. This is because, we expect that typically, the height of pedestrians is more than twice as much their width. We typically set this anywhere between 1.3 to 1.5.
+*This parameter may have to be tweaked a bit or completely taken out if shadows are messing with the suggested proposal regions for finding pedestrians by the background subtractor*
+
+
+
 
 
