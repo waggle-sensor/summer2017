@@ -25,7 +25,7 @@ nbins = 9
 - **cellSize** is to specify the size of each cell over which a histogram of gradients is computed
 - **blockSize** is to specify the size of each block used to normalize all the histograms that fall within this block
 - **blockStride** is to specify the jump that we take to go from one small patch of the image to the next to compute the histograms
-- **nbies** is to specify the number of bins that we use to discretize the ranges of angles/orientation of histograms
+- **nbins** is to specify the number of bins that we use to discretize the ranges of angles/orientation of histograms
 For more details about these parameters, please see [this](http://docs.opencv.org/2.4/modules/gpu/doc/object_detection.html).
 
 Following are the parameters that are used to specify the paths of the input images for training:
@@ -37,5 +37,16 @@ path_of_neg_input_images
 - **path_of_pos_input_images** is used to specify the path of positive training images (images containing pedestrians)
 - **path_of_neg_input_images** is used to specify the path of negative training images (images not containing pedestrians)
 
+
+Following is an outline of this code works:
+
+- Obtains all the positive samples along with it's labels
+- Obtains all the negative samples along with it's labels
+- Concatenates the samples and the labels
+- Trains the SVM model (can use to train both linear and non-linear SVM models)
+- Saves the intial SVM model
+- Finds false positive samples in the negative images
+- Concatenates the false positive samples to the initial samples 
+- Trains a final SVM model and saves it
 
 
