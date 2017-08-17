@@ -32,33 +32,33 @@ Note that, here we are using two different sets of parameters for histogram of g
 
 Other parameters that are being used in this file are given as follows:
 ```
-    # scale factor for reduction of box size for finding initial histogram
-    scaleFac = 0.6
-    # scale factor for detection window size
-    detectScaleUp = 1.6
-    # Maximum speed of each window object (in units of pixels per frame)
-    maxSpeed = 5
-    # height to width ratio to purge windows
-    h_to_w = 1.3
-    # Kernels for morphological operations`
-    kSize = 4
-    kernelO = np.ones((kSize, kSize), np.uint8)
-    kernelC = np.ones((kSize, kSize), np.uint8)
-    # Weight of overlap vs weight of correlation
-    overlapWeightage = 0.9
-    # Overlap threshold
-    overlapThresh = 0.50
-    # Appearance Model Threshold
-    corrThresh = 0.15
-    # Correlation threshold for matching with old windows
-    # corrThreshForOldWins = 0.70
-    # Threshold for discarding new boxes
-    threshForDiscarding = 0.40
-    # Detection Rate in units of frames per detection
-    detectionRate = 10
-    # pixel movement threshold
-    pixelMovThresh = 50
+# scale factor for reduction of box size for finding initial histogram
+scaleFac = 0.6
+# scale factor for detection window size
+detectScaleUp = 1.6
+# Maximum speed of each window object (in units of pixels per frame)
+maxSpeed = 5
+# height to width ratio to purge windows
+h_to_w = 1.3
+# Kernels for morphological operations`
+kSize = 4
+kernelO = np.ones((kSize, kSize), np.uint8)
+kernelC = np.ones((kSize, kSize), np.uint8)
+# Weight of overlap vs weight of correlation
+overlapWeightage = 0.9
+# Overlap threshold
+overlapThresh = 0.50
+# Appearance Model Threshold
+corrThresh = 0.15
+# Correlation threshold for matching with old windows
+# corrThreshForOldWins = 0.70
+# Threshold for discarding new boxes
+threshForDiscarding = 0.40
+# Detection Rate in units of frames per detection
+detectionRate = 10
+# pixel movement threshold
+pixelMovThresh = 50
 
-    # Window deletion factor
-    win_padding = 10
-    ```
+# Window deletion factor
+win_padding = 10
+```
