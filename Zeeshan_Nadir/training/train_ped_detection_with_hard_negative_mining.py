@@ -54,7 +54,7 @@ def preProcess(img):
     img = img[17:145, 17:81, :]
     return img
 
-def collectINRAPosSamples(path_of_input_images, featureLength, hog):
+def collectPosSamples(path_of_input_images, featureLength, hog):
     # path_of_input_images is the path of the input images
     # featureLenght is the length of the features
     # hog is the HOGDescriptor
@@ -72,7 +72,7 @@ def collectINRAPosSamples(path_of_input_images, featureLength, hog):
     return samples
 
 
-def collectINRANegSamples(path_of_input_images, winW, winH, featureLength, hog):
+def collectNegSamples(path_of_input_images, winW, winH, featureLength, hog):
     # path_of_input_images is the path of the input images
     # featureLenght is the length of the features
     # hog is the HOGDescriptor
@@ -150,11 +150,11 @@ def main():
     start = datetime.datetime.now()
     print('Obtaining Positive/Negative Samples for Training ... Please be patient!!!')
     path_of_pos_input_images ='C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\pos'
-    pos_samples = collectINRAPosSamples(path_of_pos_input_images, featureLength, hog)
+    pos_samples = collectPosSamples(path_of_pos_input_images, featureLength, hog)
 
     # Collect negative samples
     path_of_neg_input_images = 'C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\neg\\'
-    neg_samples = collectINRANegSamples(path_of_neg_input_images, winSize[0], winSize[1], featureLength, hog)
+    neg_samples = collectNegSamples(path_of_neg_input_images, winSize[0], winSize[1], featureLength, hog)
 
     # Concatenate negative and positive samples
     samples = np.concatenate((pos_samples, neg_samples))
