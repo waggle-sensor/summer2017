@@ -89,4 +89,7 @@ Following is a brief discription about each of these parameters:
 
 - **detectionRate** - Detection rate for detecting pedestrians. This parameter specifies the number of frames after which we do a detection step for each pedestrian window. Before *detectionRate* number of frames, we keep using KLT tracker.
 
-- **pixelMovThresh** - Pixel move threshold. When we match new pedestran windows to the existing ones, we want to make sure that the motion of pedestrians is not abrupt. Therefore, the parameter *pixelMovThresh* specifies the maximum change in the x and y coordinates of the pedestrians that is allowed.
+- **pixelMovThresh** - Pixel move threshold. When we match new pedestran windows to the existing ones, we want to make sure that the motion of pedestrians is not abrupt. Therefore, the parameter *pixelMovThresh* specifies the maximum change in the x and y coordinates of the pedestrians that is allowed. This parameter may serve a role similar to *overlapThresh* and can be further investigated for it's utility.
+
+- **win_padding** - Window padding. This parameter is used to specify the margin after which we don't consider the foreground object as a valid pedestrian. So as the x, y coordinate of the foreground objects given by background subtractror becomes smaller than *win_padding* or larger than *width - win_padding* or *height - win_padding*, we do not consider these foreground objects. This parameter needs to be investigated more for it's utility.
+
