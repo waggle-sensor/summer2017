@@ -209,11 +209,10 @@ def main():
     # Find the false positives
     print('Finding the False Positives to Perform Hard Negative Mining... Please be patient!!!')
     start = datetime.datetime.now()
-    path_of_neg_images = 'C:\\Users\\Zeeshan Nadir\\Documents\\Argonne\\INRIAPerson\\train_64x128_H96\\neg\\'
     max_num_of_false_pos_per_image = 10
     scale = 1.2
     winStride = (4,4)
-    falsePosSamples, labelsForFalsePosSamples = findFalsePositiveSamples(path_of_neg_images,
+    falsePosSamples, labelsForFalsePosSamples = findFalsePositiveSamples(path_of_neg_input_images,
                                                                          max_num_of_false_pos_per_image, featureLength, scale,
                                                                          winStride, winSize[0], winSize[1], hog, SVM_Object)
 
