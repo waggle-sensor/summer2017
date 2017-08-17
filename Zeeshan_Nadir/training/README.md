@@ -58,7 +58,7 @@ For this file, we need the following python modules:
 
 We also require a user defined module [**ped_detection_utilities**](/Zeeshan_Nadir/training/ped_detection_utilities.py) that has all the utility functions. We also optionally use **tkinter** for the ease of selecting a file from a graphical interface from the local file storage system. 
 
-This code is primarily to test the trained SVM model from [train_ped_detection_with_hard_negative_mining ](/Zeeshan_Nadir/training/train_ped_detection_with_hard_negative_mining.py). As such, this code has the same input parameters for the HOG feature set. Other than that, this code doesn't require any other input parameters. Following is the gernal outline of how this code works:
+This code is primarily to test the trained SVM model for pedestrian detection. As such, this code has the same input parameters for the HOG feature set. Other than that, this code doesn't require any other input parameters. Following is the gernal outline of how this code works:
 
 - Asks to select an input image
 - Obtains an input image to test for pedestrian
