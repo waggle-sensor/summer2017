@@ -29,8 +29,10 @@ nbins = 9
 For more details about these parameters, please see [this](http://docs.opencv.org/2.4/modules/gpu/doc/object_detection.html).
 
 Following are the parameters that are used to specify the paths of the input images for training:
-```path_of_pos_input_images``` 
-```path_of_neg_input_images``` 
+```
+path_of_pos_input_images 
+path_of_neg_input_images
+``` 
 
 -**path_of_pos_input_images** is used to specify the path of positive training images (images containing pedestrians)
 -**path_of_neg_input_images** is used to specify the path of negative training images (images not containing pedestrians)
