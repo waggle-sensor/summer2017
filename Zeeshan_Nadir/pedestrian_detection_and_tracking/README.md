@@ -79,7 +79,10 @@ Following is a brief discription about each of these parameters:
 - **h_to_w** - The ratio of height to width of the foreground objects that background subtractor gives. We use this parameter to delete all the foreground objects whose height to width ratio is smaller than *h_to_w*. This is because, we expect that typically, the height of pedestrians is more than twice as much their width. We typically set this anywhere between 1.3 to 1.5.
 *This parameter may have to be tweaked a bit or completely taken out if shadows are messing with the suggested proposal regions for finding pedestrians by the background subtractor*
 
+- **kSize** - The kernel size. This parameter is used to specify the diameter of the structure element in the morphological operations of erosion and dilation. This parameter can be tweaked depending upon the resolution of the input images and the distance of the pedestrians from the camera.
 
+- **overlapThresh** - Overlap threshold. In order to map new pedestrian windows to old ones, we require a certain amount of threshold. If the overlap area is smaller than the set threshold given by *overlapThresh* then we don't map the existing pedestrian to this new location.
 
+- **corrThresh** - Correlation threshold. In order to map new pedestrian windows to the old onws, we require that their appearance model have similarity more than a set threshold level given by *corrThresh*. When we acquire a new pedestrian window, we take it's color histogram and take a dot product with the existing pedestrians color histogram. This dot product should be more than *corrThresh* for them to be matched.
 
 
