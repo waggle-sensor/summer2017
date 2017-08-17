@@ -93,3 +93,15 @@ Following is a brief discription about each of these parameters:
 
 - **win_padding** - Window padding. This parameter is used to specify the margin after which we don't consider the foreground object as a valid pedestrian. So as the x, y coordinate of the foreground objects given by background subtractror becomes smaller than *win_padding* or larger than *width - win_padding* or *height - win_padding*, we do not consider these foreground objects. This parameter needs to be investigated more for it's utility.
 
+## 2. [**Window.py**](/Zeeshan_Nadir/pedestrian_detection_and_tracking/Window.py)
+This module contains the code for the Window class that we have created to manage all the pedestrians. Each pedestrian is represented by an object of the clas Window. First we describe the attributes of this class and then we shall briefly describe it's important methods.
+
+Following are the parameters related to the Kalman Filter for each pedestrian.
+```
+self.kalman = cv2.KalmanFilter(4, 2)
+self.kalman.measurementMatrix = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], np.float32)
+self.kalman.transitionMatrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)
+self.kalman.processNoiseCov = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32) * 0.03
+self.kalman.measurementNoiseCov = np.array([[1, 0], [0, 1]], np.float32) * 0.0003
+```
+The meaning of each of these parameters is evident from their names. For more details about Kalman filter, see [this](http://docs.opencv.org/trunk/dd/d6a/classcv_1_1KalmanFilter.html).
