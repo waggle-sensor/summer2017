@@ -122,16 +122,13 @@ Other parameters are given as follows:
 - **isWindowMoving** - Boolean variable to keep track of if the pedestrian is moving or not 
 - **ctrWithoutMotion** - Counts the number of frames without getting a measurement from detection or KLT tracker
 - **ctrWithoutMotionThresh** - Threshold for maximum number of frames a pedestrian can go without getting any kind of measurement at all
+- **measurementType** - Variable that changes the color of the centroid of the bounding box to indicate if it is getting updated by a detection, KLT tracker or simply by a prediction. If the pedestrian object gets it's measurement by a detection, we display a blue dot, if it receives measurement by KLT tracker, we use a green dot, if it doesn't receive any measurement and we are simply updating using prediction, then we display a red dot.
 
--**measurementType** - Variable that changes the color of the centroid of the bounding box to indicate if it is getting updated by a detection, KLT tracker or simply by a prediction. If the pedestrian object gets it's measurement by a detection, we display a blue dot, if it receives measurement by KLT tracker, we use a green dot, if it doesn't receive any measurement and we are simply updating using prediction, then we display a red dot.
-
-# KLT properties
-self.tracks = []
-self.countAfterLastDetection = 0
-self.detectCtrThresh = 30
-self.track_len = 1
-self.totalPtsThresh = 3
-self.pixelThreshForPurgingPts = 2
-self.totalPts = 0
-self.initializeCrnrPts(box, scaleFac, frame, frame_gray, feature_params)
-
+Following are the parameters of the window class that pertain to the KLT tracker.
+- **tracks** - This variable stores all the path of the feature points
+-**countAfterLastDetection** - Counter after the last time the pedestrian received a detection
+- **detectCtrThresh** - Threshold after which we stop using a KLT tracker
+- **track_len** - Number of times of the past locations for each feature point
+- **totalPtsThresh** - Minimum number of feature points required in KLT tracker to track the location
+- **pixelThreshForPurgingPts** - This is a parameter used in KLT tracking to get rid of feature points that don't appear to be well tracked
+- **totalPts** - Total number of feature points being tracked
