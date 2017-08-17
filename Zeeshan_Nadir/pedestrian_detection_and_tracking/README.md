@@ -85,4 +85,8 @@ Following is a brief discription about each of these parameters:
 
 - **corrThresh** - Correlation threshold. In order to map new pedestrian windows to the old onws, we require that their appearance model have similarity more than a set threshold level given by *corrThresh*. When we acquire a new pedestrian window, we take it's color histogram and take a dot product with the existing pedestrians color histogram. This dot product should be more than *corrThresh* for them to be matched.
 
+- **threshForDiscarding** - Threshold for discarding new windows. As we acquire each frame, we perform pedestrian detection in the regions where we sensed motion. Now, some of these pedestrians might be new, however, others are just existing pedestrians. We treat all pedestrians as an instance of existing pedestrian if they have an overlap of more than *threshForDiscarding* with any existing pedestrian. 
 
+- **detectionRate** - Detection rate for detecting pedestrians. This parameter specifies the number of frames after which we do a detection step for each pedestrian window. Before *detectionRate* number of frames, we keep using KLT tracker.
+
+- **pixelMovThresh** - Pixel move threshold. When we match new pedestran windows to the existing ones, we want to make sure that the motion of pedestrians is not abrupt. Therefore, the parameter *pixelMovThresh* specifies the maximum change in the x and y coordinates of the pedestrians that is allowed.
