@@ -105,3 +105,32 @@ self.kalman.processNoiseCov = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]
 self.kalman.measurementNoiseCov = np.array([[1, 0], [0, 1]], np.float32) * 0.0003
 ```
 The meaning of each of these parameters is evident from their names. For more details about Kalman filter, see [this](http://docs.opencv.org/trunk/dd/d6a/classcv_1_1KalmanFilter.html).
+
+Other parameters are given as follows:
+
+
+- **w** - Width of the pedestrian bounding box 
+- **h** - Height of the pedestrian bounding box
+- **maxSpeed** - Maximum speed of each window object (in units of pixels per frame)
+- **detectionRate** - Detection rate in units of frames per detection
+- **counter** - Counter for counting the frames for each pedestrian
+- **measurement** - Variable for acquiring measurements from detections or KLT tracker
+- **roiHist** - Variable for Hue and Saturation histogram of the pedestrian
+- **appearanceHist** This variable is similar to *roiHist*, except that it's flattened out as a 1D array
+- **color** - Color of the bounding box of the pedestrian
+- **markForDel** - Boolean variable to delete the current pedestrian
+- **isWindowMoving** - Boolean variable to keep track of if the pedestrian is moving or not 
+- **ctrWithoutMotion** - Counts the number of frames without getting a measurement from detection or KLT tracker
+- **ctrWithoutMotionThresh** - Threshold for maximum number of frames a pedestrian can go without getting any kind of measurement at all
+-**measurementType** - Variable that changes the color of the centroid of the bounding box to indicate if it is getting updated by a detection, KLT tracker or simply by a prediction. If the pedestrian object gets it's measurement by a detection, we display a blue dot, if it receives measurement by KLT tracker, we use a green dot, if it doesn't receive any measurement and we are simply updating using prediction, then we display a red dot.
+
+# KLT properties
+self.tracks = []
+self.countAfterLastDetection = 0
+self.detectCtrThresh = 30
+self.track_len = 1
+self.totalPtsThresh = 3
+self.pixelThreshForPurgingPts = 2
+self.totalPts = 0
+self.initializeCrnrPts(box, scaleFac, frame, frame_gray, feature_params)
+
