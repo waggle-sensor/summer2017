@@ -3,13 +3,14 @@ This readme file explains the different python files in this subdirectory. Parti
 1. [**train_ped_detection_with_hard_negative_mining** ](/Zeeshan_Nadir/training/train_ped_detection_with_hard_negative_mining.py)
 2. [**pedestrian_detector** ](/Zeeshan_Nadir/training/pedestrian_detector.py)
 
-For each of these two files, we need the following python modules:
+
+## 1. [**train_ped_detection_with_hard_negative_mining**](/Zeeshan_Nadir/training/train_ped_detection_with_hard_negative_mining.py)
+For this file, we need the following python modules:
 - **cv2** 
 - **numpy**
 
 We also require a user defined module [**ped_detection_utilities**](/Zeeshan_Nadir/training/ped_detection_utilities.py) that has all the utility functions. We also optionally use **datetime** for timing calculations and **os** for the ease of reading training images from folders.
 
-## 1. [**train_ped_detection_with_hard_negative_mining**](/Zeeshan_Nadir/training/train_ped_detection_with_hard_negative_mining.py)
 This file doesn't receive it's input arguments from command line, although, it's straight forward to modify this file so that it can receive it's input arguments from command lines. There are a few important parameters that need to be specified for this file. We shall describe each of them.
 
 Following are the parameters of the histogram of gradient features. 
@@ -51,8 +52,15 @@ Following is an outline of this code works:
 
 
 ## 2. [**pedestrian_detector**](/Zeeshan_Nadir/training/pedestrian_detector.py)
+For this file, we need the following python modules:
+- **cv2** 
+- **numpy**
+
+We also require a user defined module [**ped_detection_utilities**](/Zeeshan_Nadir/training/ped_detection_utilities.py) that has all the utility functions. We also optionally use **tkinter** for the ease of selecting a file from a graphical interface from the local file storage system. 
+
 This code is primarily to test the trained SVM model from [train_ped_detection_with_hard_negative_mining ](/Zeeshan_Nadir/training/train_ped_detection_with_hard_negative_mining.py). As such, this code has the same input parameters for the HOG feature set. Other than that, this code doesn't require any other input parameters. Following is the gernal outline of how this code works:
 
+- Asks to select an input image
 - Obtains an input image to test for pedestrian
 - Scans the image at multiple scales/zoom levels and at multiple locations to look for pedestrians
 - Uses the trained SVM model to decide if there is a pedestrian or not
