@@ -122,6 +122,7 @@ Other parameters are given as follows:
 - **isWindowMoving** - Boolean variable to keep track of if the pedestrian is moving or not 
 - **ctrWithoutMotion** - Counts the number of frames without getting a measurement from detection or KLT tracker
 - **ctrWithoutMotionThresh** - Threshold for maximum number of frames a pedestrian can go without getting any kind of measurement at all
+
 -**measurementType** - Variable that changes the color of the centroid of the bounding box to indicate if it is getting updated by a detection, KLT tracker or simply by a prediction. If the pedestrian object gets it's measurement by a detection, we display a blue dot, if it receives measurement by KLT tracker, we use a green dot, if it doesn't receive any measurement and we are simply updating using prediction, then we display a red dot.
 
 # KLT properties
