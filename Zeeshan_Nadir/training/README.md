@@ -50,3 +50,11 @@ Following is an outline of this code works:
 - Trains a final SVM model and saves it
 
 
+## 2. [**pedestrian_detector**](/Zeeshan_Nadir/training/pedestrian_detector.py)
+This code is primarily to test the trained SVM model from [train_ped_detection_with_hard_negative_mining ](/Zeeshan_Nadir/training/train_ped_detection_with_hard_negative_mining.py). As such, this code has the same input parameters for the HOG feature set. Other than that, this code doesn't require any other input parameters. Following is the gernal outline of how this code works:
+
+- Obtains an input image to test for pedestrian
+- Scans the image at multiple scales/zoom levels and at multiple locations to look for pedestrians
+- Uses the trained SVM model to decide if there is a pedestrian or not
+- Uses the opencv's builtin pedestrian detector model as well to give a comparison
+- Shows the images of detected pedestrians for both these models in separate windows
