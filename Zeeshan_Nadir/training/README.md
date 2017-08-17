@@ -34,7 +34,8 @@ path_of_pos_input_images
 path_of_neg_input_images
 ``` 
 
--**path_of_pos_input_images** is used to specify the path of positive training images (images containing pedestrians)
--**path_of_neg_input_images** is used to specify the path of negative training images (images not containing pedestrians)
+- **path_of_pos_input_images** is used to specify the path of positive training images (images containing pedestrians)
+- **path_of_neg_input_images** is used to specify the path of negative training images (images not containing pedestrians)
+
 
 
