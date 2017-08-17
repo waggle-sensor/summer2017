@@ -18,7 +18,7 @@ The rest of the read me documentation is organized as follows:
 4. Detection and Tracking Algorithm
 5. Results
 
-## Pedestrian Detection using HOG Features and Linear SVM
+## 1. Pedestrian Detection using HOG Features and Linear SVM
 Generally, a basic object detection problem is defined as finding a given object of interest in any given image of a fixed size. Therefore, given an image of predefined size, the object detector must decide if the image is of the object of interest or not. However, in practice, the size of the object in real images need not be equal to the predefined size, that is, the object can be at different scale levels (zoom levels) inside the image. Moreover, real images can have the objects of interest in any possible location inside the image i.e., at different coordinates inside the image. In order to cope with this, we use a basic object detector and use sliding window and scale space to try to detect objects inside the images. In the context of pedestrian detection, what this means is that given any monocular image that may or may not contain pedestrians, we want to detect pedestrians inside this image and indicate it's location by drawing a (preferably tight) bouding box around the pedestrian. One of the most popular method to detect pedestrians is based on [Histogram of Gradients (HOG)](https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) by Navneet and Dalal. We shall be using HOG in our work to detect pedestrians. 
 
 The following block diagram gives a brief overview of pedestrian detection pipeline.
@@ -78,7 +78,7 @@ One possible would be to work with small window size from the very beginning, ho
 The above figure shows that we detect pedestrians first using a larger window size. If the pedestrian to be detected is smaller than the large window size, we then switch to a smaller window size. In this particular example, we tried to detect the pedestrian in black shirt and we are able to detect him using a smaller window size. Another example of this can be seen in the following example.
 ![small_window_detector](https://user-images.githubusercontent.com/29146711/29387908-fd20fbd2-82a7-11e7-92b3-9613daa3828d.png)
 
-## Background Subtraction
+## 2. Background Subtraction
 In practice, however, performing detection on each of the input video frames may be computationally prohibitive to yield real time processing results. Therefore, we use an additional preprocessing step of [Background Subtraction](http://docs.opencv.org/3.1.0/db/d5c/tutorial_py_bg_subtraction.html). This removes all the background clutter from the video frame, thereby helping us focus computations on the regions in the image belonging to the foreground. In other words, as we process each of the incoming frames of the video, we only focus on regions where we have motion, thereby, essentially not spending computations on regions that do not have motion. Fruther, in order to improve performance, we can disregard motion regions that are very small e.g., motion of a dog or leave, or motion regions that are extremely large e.g., motion of a large truck or a random illumination change due to lightning etc. This is done by using opencv's mixture of Gaussians based background detector. 
 
 In simple words, this works by maintaining a running model for the background where each pixels is assumed to have a Gaussian mixture distribution. When we encoutner some pixel that cannot be explained by model, we declare that it's a foreground pixel. Following code snippet gives a brief example of how this can be done in opencv:
@@ -94,7 +94,7 @@ As shown in the figure below, once the background is subtracted, we can separate
 ![background_subtraction](https://user-images.githubusercontent.com/29146711/29384202-e1282c16-8298-11e7-807e-c6c3116c81c2.png)
 
 
-## Pedestrian Tracking using Kalman Filter and Kanade Lucas Tomasi (KLT) Tracker
+## 3. Pedestrian Tracking using Kalman Filter and Kanade Lucas Tomasi (KLT) Tracker
 A tracking problem by nature works with video signals. Generally, a basic tracking problem is defined as tracking a fixed object inside a video signal. In practice, however, we may want to track multiple objects that may or may not get occluded due to each other or due to other objects that are part of the scene of the video. There are many different approaches to track objects in videos including Point Tracking e.g., [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter), Kernel Tracking e.g., [Kanade Lucas Tomasi (KLT) Tracker](https://en.wikipedia.org/wiki/Kanade%E2%80%93Lucas%E2%80%93Tomasi_feature_tracker), and Silhouette Tracking e.g., shape and contour based models. In this work, we shall be using Kalman Filtering and KLT tracking to track pedestrians. Though these methods are not new, however, the important challenge comes in how we combine these two tracking methods to have a robust tracking mechanism that gives good performance while still being in the realm of real time processing. 
 
 Following figure shows the workflow of pedestrian detection and tracking problem:
@@ -127,5 +127,5 @@ An example of KLT tracker in working is shown in the figure below:
 
 Here we are able to detect two pedestrians in this video so far. The dots on each of the pedestrians represent the feature points that we have selected of the pedestrians. As the pedestrians would move from one frame to the next, so shall the dots move and we shall use their collective motion to capture the direction.
 
-## Putting this together
+## 4. Detection and Tracking Algorithm
 
