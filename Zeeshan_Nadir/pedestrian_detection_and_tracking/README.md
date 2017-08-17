@@ -34,31 +34,45 @@ Other parameters that are being used in this file are given as follows:
 ```
 # scale factor for reduction of box size for finding initial histogram
 scaleFac = 0.6
+
 # scale factor for detection window size
 detectScaleUp = 1.6
+
 # Maximum speed of each window object (in units of pixels per frame)
 maxSpeed = 5
+
 # height to width ratio to purge windows
 h_to_w = 1.3
 # Kernels for morphological operations`
+
 kSize = 4
-kernelO = np.ones((kSize, kSize), np.uint8)
-kernelC = np.ones((kSize, kSize), np.uint8)
 # Weight of overlap vs weight of correlation
 overlapWeightage = 0.9
+
 # Overlap threshold
 overlapThresh = 0.50
+
 # Appearance Model Threshold
 corrThresh = 0.15
-# Correlation threshold for matching with old windows
-# corrThreshForOldWins = 0.70
+
 # Threshold for discarding new boxes
 threshForDiscarding = 0.40
+
 # Detection Rate in units of frames per detection
 detectionRate = 10
+
 # pixel movement threshold
 pixelMovThresh = 50
 
 # Window deletion factor
 win_padding = 10
 ```
+
+Following is a brief discription about each of these parameters:
+
+- **scaleFac** - The reduction in size of the box around the pedestrian to get the color histogram of the pedestrian. This is because, typically, the bounding box almost always have some background area as well. By descreasing it's width and height by a scale factor, we make sure that we mostly use the region that falls inside the body of the pedestrian.
+
+- **detectScaleUp** - The factor by which we increase the size of the bounding box around the foreground objects. This is because we want to make sure that we do not miss any part of the pedestrian due to shortcomings of background subtractor. Therefore, we increase the width and height of the bounding box obtained from the background subtractor by a factor of *detectScaleUp* and then detect the pedestrian in relatively larger window.
+
+
+
