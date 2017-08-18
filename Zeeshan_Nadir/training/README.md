@@ -66,3 +66,6 @@ This code is primarily to test the trained SVM model for pedestrian detection. A
 - Uses the trained SVM model to decide if there is a pedestrian or not
 - Uses the opencv's builtin pedestrian detector model as well to give a comparison
 - Shows the images of detected pedestrians for both these models in separate windows
+
+
+Note: The trained XML files can be found on DropBox.
