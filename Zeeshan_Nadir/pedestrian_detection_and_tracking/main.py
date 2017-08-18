@@ -171,7 +171,7 @@ def main():
         for i, win in enumerate(list_of_windows):
             list_of_windows[i].correct(pixelMovThresh, frame_HSV, corrThresh,
                                        scaleFac, overlapThresh, win_W, win_H, frame, hog, detectScaleUp, overlapWeightage,
-                                       prev_gray, frame_gray, lk_params, feature_params, frame_width, frame_height)
+                                       prev_gray, frame_gray, lk_params, feature_params, frame_width, frame_height, win_padding)
 
 
         # ------------------------------------ Delete all the mapped new boxes ----------------------------------
@@ -186,9 +186,7 @@ def main():
         # ------------------------------------------------------------------------------------------------------
 
 
-        # ----------------------------------------- Purge Kalman windows -------------------------------------------
-        if len(list_of_windows) >= 1:
-            track.purgeAllKalmanWindowsForDeletion(list_of_windows, frame_width, frame_height, win_padding)
+        # ----------------------------------------- Delete Purged Kalman windows -------------------------------------------
         for win in list_of_windows:
             if win.markForDel is True:
                 list_of_windows.remove(win)
