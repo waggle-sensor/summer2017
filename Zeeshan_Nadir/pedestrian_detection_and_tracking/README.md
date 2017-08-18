@@ -139,5 +139,7 @@ Following are the most notable methods of the class Window:
 
 - **correct** - This function is used to correct the location of the pedestrians by incorporating a measurement either by a detection or KLT tracker.
 
+- **detectPedestrianInCurrentWindow** - This function is used to detect pedestrians in the current window of the pedestrians. We expand the current window slightly by a factor *detectScaleUp* and try to look for the pedestrian in this window. This happens after a set number of frames (*detectionRate*) have passed.
 
-To get more details about the algorithm used to track pedestrians, please see this [documentation](/Zeeshan_Nadir/readme.md)
+
+To get more details about the algorithm used to track pedestrians, please see the section on Detection and Tracking of this [documentation](/Zeeshan_Nadir/readme.md)
