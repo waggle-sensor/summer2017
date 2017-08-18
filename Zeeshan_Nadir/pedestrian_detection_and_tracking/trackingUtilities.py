@@ -78,6 +78,7 @@ def mapMotionToCurrentWindows(list_of_current_windows, list_of_new_boxes, pixelM
 
 
 
+# This function could be used to delete extra bounding boxes on the same pedestrian
 def deleteOverlappingOldWindows(windows, thresh):
     indices_to_delete = set()
     totalOldWindows = len(windows)
@@ -90,8 +91,8 @@ def deleteOverlappingOldWindows(windows, thresh):
                 continue
     return indices_to_delete
 
-
-def giveContours(ctrs, frame_area, frame_width, frame_height, h_to_w, win_padding, lowerThreshForArea, upperThreshForArea):
+# This function is used to get a a list of bounding boxes from all the foreground objects
+def giveBoundingBoxes(ctrs, frame_area, frame_width, frame_height, h_to_w, win_padding, lowerThreshForArea, upperThreshForArea):
     list_of_new_boxes = list()
     # ------------------------------------------- Find Contours ------------------------------------
     for c in ctrs:
@@ -108,16 +109,6 @@ def giveContours(ctrs, frame_area, frame_width, frame_height, h_to_w, win_paddin
         list_of_new_boxes.append((cx, cy, w, h))
         #cv2.rectangle(frame, (x-10, y-10), (x + w, y + h), (24, 200, 100), 2)
     return list_of_new_boxes
-
-
-def purgeAllKalmanWindowsForDeletion(list_of_windows, frame_width, frame_height, win_padding):
-    for i, win in enumerate(list_of_windows):
-        cx = win.kalman.statePost[0]
-        cy = win.kalman.statePost[1]
-        if centerOutsideFrame (cx, cy, frame_width, frame_height, win_padding):
-            win.markForDel = True
-        elif win.ctrWithoutMotion > win.ctrWithoutMotionThresh:
-            win.markForDel = True
 
 def centerOutsideFrame (cx, cy, frame_width, frame_height, win_padding=0):
     if (cx <= win_padding or cx >= frame_width - win_padding) \
