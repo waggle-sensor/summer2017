@@ -1,5 +1,5 @@
 # Pedestrian Detection and Tracking using Kalman Filter and KLT Tracker
-(*Note that this documentation is specifically explains the work presented in the folder [pedestrian_detection_and_tracking](/Zeeshan_Nadir/pedestrian_detection_and_tracking)*)
+(*Note that this documentation is specifically explains the work presented in the folder [pedestrian_detection_and_tracking](/Zeeshan_Nadir/pedestrian_detection_and_tracking). Although [pedestrian_detection_and_tracking](/Zeeshan_Nadir/pedestrian_detection_and_tracking) has a documentation of it's own, however, this README file explains the projection from a broader perspective.*)
 
 ## Introduction
 Pedestrian detection and tracking is an important problem in the field of computer vision and is still being researched. Similar it may sound, but pedestrian detection and tracking are two separate problems. In this description, I shall discuss both the two problems, give a brief literature survey and then describe the approach that I have taken to tackle these problems. I shall then provide a unified framework for pedestrian detection and tracking in real time video sequences.
