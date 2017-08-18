@@ -167,7 +167,7 @@ class Window:
 
     def correct(self, pixelMovThresh, frame_HSV, corrThresh, scaleFac, overlapThresh,
                 winW, winH, frame, hog, detectScaleUp, overlapWeightage, prev_gray, frame_gray, lk_params,
-                feature_params, frame_width, frame_height):
+                feature_params, frame_width, frame_height, win_padding):
         if self.measurement is not None:
             self.correct_with_new_motion(self.measurement)
             self.initializeCrnrPts(self.measurement, scaleFac, frame, frame_gray, feature_params)
@@ -202,7 +202,7 @@ class Window:
                 self.measurementType = 2
 
         self.clipSpeed()
-
+        self.purgeAllKalmanWindowsForDeletion(self, frame_width, frame_height, win_padding)
     def detectPedestrianInCurrentWindow(self, winW, winH, frame, frame_HSV, scaleFac, pixelMovThresh, corrThresh, overlapThresh,
                                         overlapWeightage, hog, detectScaleUp, frame_width, frame_height):
         measurement = None
@@ -231,6 +231,13 @@ class Window:
                 measurement = np.array([[box[0]], [box[1]], [box[2]], [box[3]]], dtype=np.float32)
         return measurement
 
+    def purgeAllKalmanWindowsForDeletion(self, frame_width, frame_height, win_padding):
+        cx = self.kalman.statePost[0]
+        cy = self.kalman.statePost[1]
+        if track.centerOutsideFrame(cx, cy, frame_width, frame_height, win_padding):
+            self.markForDel = True
+        elif self.ctrWithoutMotion > self.ctrWithoutMotionThresh:
+            self.markForDel = True
 
     def resetMotion(self):
         self.isWindowMoving = False
