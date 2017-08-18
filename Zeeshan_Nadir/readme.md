@@ -17,6 +17,8 @@ The rest of the read me documentation is organized as follows:
 3. Pedestrian Tracking using Kalman Filtering and Kanade Lucas Tomasi (KLT) Tracker
 4. Detection and Tracking Algorithm
 5. Results
+6. Future Work
+
 
 ## 1. Pedestrian Detection using HOG Features and Linear SVM
 Generally, a basic object detection problem is defined as finding a given object of interest in any given image of a fixed size. Therefore, given an image of predefined size, the object detector must decide if the image is of the object of interest or not. However, in practice, the size of the object in real images need not be equal to the predefined size, that is, the object can be at different scale levels (zoom levels) inside the image. Moreover, real images can have the objects of interest in any possible location inside the image i.e., at different coordinates inside the image. In order to cope with this, we use a basic object detector and use sliding window and scale space to try to detect objects inside the images. In the context of pedestrian detection, what this means is that given any monocular image that may or may not contain pedestrians, we want to detect pedestrians inside this image and indicate it's location by drawing a (preferably tight) bouding box around the pedestrian. One of the most popular method to detect pedestrians is based on [Histogram of Gradients (HOG)](https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf) by Navneet and Dalal. We shall be using HOG in our work to detect pedestrians. 
@@ -142,6 +144,9 @@ The question remains that how do we map a new pedestrian in frame n to the exist
 The figure below gives an example of the color histogram of a pedestrian from two nearby frames. 
 ![color_histogram](https://user-images.githubusercontent.com/29146711/29423606-fef8a7bc-8341-11e7-86b5-5add85eaa386.png)
 It can be seen that the two histograms appear to be similar. Note that, we initialize the apppearance model only at the beginning of initializing our pedestrian object and later, we only compare the new appearance of the pedestrian (i.e., the new color histogram of the pedestrian based on current location) with the initial color histogram. We can also re-initialize the color histogram with new detections to improve perfromance, but hasn't been implemented here.
+
+## Results
+The results of detection and tracking can be found on the dropbox page.
 
 ## Future Work
 There is a great deal of room for improvement in both detection and tracking parts of this project. Two of the important future directions that I would like to mention are given as follows:
