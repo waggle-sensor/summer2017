@@ -5,12 +5,14 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Instance Variables
 BOARDNAME = '04A3E2BD29' # name of the board
 CHEMICAL = 'NO2' # chemical (either IRR, IAQ, SO2, H2S, OZO, NO2, or CMO)
 INSTANTTEMP = 26.0 # the temperature at the moment of measurement
 INSTANTCURRENT = 2492 # the current at the moment of measurement
+# Calibration Parameters
+directory = "./Chemsense_Spec_Data.xlsx" # directory of the sensor data
 ZEROTEMP = 25.0 # initial temperature
-directory = "C:/Users/Caeley/Documents/Argonne/Code/Chemsense_Spec_Data.xlsx" # directory of the sensor data
 
 # creates a dataset and opens the excel sensor data
 db = dataset.connect()
