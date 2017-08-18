@@ -51,7 +51,7 @@ def main():
     # Overlap threshold
     overlapThresh = 0.50
     # Appearance Model Threshold
-    corrThresh = 0.15
+    corrThresh = 0.10
     # Correlation threshold for matching with old windows
     # corrThreshForOldWins = 0.70
     # Threshold for discarding new boxes
@@ -93,7 +93,7 @@ def main():
     #frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # Video Writer object
-    #out = cv2.VideoWriter(".\\data\\results11.avi", -1, fps, (frame_width, frame_height))
+    out = cv2.VideoWriter(".\\data\\results12.avi", -1, fps, (frame_width, frame_height))
 
     # create background subtraction object
     fgbg = cv2.createBackgroundSubtractorMOG2()
@@ -107,7 +107,7 @@ def main():
         if frame is None:
             break
 
-        if counter ==2000:
+        if counter ==1000:
             break
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -196,7 +196,7 @@ def main():
 
         # ---------------------------------------------------------------------------------------------------------
 
-        # -------------------------------- Delete outgoing window and plot the rest -----------------------------------
+        # -------------------------------- Plot the Windows -----------------------------------
         for i, win in enumerate(list_of_windows):
             cx = win.kalman.statePost[0]
             cy = win.kalman.statePost[1]
@@ -206,16 +206,15 @@ def main():
                 x = int(cx - win.w / 2)
                 y = int(cy - win.h / 2)
                 cv2.rectangle(frame, (x, y), (x + win.w, y + win.h), win.color, 2)
-                win.resetMotion()
                 if win.measurementType==0:
-                    cv2.circle(frame, (cx, cy), 2, (255,0,0), thickness=2)
+                    cv2.circle(frame, (cx, cy), 2, (255, 0, 0), thickness=2)
                 elif win.measurementType==1:
                     cv2.circle(frame, (cx, cy), 2, (0, 255, 0), thickness=2)
                 elif win.measurementType==2:
                     cv2.circle(frame, (cx, cy), 2, (0, 0, 255), thickness=2)
         # ------------------------------------------------------------------------------------------------------
         prev_gray = frame_gray
-        #out.write(frame)
+        out.write(frame)
         cv2.imshow('Video', frame)
         cv2.waitKey(1)
         # ---------------------------------------------------------------------------------------------------------
