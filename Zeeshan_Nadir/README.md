@@ -150,10 +150,13 @@ It can be seen that the two histograms appear to be similar. Note that, we initi
 The results of detection and tracking can be found on the dropbox page.
 
 ## 6. Future Work
-There is a great deal of room for improvement in both detection and tracking parts of this project. Two of the important future directions that I would like to mention are given as follows:
+There is a great deal of room for improvement in both detection and tracking parts of this project. Some of the important future directions that I would like to mention are given as follows:
 
 ### Correction for warping
 In some cases, the pedestrian images may appear warped because of their relative pose with the camera. In order to increase the performance of detection, corrections could be applied for this warping.
 
 ### OpenCV's [detectMultiScale](http://docs.opencv.org/2.4/modules/gpu/doc/object_detection.html#gpu-hogdescriptor-detectmultiscale) function with Custom SVM Classifier
 Even though I trained my own custom SVM classifier for detecting people using histogram of gradient features, however, right now, I am using opencv's [detectMultiScale](http://docs.opencv.org/2.4/modules/gpu/doc/object_detection.html#gpu-hogdescriptor-detectmultiscale) function with it's own built in classifier. The reason for not using my own classifier is purely performance. This is because if I use my own classifier, I have to traverse the scale space and slide the window across frames entirely in python. Whereas in case of [detectMultiScale](http://docs.opencv.org/2.4/modules/gpu/doc/object_detection.html#gpu-hogdescriptor-detectmultiscale) presumably uses optimized pre-compiled binaries to do the same. Therefore, it would be interesting to set the builtin classifier of the HOGDescriptor object such that it uses your own custom trained classifer. I tried to do this using a few online solutions, but for some reason, it appears that it's not possible to do this in python. However, it seems there must be a way around it and if so, we can use our own custom trained classifier with the [detectMultiScale](http://docs.opencv.org/2.4/modules/gpu/doc/object_detection.html#gpu-hogdescriptor-detectmultiscale) function.
+
+### Better Appearance Model
+Right now, I am using Hue and Saturation histogram for each pedestrian as their apperance model. However, more research can be done to find some better appearance models for pedestrians that can then be incorporated in this project and easily maintain a history of pedestrians. This will help in recovering the identity of pedestrian that was lost due to occlusion or a missed detection.
