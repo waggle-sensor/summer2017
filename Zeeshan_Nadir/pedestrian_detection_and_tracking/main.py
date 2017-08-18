@@ -128,7 +128,7 @@ def main():
         # ------------------------------------------------------------------------------------------------------
 
         # ---------------------------------- Get the list of new boxes -------------------------------------------
-        list_of_new_boxes = track.giveContours(contours, frame_area, frame_width, frame_height, h_to_w, win_padding,
+        list_of_new_boxes = track.giveBoundingBoxes(contours, frame_area, frame_width, frame_height, h_to_w, win_padding,
                                          0.003/100, 20/100)
 
 
