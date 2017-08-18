@@ -1,7 +1,7 @@
 # *DS18B20 Sensor*
 ## Part I. General Overview
 ### What is the DS18B20?
-
+   
   * 1-Wire Digital Thermometer
   * Measures Temperatures from -55°C to +125°C
   * Must be used with a pull up resistor with a value of around 4.7 kΩ
