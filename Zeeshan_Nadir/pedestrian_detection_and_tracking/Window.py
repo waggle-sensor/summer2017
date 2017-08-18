@@ -54,19 +54,17 @@ class Window:
 
         # Indicate to delete the window
         self.markForDel = False
-        # Keep track of the motion of this window
-        self.isWindowMoving = True
         # Times without a motion measurement and corresponding threshold
         self.ctrWithoutMotion = 0
         # Maximum no. of predictions without getting a detection
-        self.ctrWithoutMotionThresh = 35
+        self.ctrWithoutMotionThresh = 60
 
         self.measurementType = None
 
         # KLT properties
         self.tracks = []
         self.countAfterLastDetection = 0
-        self.detectCtrThresh = 30
+        self.detectCtrThresh = 45
         self.track_len = 1
         self.totalPtsThresh = 3
         self.pixelThreshForPurgingPts = 2
@@ -103,6 +101,7 @@ class Window:
                 #cv2.circle(frame, (x, y), 2, self.color, -1)
         self.totalPts = len(self.tracks)
 
+    # This function is used to track the KLT feature points. This is used to feed the measurements to the Kalman filter.
     def trackCrnrPts(self, frame, scaleFac, prev_gray, frame_gray, lk_params):
         if self.countAfterLastDetection < self.detectCtrThresh and self.totalPts > self.totalPtsThresh:
             p0 = np.float32([tr[-1] for tr in self.tracks]).reshape(-1, 1, 2)
@@ -126,7 +125,7 @@ class Window:
                 if len(tr) > self.track_len:
                     del tr[0]
                 new_tracks.append(tr)
-                cv2.circle(frame, (x, y), 2, self.color, -1)
+                #cv2.circle(frame, (x, y), 2, self.color, -1)
             self.tracks = new_tracks
 
             d = np.zeros((2), dtype=np.float32)
@@ -160,7 +159,6 @@ class Window:
     def correct_with_new_motion(self, measurement):
         self.w = int(measurement[2])
         self.h = int(measurement[3])
-        self.isWindowMoving = True
         self.ctrWithoutMotion = 0
         self.kalman.correct(measurement[0:2])
 
@@ -188,7 +186,6 @@ class Window:
                     self.measurementType = 1
                 else:
                     self.ctrWithoutMotion = self.ctrWithoutMotion + 1
-                    self.isWindowMoving = False
                     self.measurementType = 2
         else:
             measurement = self.trackCrnrPts(frame, scaleFac, prev_gray, frame_gray, lk_params)
@@ -198,11 +195,14 @@ class Window:
             else:
                 # self.correct_with_color(pixelMovThresh, frame_HSV, corrThresh, scaleCam)
                 self.ctrWithoutMotion = self.ctrWithoutMotion + 1
-                self.isWindowMoving = False
                 self.measurementType = 2
 
         self.clipSpeed()
-        self.purgeAllKalmanWindowsForDeletion(self, frame_width, frame_height, win_padding)
+        self.purgeAllKalmanWindowsForDeletion(frame_width, frame_height, win_padding)
+
+    # This function is used to detect pedestrians in the current window of the pedestrians.
+    # We expand the current window slightly by a factor detectScaleUp
+    # and try to look for the pedestrian in this window. This happens after a set number of frames (detectionRate) have passed.
     def detectPedestrianInCurrentWindow(self, winW, winH, frame, frame_HSV, scaleFac, pixelMovThresh, corrThresh, overlapThresh,
                                         overlapWeightage, hog, detectScaleUp, frame_width, frame_height):
         measurement = None
@@ -238,9 +238,6 @@ class Window:
             self.markForDel = True
         elif self.ctrWithoutMotion > self.ctrWithoutMotionThresh:
             self.markForDel = True
-
-    def resetMotion(self):
-        self.isWindowMoving = False
 
     def clipSpeed(self):
         if self.kalman.statePost[2] < -self.maxSpeed:
