@@ -13,8 +13,13 @@
 [Original Source](https://randomnerdtutorials.com/guide-for-soil-moisture-sensor-yl-69-or-hl-69-with-the-arduino/)
 ### Connection Images
 ![image of YL-69 connection](https://github.com/charihara/Experimental_Sensors/blob/master/Images/YL69_Connection_1.JPG)
+
 The YL-69 soil moisture sensor is hooked up as a voltage divider. For more information about voltage dividers and examples, see:
-[Documentation detailing how to setup and read data from the Particle Photon can be found here.](https://github.com/charihara/Experimental_Sensors/blob/master/Photon_Instructions.md)
+[Voltage Divider Explanation.](https://en.wikipedia.org/wiki/Voltage_divider)
+
+[Voltage Divider Example (Ohm Meter).](http://www.circuitbasics.com/arduino-ohm-meter/)
+
+[Voltage Divider Example (FSR).](https://learn.adafruit.com/force-sensitive-resistor-fsr/using-an-fsr)
 ### Working Logic / Functionality
 #### Output
 
@@ -25,9 +30,7 @@ The YL-69 soil moisture sensor is hooked up as a voltage divider. For more infor
 ## Part II. Waggle Specific
 ### Application
 #### How does my sensor work with a Particle Photon?
-[Voltage Divider Explanation.](https://en.wikipedia.org/wiki/Voltage_divider)
-[Voltage Divider Example (Ohm Meter).](http://www.circuitbasics.com/arduino-ohm-meter/)
-[Voltage Divider Example (FSR).](https://learn.adafruit.com/force-sensitive-resistor-fsr/using-an-fsr)
+[Documentation detailing how to setup and read data from the Particle Photon can be found here.](https://github.com/charihara/Experimental_Sensors/blob/master/Photon_Instructions.md)
 
 #### How does my sensor work with a Particle Electron?
 [Documentation detailing how to setup and read data from the Particle Electron can be found here.](https://github.com/charihara/Experimental_Sensors/blob/master/Electron_Instructions.md)
