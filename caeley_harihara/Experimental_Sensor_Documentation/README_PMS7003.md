@@ -2,7 +2,7 @@
 ## Part I. General Overview
 ### What is the PMS7003?
 
-  * Airborne particulate matter sensor
+  * Airborne particulate matter sensor  
   * Senses based on the principle of laser scattering 
   * Requires a 5V power supply 
   * Detects fine particulate matter (width of particles < 2.5 microns)
