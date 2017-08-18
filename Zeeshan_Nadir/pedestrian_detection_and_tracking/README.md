@@ -147,4 +147,4 @@ Following are the most notable methods of the class Window:
 
 The rest of the two files [trackingUtilities](/Zeeshan_Nadir/pedestrian_detection_and_tracking/trackingUtilities.py) and [imageProcUtilities](/Zeeshan_Nadir/pedestrian_detection_and_tracking/imageProcUtilities.py) are self explanatory and have comments in them to explain the purpose of different functions.
 
-To get more details about the algorithm used to track pedestrians, please see the section on Detection and Tracking of this [documentation](/Zeeshan_Nadir/readme.md)
+To get more details about the algorithm used to track pedestrians, please see the section on Detection and Tracking of this [documentation](/Zeeshan_Nadir/readme.md).
