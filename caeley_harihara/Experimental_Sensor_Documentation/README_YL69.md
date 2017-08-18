@@ -14,7 +14,8 @@
 ### Connection Images
 ![image of YL-69 connection](https://github.com/charihara/Experimental_Sensors/blob/master/Images/YL69_Connection_1.JPG)
 
-The YL-69 soil moisture sensor is hooked up as a voltage divider. For more information about voltage dividers and examples, see:
+The YL-69 sensor is hooked up as a voltage divider. For more information about voltage dividers and examples, see:
+
 [Voltage Divider Explanation.](https://en.wikipedia.org/wiki/Voltage_divider)
 
 [Voltage Divider Example (Ohm Meter).](http://www.circuitbasics.com/arduino-ohm-meter/)
