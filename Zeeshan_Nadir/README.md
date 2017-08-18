@@ -146,10 +146,10 @@ The figure below gives an example of the color histogram of a pedestrian from tw
 ![color_histogram](https://user-images.githubusercontent.com/29146711/29423606-fef8a7bc-8341-11e7-86b5-5add85eaa386.png)
 It can be seen that the two histograms appear to be similar. Note that, we initialize the apppearance model only at the beginning of initializing our pedestrian object and later, we only compare the new appearance of the pedestrian (i.e., the new color histogram of the pedestrian based on current location) with the initial color histogram. We can also re-initialize the color histogram with new detections to improve perfromance, but hasn't been implemented here.
 
-## Results
+## 5. Results
 The results of detection and tracking can be found on the dropbox page.
 
-## Future Work
+## 6. Future Work
 There is a great deal of room for improvement in both detection and tracking parts of this project. Two of the important future directions that I would like to mention are given as follows:
 
 ### Correction for warping
