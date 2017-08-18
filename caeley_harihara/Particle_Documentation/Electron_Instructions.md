@@ -1,4 +1,4 @@
-# *Electron Instructions* 
+# *Electron Instructions*  
 ## NOTE: If you have never used an electron before, follow the instructions on this link: https://docs.particle.io/guide/getting-started/connect/electron/ to install the Particle CLI
 
 ## Connecting to the Electron
