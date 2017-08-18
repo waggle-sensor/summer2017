@@ -141,5 +141,8 @@ Following are the most notable methods of the class Window:
 
 - **detectPedestrianInCurrentWindow** - This function is used to detect pedestrians in the current window of the pedestrians. We expand the current window slightly by a factor *detectScaleUp* and try to look for the pedestrian in this window. This happens after a set number of frames (*detectionRate*) have passed.
 
+- **initializeCrnrPts** - This function initialize the KLT feature points around the body of the pedestrian whenever we perform a detection.
+
+-**trackCrnrPts** - This function is used to track the KLT feature points. This is used to feed the measurements to the Kalman filter.
 
 To get more details about the algorithm used to track pedestrians, please see the section on Detection and Tracking of this [documentation](/Zeeshan_Nadir/readme.md)
