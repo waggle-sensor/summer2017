@@ -68,4 +68,4 @@ This code is primarily to test the trained SVM model for pedestrian detection. A
 - Shows the images of detected pedestrians for both these models in separate windows
 
 
-Note: The trained XML files can be found on DropBox.
+Note: The trained XML files corresponding to the SVM classifier for pedestrian detection can be found on DropBox.
