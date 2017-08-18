@@ -133,5 +133,11 @@ Following are the parameters of the window class that pertain to the KLT tracker
 - **pixelThreshForPurgingPts** - This is a parameter used in KLT tracking to get rid of feature points that don't appear to be well tracked
 - **totalPts** - Total number of feature points being tracked
 
-Following are the most notable methods of the class Window
+Following are the most notable methods of the class Window:
+
 - **predict** - This function is used to predict the location of the pedestrian. It helps in smoothing out the trajectory of the pedestrians as well as keeping track of the motion when we don't have a detection or KLT tracker based measurement available for the pedestrians.
+
+- **correct** - This function is used to correct the location of the pedestrians by incorporating a measurement either by a detection or KLT tracker.
+
+
+To get more details about the algorithm used to track pedestrians, please see this [documentation](/Zeeshan_Nadir/readme.md)
