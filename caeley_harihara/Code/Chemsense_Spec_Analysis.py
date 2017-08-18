@@ -1,3 +1,4 @@
+# Analyzes and Plots Chemical data from SpecSensors (to be used in conjunction with Chemsense_Spec_Data.xlsx
 import dataset
 import xlrd
 import math
