@@ -75,8 +75,8 @@ After training the SVM classifier with HOG features, the next natural step is to
 ![picture6](https://user-images.githubusercontent.com/29146711/29382250-98ef552a-8291-11e7-9ca2-a9dc95562f02.png)
 
 ### Heirarchy of detectors
-We know that if the pedestrian in the image is too big, we can downsample the image to fit the pedestrians in our standard window size (e.g., 128x64). However, what to do if the pedestrian's size is too small? For example, how do we detect a pedestrianm whose size is 64x32? 
-One possible would be to work with small window size from the very beginning, however, that would limit the accuracy of classifier since we are working in a lower dimensional space and 64x32 pixels are not enough to display a pedestrian well. Therefore, we use a combination of detectors as shown in the following figure. 
+We know that if the pedestrian in the image is too big, we can downsample the image to fit the pedestrians in our standard window size (e.g., 128x64). However, what to do if the pedestrian's size is too small? For example, how do we detect a pedestrian whose size is 64x32? 
+One possibility would be to work with small window size from the very beginning, however, that would limit the accuracy of classifier since we are working in a lower dimensional space and 64x32 pixels are not enough to display a pedestrian well. Therefore, we use a combination of detectors as shown in the following figure. 
 ![hierarchy_of_pedestrians](https://user-images.githubusercontent.com/29146711/29387846-a3686b3e-82a7-11e7-841b-80e18d3a00e0.png)
 The above figure shows that we detect pedestrians first using a larger window size. If the pedestrian to be detected is smaller than the large window size, we then switch to a smaller window size. In this particular example, we tried to detect the pedestrian in black shirt on top right of the image and we are able to detect him using a smaller window size. Another example of this can be seen in the following figure.
 ![small_window_detector](https://user-images.githubusercontent.com/29146711/29387908-fd20fbd2-82a7-11e7-92b3-9613daa3828d.png)
