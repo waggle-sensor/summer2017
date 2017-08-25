@@ -66,18 +66,18 @@ From that a mask is created called isWaterFound. After that, I crop the edges be
 This testFullVid() function is called from inside moduleE(). What moduleE() does, is runs testFullVid() `numVids` amount of times and it will create a final mask where each pixel will be classified as whichever classification was the majority when it ran testFullVid()`numVids` times.
 
 
-Tl;dr
-To run the classifier, all you must do is run moduleE() with the correct parameters. Can do in scratch.py
-•	Vidpath – (string) path to the test video or 0 (int)
-•	Maskpath - (string) path to the test mask or 0 (int) if you don’t have a mask
-•	outputFolder – (string) path to folder where you want the resulting images to output or use “/”to have images output in the current directory (path must exist)
-•	numFrames – (int) must be 200 (what current classifier is set to)
-•	dFactor – (int) amount of times you want to downsample image (2 is recommended)
-•	densityMode – (int) whether density mode is active or direct is activated (0 is recommended – direct mode)
-•	boxSize – (int) size of kernel to smooth image
-•	patchSize – (int) size of 2-D patch where the Local Binary Pattern will be calculated and histogram taken of
-•	numFramesAvg – (int) number of frames of size patchSize which the histogram will be taken of
-•	numVids – (int) number of times you want to compute the mask so that you can take the majority amount of pixels
+Tl;dr  
+To run the classifier, all you must do is run moduleE() with the correct parameters. Can do in scratch.py  
+•	Vidpath – (string) path to the test video or 0 (int)  
+•	Maskpath - (string) path to the test mask or 0 (int) if you don’t have a mask  
+•	outputFolder – (string) path to folder where you want the resulting images to output or use “/”to have images output in the current directory (path must exist)  
+•	numFrames – (int) must be 200 (what current classifier is set to)  
+•	dFactor – (int) amount of times you want to downsample image (2 is recommended)  
+•	densityMode – (int) whether density mode is active or direct is activated (0 is recommended – direct mode)  
+•	boxSize – (int) size of kernel to smooth image  
+•	patchSize – (int) size of 2-D patch where the Local Binary Pattern will be calculated and histogram taken of  
+•	numFramesAvg – (int) number of frames of size patchSize which the histogram will be taken of  
+•	numVids – (int) number of times you want to compute the mask so that you can take the majority amount of pixels  
 
 
 
