@@ -34,11 +34,11 @@ This will direct you to your home directory.
 
 This will bring you insde the VNE repoistory you cloned on your local machine.
 
-`docker build -t waggle-node-controller-base:2.6.0-pre1 -f dockerfiles/waggle-node-controller-base .`
+`docker build -t waggle-node-controller-base:0.3 -f dockerfiles/waggle-node-controller-base .`
 
-`docker build -t waggle-edge-processor-base:2.6.0-pre1 -f dockerfiles/waggle-edge-processor-base .`
+`docker build -t waggle-edge-processor-base:0.3 -f dockerfiles/waggle-edge-processor-base .`
 
-`docker build -t waggle-node-controller:2.6.0-pre1 -f dockerfiles/waggle-node-controller .`
+`docker build -t waggle-node-controller:2.6.0-pre1 -f dockerfiles/waggle-node-controller --build-arg branch=develop --build-arg server_host=10.10.10.5 .`
 
 This will build the pre-exisiting node images before creating your virtual environment.
 
