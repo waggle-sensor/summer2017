@@ -34,6 +34,14 @@ This will direct you to your home directory.
 
 This will bring you insde the VNE repoistory you cloned on your local machine.
 
+`docker build -t waggle-node-controller-base:2.6.0-pre1 -f dockerfiles/waggle-node-controller-base .`
+
+`docker build -t waggle-edge-processor-base:2.6.0-pre1 -f dockerfiles/waggle-edge-processor-base .`
+
+`docker build -t waggle-node-controller:2.6.0-pre1 -f dockerfiles/waggle-node-controller .`
+
+This will build the pre-exisiting node images before creating your virtual environment.
+
 `docker build -t waggle-vne-image:2.6.0-pre1 -f dockerfiles/waggle-vne-image .`
 
 Execute this following docker build command to build your image from the waggle-vne-image dockerfile.
@@ -44,7 +52,7 @@ Runnning this command will provide you the list of docker images on your local m
 
 
 
-# Creaing the Docker Container
+# Creating the Docker Container
 The following section will describe a sample example of how to create your container(s) to run the coresense plugin virtually, when a coresense board is conected to you local machine.
 
 The following information presented below is an instance of how to use this tool in a certain way. This tool can be used to preform other actions, a node would preform, virtually.
