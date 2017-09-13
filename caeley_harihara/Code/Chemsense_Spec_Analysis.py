@@ -1,18 +1,16 @@
-# Analyzes and Plots Chemical data from SpecSensors (to be used in conjunction with Chemsense_Spec_Data.xlsx)
 import dataset
 import xlrd
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Instance Variables
-BOARDNAME = '04A3E2BD29' # name of the board
-CHEMICAL = 'NO2' # chemical (either IRR, IAQ, SO2, H2S, OZO, NO2, or CMO)
-INSTANTTEMP = 26.0 # the temperature at the moment of measurement
-INSTANTCURRENT = 2492 # the current at the moment of measurement
-# Calibration Parameters
-directory = "./Chemsense_Spec_Data.xlsx" # directory of the sensor data
+# BOARDNAME = '04A3E2BD29' # name of the board
+# CHEMICAL = 'NO2' # chemical (either IRR, IAQ, SO2, H2S, OZO, NO2, or CMO)
+# INSTANTTEMP = 26.0 # the temperature at the moment of measurement
+# INSTANTCURRENT = 2492 # the current at the moment of measurement
 ZEROTEMP = 25.0 # initial temperature
+directory = "C:/Users/Caeley/Documents/Argonne/Code/Chemsense_Spec_Data.xlsx" # directory of the sensor data
+
 
 # creates a dataset and opens the excel sensor data
 db = dataset.connect()
@@ -40,38 +38,62 @@ for rownum in range(sheet.nrows):
         H2S_Sensitivity = rowValues[18], OZO_Sensitivity = rowValues[19],
         NO2_Sensitivity = rowValues[20], CMO_Sensitivity = rowValues[21]))
 
-# finds the baseline current and m time-constant based on the name of the board
-# and the given chemical
-results = table.find(board = BOARDNAME)
-for row in results:
-    baseline = (row[CHEMICAL + '_baseline'])
-    MValue = (row[CHEMICAL + '_M'])
-    sensitivity = (row[CHEMICAL + '_Sensitivity'])
+# function returns the PPM
+def PPM(BOARDNAME, CHEMICAL, INSTANTTEMP, INSTANTCURRENT):
+    results = table.find(board = BOARDNAME)
+    # finds the baseline current and m time-constant based on the name of the
+    # board and the given chemical
+    for row in results:
+        baseline = (row[CHEMICAL + '_baseline'])
+        MValue = (row[CHEMICAL + '_M'])
+        sensitivity = (row[CHEMICAL + '_Sensitivity'])
 
-baseline = float(baseline)
-MValue = float(MValue)
-sensitivity = float(sensitivity)
+    baseline = float(baseline)
+    MValue = float(MValue)
+    sensitivity = float(sensitivity)
 
-# calculates the value of the corrected current
-# ICORRECTED = INSTANTCURRENT - baseline * math.exp((INSTANTTEMP - ZEROTEMP)/MValue)
-
-ICorrectedList = []
-for i in range(-40, 45):
-    INSTANTTEMP = i
+    # calculates and returns the value of the PPM (rounds to the nearest hundredth)
     if MValue == 'INFINITY':
         ICORRECTED = INSTANTCURRENT - baseline #if the M value is infinity, the exponent dissapears
     else:
         ICORRECTED = INSTANTCURRENT - baseline * math.exp((INSTANTTEMP - ZEROTEMP)/MValue)
-    toAppend = ICORRECTED/sensitivity
-    ICorrectedList.append(toAppend)
 
-ICorrectedArray = np.array(ICorrectedList)
-TempArray = np.array(range(-40,45))
+    return(str(round(ICORRECTED/sensitivity, 2)))
 
-plt.xlabel('Temperature')
-plt.ylabel('ICorrected')
-plt.title('Temperature vs ICorrected')
-plt.grid(True)
-plt.plot(TempArray, ICorrectedArray)
-# plt.savefig("testGraph.png")
-plt.show()
+# print(PPM('04A3E2BD29', 'NO2', 26.0, 2492))
+
+#function plots PPM vs. Temperature
+def plot(BOARDNAME, CHEMICAL, INSTANTCURRENT):
+    results = table.find(board = BOARDNAME)
+    for row in results:
+        baseline = (row[CHEMICAL + '_baseline'])
+        MValue = (row[CHEMICAL + '_M'])
+        sensitivity = (row[CHEMICAL + '_Sensitivity'])
+
+    baseline = float(baseline)
+    MValue = float(MValue)
+    sensitivity = float(sensitivity)
+
+    ICorrectedList = []
+    for i in range(-40, 45):
+        INSTANTTEMP = i
+        if MValue == 'INFINITY':
+            ICORRECTED = INSTANTCURRENT - baseline #if the M value is infinity, the exponent dissapears
+        else:
+            ICORRECTED = INSTANTCURRENT - baseline * math.exp((INSTANTTEMP - ZEROTEMP)/MValue)
+        toAppend = ICORRECTED/sensitivity
+        ICorrectedList.append(toAppend)
+
+    ICorrectedArray = np.array(ICorrectedList)
+    TempArray = np.array(range(-40,45))
+
+    plt.xlabel('Temperature')
+    plt.ylabel('PPM')
+    plt.title('Temperature vs PPM')
+    plt.grid(True)
+    plt.plot(TempArray, ICorrectedArray)
+    # plt.savefig("testGraph.png")
+    plt.show()
+
+# plot('04A3E2BD29', 'CMO', 2492)
+
