@@ -114,3 +114,37 @@ void loop()
 [Particle to Beehive dev source code](https://github.com/JordanFleming/sensor_documentation/blob/master/Particle_to_Beehive_plugin)
 ### Waggle-space ID
 [Sensor ID Table](https://github.com/JordanFleming/sensor_documentation/blob/master/Sensor_IDs.md)
+
+
+## Physical Connection with Metsense Board: 
+
+Purchase sensor woth breakout board and F-F breakout wire from [AliExpress ](https://www.aliexpress.com/item/1-set-Laser-PM2-5-PMS7003-G7-High-precision-laser-dust-concentration-sensor-digital-dust-particles/32826370928.html)
+
+### Breakout Board ATtachement to PM7003:
+
+*Insert Header Attachment to Sensor Picture*
+*Insert Wire Attachment to Sensor Here* 
+
+### Connection Mods: 
+
+The 8-wide wire above has to be converted to a 4 wire attachment to connect to the Metsense Board on **Ports 3V3RS (data) and 5E5G (power)**. This port 
+provides 5 V power and uses 3.3V logic for RS-232 communication. It is attached to **Serial 2** interface on the ARM processor. 
+
+```
+1. Purple -- VCC --- Red Wire to Metsense, PIN 2 of 5E5G
+2. Orange -- GND --- Black Wire to Metsense, PIN 1 of 5E5G
+3. White -- Setup --- Add 10K resistor and connecet to VCC
+4. Blue -- RX --- Blue Wire to TX on Metsense, PIN 3 of 3V3RS
+5. Green -- TX --- Green Wire to RX on Metsense, PIN 2 of 3V3RS
+6. Yellow -- RST --- Short to Setup (White Above)
+7. Black --- NC
+8. Red --- NC
+```
+
+### Metsense Board Attachment:
+```
+Put 2 PIN header on PIN 2,3 of 3V3RS
+Put 2 PIN heder on PIN 1,2 of 5E5G
+```
+
+Length of wire-bundle nedeed : 10 inches from One female end to another. 
