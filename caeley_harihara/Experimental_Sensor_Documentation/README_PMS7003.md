@@ -127,7 +127,7 @@ Purchase sensor woth breakout board and F-F breakout wire from [AliExpress ](htt
 
 ### Connection Mods: 
 
-The 8-wide wire above has to be converted to a 4 wire attachment to connect to the Metsense Board on **Ports 5V5RS (data and power)**. This port provides 5 V power and uses 5V logic for RS-232 communication. It is attached to **Serial 2** interface on the ARM processor. 
+The 8-wide wire above has to be converted to a 4 wire attachment to connect to the Metsense Board on **Port 5V5RS (data and power)**. This port provides 5 V power and uses 3V logic for RS-232 communication. It is attached to **Serial 2** interface on the ARM processor. 
 
 ```
 1. Purple -- VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
