@@ -142,8 +142,8 @@ provides 5 V power and uses 3.3V logic for RS-232 communication. It is attached 
 ```
 
 ### Metsense Board Attachment:
+Use all four pins of 5V5RS:
 ```
-Use all four pins of 5V5RS
 GND --- Black Wire to Metsense, PIN 1 of 5V5RS
 TX --- Green Wire to RX on Metsense, PIN 2 of 5V5RS
 RX --- Blue Wire to TX on Metsense, PIN 3 of 5V5RS
