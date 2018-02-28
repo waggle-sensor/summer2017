@@ -131,11 +131,11 @@ The 8-wide wire above has to be converted to a 4 wire attachment to connect to t
 provides 5 V power and uses 3.3V logic for RS-232 communication. It is attached to **Serial 2** interface on the ARM processor. 
 
 ```
-1. Purple -- VCC --- Red Wire to Metsense, PIN 2 of 5E5G
-2. Orange -- GND --- Black Wire to Metsense, PIN 1 of 5E5G
+1. Purple -- VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
+2. Orange -- GND --- Black Wire to Metsense, PIN 1 of 5V5RS
 3. White -- Setup --- Add 10K resistor and connecet to VCC
-4. Blue -- RX --- Blue Wire to TX on Metsense, PIN 3 of 3V3RS
-5. Green -- TX --- Green Wire to RX on Metsense, PIN 2 of 3V3RS
+4. Blue -- RX --- Blue Wire to TX on Metsense, PIN 3 of 5V5RS
+5. Green -- TX --- Green Wire to RX on Metsense, PIN 2 of 5V5RS
 6. Yellow -- RST --- Short to Setup (White Above)
 7. Black --- NC
 8. Red --- NC
@@ -143,8 +143,11 @@ provides 5 V power and uses 3.3V logic for RS-232 communication. It is attached 
 
 ### Metsense Board Attachment:
 ```
-Put 2 PIN header on PIN 2,3 of 3V3RS
-Put 2 PIN heder on PIN 1,2 of 5E5G
+Use all four pins of 5V5RS
+GND --- Black Wire to Metsense, PIN 1 of 5V5RS
+TX --- Green Wire to RX on Metsense, PIN 2 of 5V5RS
+RX --- Blue Wire to TX on Metsense, PIN 3 of 5V5RS
+VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
 ```
 
 Length of wire-bundle nedeed : 10 inches from One female end to another. 
