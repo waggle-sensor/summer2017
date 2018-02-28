@@ -11,8 +11,10 @@
 ### Datasheet
 [PMS 7003 Datasheet](https://github.com/charihara/Experimental_Sensors/blob/master/Datasheets/PMS_7003_Datasheet.pdf)
 ### Connection Images
-![image of PMS7003 pinout](https://github.com/charihara/Experimental_Sensors/blob/master/Images/PMS7003_pin_out.jpg)
-![image of PMS7003 connection](https://github.com/charihara/Experimental_Sensors/blob/master/Images/7003_Connection_Diagram.JPG)
+
+<img src="./Images/PMS7003_pin_out.jpg" width=400 />
+<img src="./Images/7003_Connection_Diagram.JPG" width=400 />
+
 ### Working Logic / Functionality
 #### Output
 
@@ -120,14 +122,17 @@ void loop()
 
 Purchase sensor woth breakout board and F-F breakout wire from [AliExpress ](https://www.aliexpress.com/item/1-set-Laser-PM2-5-PMS7003-G7-High-precision-laser-dust-concentration-sensor-digital-dust-particles/32826370928.html)
 
-### Breakout Board ATtachement to PM7003:
+#### Breakout Board Attachement to PM7003:
 
-*Insert Header Attachment to Sensor Picture*
-*Insert Wire Attachment to Sensor Here* 
+The figure below shows the attachment of the breakout board to the PMS7003 sensor. 
+
+
+<img src="./Images/PMS7003_HeaderConnection.jpeg" width=400 />
 
 ### Connection Mods: 
 
 The 8-wide wire above has to be converted to a 4 wire attachment to connect to the Metsense Board on **Port 5V5RS (data and power)**. This port provides 5 V power and uses 3V logic for RS-232 communication. It is attached to **Serial 2** interface on the ARM processor. 
+The red and black wires from the header above are snipped. 
 
 ```
 1. Purple -- VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
@@ -148,5 +153,11 @@ TX --- Green Wire to RX on Metsense, PIN 2 of 5V5RS
 RX --- Blue Wire to TX on Metsense, PIN 3 of 5V5RS
 VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
 ```
+The figure below shows the attachment of the PMS7003 cable to Metsense. 
 
-Length of wire-bundle nedeed : 10 inches from One female end to another. 
+<img src="./Images/PMS7003_BoardAttachment.jpeg" width=400 />
+
+**Length of wire-bundle nedeed : 10 inches end-to-end. **
+
+
+
