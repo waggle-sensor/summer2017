@@ -131,7 +131,7 @@ void loop()
 The figure below shows the attachment of the breakout board to the PMS7003 sensor. 
 
 
-<img src="./Images/PMS7003_HeaderConnection.jpeg" width=400 />
+<img src="./Images/PMS7003_HeaderConnection.jpeg" width=600 />
 
 ### Connection Mods: 
 
@@ -162,7 +162,7 @@ VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
 ```
 The figure below shows the attachment of the PMS7003 cable to Metsense. 
 
-<img src="./Images/PMS7003_BoardAttachment.jpeg" width=400 />
+<img src="./Images/PMS7003_BoardAttachment.jpeg" width=600 />
 
 **Length of wire-bundle nedeed : 10 inches end-to-end. **
 
