@@ -120,7 +120,7 @@ void loop()
 
 ## Physical Connection with Metsense Board: 
 #### Parts:
- - Sensor with breakout board and F-F breakout wire from [AliExpress ](https://www.aliexpress.com/item/1-set-Laser-PM2-5-PMS7003-G7-High-precision-laser-dust-concentration-sensor-digital-dust-particles/32826370928.html)
+ - Sensor with breakout board and F-F breakout wire from AliExpress [PMS7003](https://www.aliexpress.com/item/1-set-Laser-PM2-5-PMS7003-G7-High-precision-laser-dust-concentration-sensor-digital-dust-particles/32826370928.html)
  - Breakout Wires from Digikey - [1568-1588-ND](https://www.digikey.com/product-detail/en/sparkfun-electronics/PRT-09390/1568-1588-ND/5993852)
  - 10K Resistor from Digikey - [CF14JT10K0CT-ND](https://www.digikey.com/product-detail/en/stackpole-electronics-inc/CF14JT10K0/CF14JT10K0CT-ND/1830374)
  
