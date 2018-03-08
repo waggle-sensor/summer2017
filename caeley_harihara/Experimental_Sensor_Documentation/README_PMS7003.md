@@ -134,6 +134,9 @@ The figure below shows the attachment of the breakout board to the PMS7003 senso
 The 8-wide wire above has to be converted to a 4 wire attachment to connect to the Metsense Board on **Port 5V5RS (data and power)**. This port provides 5 V power and uses 3V logic for RS-232 communication. It is attached to **Serial 2** interface on the ARM processor. 
 The red and black wires from the header above are snipped. 
 
+<img src="./Images/PMS7003-MetsenseWiring.svg" width=600 />
+
+
 ```
 1. Purple -- VCC --- Red Wire to Metsense, PIN 4 of 5V5RS
 2. Orange -- GND --- Black Wire to Metsense, PIN 1 of 5V5RS
