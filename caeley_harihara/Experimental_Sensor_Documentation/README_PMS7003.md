@@ -131,7 +131,7 @@ void loop()
 The figure below shows the attachment of the breakout board to the PMS7003 sensor. 
 
 
-<img src="./Images/PMS7003_HeaderConnection.jpeg" width=600 />
+<img src="./Images/PMS7003_HeaderConnection.jpeg" width=400 />
 
 ### Connection Mods: 
 
